@@ -1,0 +1,148 @@
+/* style.css — FULL FILE (keep your existing CSS if you want, but this is safe to paste as full file)
+   Includes: smooth transitions + emergency red accent.
+*/
+:root{
+  --navy:#243e56;
+  --bg:#0b1220;
+  --card:#121a2a;
+  --border:rgba(255,255,255,.08);
+  --text:#e9eef7;
+  --muted:#aab6c6;
+  --accent:#4aa3ff;
+  --danger:#ff4d4d;
+  --radius:18px;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:linear-gradient(180deg,#070c16 0%, #0b1220 55%, #070c16 100%);
+  color:var(--text);
+}
+
+/* Topbar */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 14px;
+  background:rgba(8,12,22,.85);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.topbar__title{font-weight:800; letter-spacing:.2px}
+.topbar__reset{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:999px;
+}
+
+/* Layout */
+.app{max-width:980px; margin:0 auto; padding:14px 14px 90px}
+.view{display:block}
+.h1{font-size:28px; margin:16px 2px 6px; font-weight:900}
+.p-muted{margin:0 2px 12px; color:var(--muted)}
+
+/* Cards */
+.card{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
+  margin:12px 0;
+}
+.card__title{font-weight:900; margin-bottom:10px}
+.card--output{
+  border-left:6px solid rgba(74,163,255,.55);
+  transition:border-left-color .25s ease;
+}
+
+/* Emergency accent (Flow view only) */
+#view-flow.is-emergency .card--output{
+  border-left-color: rgba(255,77,77,.75);
+}
+#view-flow.is-emergency .seg__btn.is-on{
+  outline:2px solid rgba(255,77,77,.35);
+}
+
+/* Segmented controls */
+.seg{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.seg__btn{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  padding:16px 14px;
+  border-radius:16px;
+  font-weight:800;
+  font-size:18px;
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+}
+.seg__btn:active{transform:scale(.98)}
+.seg__btn.is-on{
+  background:rgba(74,163,255,.14);
+  border-color:rgba(74,163,255,.35);
+  color:var(--text);
+}
+
+/* Output content */
+.output__title{
+  font-weight:900;
+  font-size:18px;
+  margin-bottom:10px;
+}
+.output__ul{
+  margin:0;
+  padding-left:18px;
+  line-height:1.4;
+  font-size:18px;
+}
+.output__ul li{margin:10px 0}
+
+/* Transition effect for updates */
+.is-updating{
+  opacity:.65;
+  transform:translateY(4px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+/* Safety net */
+.safety{
+  color:var(--text);
+  font-size:16px;
+  line-height:1.35;
+}
+
+/* Bottom nav */
+.bottomnav{
+  position:fixed; left:0; right:0; bottom:0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  padding:10px 10px 14px;
+  background:rgba(8,12,22,.9);
+  border-top:1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+.bottomnav__btn{
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  padding:12px 10px;
+  border-radius:14px;
+  font-weight:900;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+.bottomnav__btn.is-on{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.14);
+  color:var(--text);
+}
