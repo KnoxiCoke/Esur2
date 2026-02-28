@@ -68,7 +68,17 @@
     <h1 class="h1">Switching Assistant</h1>
     <p class="p-muted">Select the involved contrast agent.</p>
 
+    <!-- NEW: CM TYPE TOGGLE (ICM vs GBCA) -->
     <div class="card">
+      <div class="card__title">Contrast type</div>
+      <div class="seg">
+        <button class="seg__btn is-on" data-seg="cmtype" data-value="icm">ICM (CT)</button>
+        <button class="seg__btn" data-seg="cmtype" data-value="gbca">GBCA (MRI)</button>
+      </div>
+    </div>
+
+    <!-- ICM CARD (existing, unchanged) -->
+    <div class="card" id="icmCard">
       <div class="card__title">ICM (Iodine-based)</div>
       <div class="seg">
         <button class="seg__btn" data-seg="icm" data-value="A">Group A</button>
@@ -76,6 +86,17 @@
         <button class="seg__btn" data-seg="icm" data-value="C">Group C</button>
         <button class="seg__btn" data-seg="icm" data-value="D">Group D</button>
         <button class="seg__btn" data-seg="icm" data-value="unknown">Unknown</button>
+      </div>
+    </div>
+
+    <!-- NEW: GBCA CARD -->
+    <div class="card" id="gbcaCard" hidden>
+      <div class="card__title">GBCA (Macrocyclic)</div>
+      <div class="seg">
+        <button class="seg__btn" data-seg="gbca" data-value="A">Group A</button>
+        <button class="seg__btn" data-seg="gbca" data-value="B">Group B</button>
+        <button class="seg__btn" data-seg="gbca" data-value="C">Group C</button>
+        <button class="seg__btn" data-seg="gbca" data-value="unknown">Unknown</button>
       </div>
     </div>
 
