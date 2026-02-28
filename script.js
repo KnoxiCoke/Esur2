@@ -1,445 +1,395 @@
-// script.js — FULL FILE (for your exact HTML)
-// Features:
-// - Flow recommendation is fully dynamic (Elective/Emergency + Moderate/Mild)
-// - Switch assistant includes "Unknown" logic + full text blocks (ICM + GBCA note)
-// - Tryptase calculator works (formula + interpretation)
-// - NIHR/SCAR checkbox logic works (dynamic warning)
-// - Smooth auto-scroll to outputs + soft transitions
-// - Emergency visual accent in Flow (red accent)
-
 (() => {
   const state = {
     nav: "flow",
-    situation: "elective", // elective | emergency
-    reaction: "moderate",  // moderate | mild
-    icm: null,             // A | B | C | D | unknown
+    situation: "elective",   // elective | emergency
+    reaction: "moderate",    // moderate | mild
+    cmtype: "icm",           // icm | gbca
+    icm: null,               // A|B|C|D|unknown
+    gbca: null,              // A|B|C|unknown
+    baseline: "",
+    acute: ""
   };
 
-  const $ = (s) => document.querySelector(s);
+  const $  = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // ---------- FLOW CONTENT ----------
-  const FLOW = {
-    elective: {
-      moderate: {
+  const views = ["flow", "switch", "tryptase", "nihr"];
+
+  // ---------------- CONTENT ----------------
+  function flowRecommendation() {
+    const s = state.situation;
+    const r = state.reaction;
+
+    if (s === "elective" && r === "moderate") {
+      return {
         title: "Elective imaging — prior moderate/severe IHR",
         bullets: [
           "Postpone examination.",
           "Await allergy evaluation results.",
           "Prefer allergist-recommended alternative.",
-          "Observe ≥ 30 min with IV access.",
-        ],
-      },
-      mild: {
-        title: "Elective imaging — prior mild/unclear reaction",
-        bullets: [
-          "Proceed if clinically necessary; assess risk/benefit and follow local protocol.",
-          "Prefer an alternative contrast agent when feasible (allergist-guided switch preferred).",
-          "Routine premedication is not recommended.",
-          "Consider observation ≥ 30 min with IV access if concern or history suggests higher risk.",
-        ],
-      },
-    },
-    emergency: {
-      moderate: {
+          "Observe ≥ 30 min with IV access."
+        ]
+      };
+    }
+
+    if (s === "emergency" && r === "moderate") {
+      return {
         title: "Emergency imaging — prior moderate/severe IHR",
         bullets: [
           "Ensure rapid response/resuscitation capability is available nearby.",
           "Choose a different CM (prefer different structural group).",
           "Premedication: optional only in severe HR with unknown culprit (emergency scenario).",
-          "Observe ≥ 30 min with IV access.",
-        ],
-      },
-      mild: {
-        title: "Emergency imaging — prior mild/unclear reaction",
-        bullets: [
-          "Ensure rapid response/resuscitation capability is available nearby.",
-          "Prefer a different CM (prefer different structural group).",
-          "Premedication is not routine; consider only if justified by urgency and local protocol.",
-          "Observe ≥ 30 min with IV access if concern.",
-        ],
-      },
-    },
-  };
+          "Observe ≥ 30 min with IV access."
+        ]
+      };
+    }
 
-  // ---------- SWITCHING ASSISTANT ----------
-  // Text is intentionally explicit (minimizes “interpretation” and copy/paste errors)
-  const SWITCH_ICM = {
+    if (s === "elective" && r === "mild") {
+      return {
+        title: "Elective imaging — prior mild/unclear reaction",
+        bullets: [
+          "Clarify reaction history if possible (timing, symptoms, agent).",
+          "Prefer a different CM (different structural group) when feasible.",
+          "Consider allergy referral if reactions recur or involve multiple agents.",
+          "Observe ≥ 30 min with IV access if risk is uncertain."
+        ]
+      };
+    }
+
+    return {
+      title: "Emergency imaging — prior mild/unclear reaction",
+      bullets: [
+        "Proceed if clinically necessary; ensure capability to manage acute reactions.",
+        "Prefer a different CM (different structural group) when feasible.",
+        "Premedication is not routine; consider only case-by-case.",
+        "Observe ≥ 30 min with IV access if risk is uncertain."
+      ]
+    };
+  }
+
+  // ICM (ESUR grouping logic + your desired unknown text)
+  const ICM_TEXT = {
     A: {
-      title: "ICM involved: Group A",
-      text: [
-        "Alternative ICM from Group B or D (without classic carbamoyl sidechain).",
-        "High cross-reactivity between Group A–Group C.",
-      ],
+      headline: "ICM is from Group A",
+      rec: "Choose an alternative ICM from Group B or D.",
+      note: "Classic carbamoyl side chain. Cross-reactivity patterns are variable."
     },
     B: {
-      title: "ICM involved: Group B",
-      text: [
-        "Alternative ICM from Group A, C or D.",
-      ],
+      headline: "ICM is from Group B",
+      rec: "Choose an alternative ICM from Group A, C or D.",
+      note: "No classic carbamoyl side chain."
     },
     C: {
-      title: "ICM involved: Group C",
-      text: [
-        "Alternative ICM from Group B (without classic or methyl-modified carbamoyl sidechain).",
-      ],
+      headline: "ICM is from Group C",
+      rec: "Choose an alternative ICM from Group B (preferred) or D.",
+      note: "Methyl-modified carbamoyl side chain. High cross-reactivity with Group A can occur."
     },
     D: {
-      title: "ICM involved: Group D",
-      text: [
-        "Alternative ICM from Group A or B (without methyl-modified carbamoyl sidechain).",
-      ],
+      headline: "ICM is from Group D",
+      rec: "Choose an alternative ICM from Group A or B.",
+      note: "Two methyl-modified carbamoyl side chains."
     },
     unknown: {
-      title: "ICM involved: Unknown",
-      text: [
-        "Due to the higher likelihood that the involved ICM is from group A:",
-        "Choose the alternative ICM from Group B or D.",
-        "High cross-reactivity between Group C–Group A.",
-      ],
+      headline: "When the involved ICM is unknown",
+      rec: "Due to the higher likelihood that the involved ICM is from Group A: choose the alternative ICM from Group B or D.",
+      note: "High cross-reactivity between Group C and Group A."
+    }
+  };
+
+  // GBCA (macrocyclic groups + your desired unknown text)
+  const GBCA_TEXT = {
+    A: {
+      headline: "GBCA is from Group A (DOTA chelate)",
+      rec: "Prefer switching to Group B when feasible.",
+      note: "Cross-reactivity among macrocyclic GBCAs can be substantial; testing preferred."
     },
+    B: {
+      headline: "GBCA is from Group B (DO3A variants)",
+      rec: "Prefer switching to Group A when feasible.",
+      note: "Cross-reactivity among macrocyclic GBCAs can be substantial; testing preferred."
+    },
+    C: {
+      headline: "GBCA is from Group C (Pyclen chelate)",
+      rec: "Prefer switching to Group A or B when feasible.",
+      note: "Data are more limited; specialist guidance preferred."
+    },
+    unknown: {
+      headline: "When the involved GBCA is unknown",
+      rec: "It is not possible to recommend a regimen with certainty. Due to the probability of involvement, using a GBCA different from the one routinely administered is suggested.",
+      note: "Allergy testing and specialist advice are preferred whenever feasible."
+    }
   };
 
-  // GBCA note (your quote) — displayed as a constant safety note under the ICM output
-  const SWITCH_GBCA_NOTE = [
-    "Gadolinium-based contrast agents (GBCA):",
-    "It is not possible to recommend a regimen with certainty.",
-    "Due to the probability of involvement, using a GBCA different from the one routinely administered is suggested.",
-  ];
-
-  // ---------- TRYPTASE ----------
-  // Rule: acute elevation ≥ 2 ng/mL + (1.2 × baseline) suggests IHR.
-  function computeTryptase(baseline, acute) {
-    const threshold = 2 + 1.2 * baseline;
-    const significant = acute >= threshold;
-    return { threshold, significant };
-  }
-
-  // ---------- NIHR / SCAR ----------
-  const NIHR_RED_FLAGS = {
-    blister: "Blistering",
-    mucosa: "Mucosal involvement",
-    erosion: "Erosions",
-    hemorrhagic: "Hemorrhagic lesions",
-  };
-
-  // ---------- UX HELPERS ----------
-  function withTransition(el, fn) {
-    if (!el) return fn();
-    el.classList.add("is-updating");
-    requestAnimationFrame(() => {
-      fn();
-      requestAnimationFrame(() => el.classList.remove("is-updating"));
-    });
-  }
-
-  function smoothScrollTo(el) {
-    if (!el) return;
-    try {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    } catch {
-      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 10);
+  function switchRecommendationHTML() {
+    // Determine which set to use
+    if (state.cmtype === "icm") {
+      if (!state.icm) {
+        return `<div>Select the involved ICM group above to see the recommendation.</div>`;
+      }
+      const t = ICM_TEXT[state.icm];
+      return `
+        <div><strong>${t.headline}</strong></div>
+        <div style="margin-top:10px">${t.rec}</div>
+        ${t.note ? `<div style="margin-top:10px; color: var(--muted)"><em>${t.note}</em></div>` : ``}
+      `;
+    } else {
+      if (!state.gbca) {
+        return `<div>Select the involved GBCA group above to see the recommendation.</div>`;
+      }
+      const t = GBCA_TEXT[state.gbca];
+      return `
+        <div><strong>${t.headline}</strong></div>
+        <div style="margin-top:10px">${t.rec}</div>
+        ${t.note ? `<div style="margin-top:10px; color: var(--muted)"><em>${t.note}</em></div>` : ``}
+      `;
     }
   }
 
-  function applyEmergencyAccent() {
-    const flowView = $("#view-flow");
-    if (!flowView) return;
-    flowView.classList.toggle("is-emergency", state.situation === "emergency");
+  function tryptaseHTML() {
+    const b = parseFloat(state.baseline);
+    const a = parseFloat(state.acute);
+
+    if (!Number.isFinite(b) || !Number.isFinite(a) || b <= 0 || a <= 0) {
+      return `Enter baseline and acute tryptase values (ng/mL).`;
+    }
+
+    const threshold = 2 + 1.2 * b;
+    const significant = a >= threshold;
+
+    return `
+      <div><strong>Rule:</strong> Acute elevation ≥ 2 ng/mL + (1.2 × baseline)</div>
+      <div style="margin-top:10px"><strong>Baseline:</strong> ${b.toFixed(2)} ng/mL</div>
+      <div><strong>Acute:</strong> ${a.toFixed(2)} ng/mL</div>
+      <div style="margin-top:10px"><strong>Threshold:</strong> ${threshold.toFixed(2)} ng/mL</div>
+      <div style="margin-top:12px; font-weight:900;">
+        ${significant ? "✅ Suggests IHR (significant elevation)." : "ℹ️ Not significant by the 2 + 1.2× rule."}
+      </div>
+    `;
   }
 
-  // ---------- NAV ----------
-  function setNav(nav) {
-    state.nav = nav;
+  function nihrHTML() {
+    const checked = $$(".nihr-check:checked").map(x => x.value);
+    if (checked.length === 0) {
+      return `No SCAR red flags selected. If symptoms evolve → specialist referral.`;
+    }
+    return `
+      <div style="font-weight:900; color: var(--danger)">⚠️ SCAR red flags present</div>
+      <div style="margin-top:10px">
+        Prompt specialist referral is recommended. Avoid the culprit agent/class. Premedication is not recommended for NIHR.
+      </div>
+    `;
+  }
 
-    $$("#app .view").forEach((v) => (v.hidden = true));
-    const view = $(`#view-${nav}`);
-    if (view) view.hidden = false;
+  // ---------------- RENDER ----------------
+  function renderFlow() {
+    const out = $("#flowOutput");
+    const r = flowRecommendation();
+    out.innerHTML = `
+      <div style="font-weight:900; margin-bottom:10px">${r.title}</div>
+      <ul>${r.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+    `;
 
-    $$(".bottomnav__btn").forEach((b) => {
-      const on = b.dataset.nav === nav;
-      b.classList.toggle("is-on", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
+    const outputCard = out.closest(".card--output");
+    const isEmerg = state.situation === "emergency";
+    outputCard.classList.toggle("is-emergency", isEmerg);
+
+    // tint the active emergency button
+    $$('.seg__btn[data-seg="situation"]').forEach(b => {
+      const on = b.classList.contains("is-on");
+      b.classList.toggle("is-danger", on && b.dataset.value === "emergency");
+    });
+  }
+
+  function renderSwitch() {
+    // toggle which button row is visible (ICM buttons already in HTML)
+    const gbcaCard = $("#gbcaCard");
+    const icmBtns = $$('.seg__btn[data-seg="icm"]');
+    const showGBCA = state.cmtype === "gbca";
+
+    if (gbcaCard) gbcaCard.hidden = !showGBCA;
+    icmBtns.forEach(btn => {
+      // hide the ICM row by hiding their parent container if possible
+      // but keep it simple: disable + visually dim when GBCA selected
+      btn.disabled = showGBCA;
+      btn.style.opacity = showGBCA ? "0.35" : "1";
+      btn.style.pointerEvents = showGBCA ? "none" : "auto";
     });
 
-    // Render current view output when switching tabs
-    if (nav === "flow") renderFlow(false);
-    if (nav === "switch") renderSwitch(false);
-    if (nav === "tryptase") renderTryptase(false);
-    if (nav === "nihr") renderNihr(false);
-
-    applyEmergencyAccent();
+    $("#switchOutput").innerHTML = switchRecommendationHTML();
   }
 
-  // ---------- SEGMENTED CONTROL SETTER ----------
+  function renderTryptase() {
+    $("#tryptaseOutput").innerHTML = tryptaseHTML();
+  }
+
+  function renderNIHR() {
+    $("#nihrOutput").innerHTML = nihrHTML();
+  }
+
+  function renderAll() {
+    renderFlow();
+    renderSwitch();
+    renderTryptase();
+    renderNIHR();
+  }
+
+  function setNav(nav) {
+    state.nav = nav;
+    views.forEach(v => {
+      const el = $(`#view-${v}`);
+      if (el) el.hidden = (v !== nav);
+    });
+
+    $$(".bottomnav__btn").forEach(b => {
+      const on = b.dataset.nav === nav;
+      b.classList.toggle("is-on", on);
+      b.classList.toggle("is-danger", on && nav === "flow" && state.situation === "emergency");
+    });
+
+    requestAnimationFrame(() => {
+      $("#app")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   function setSeg(seg, value) {
     state[seg] = value;
 
-    $$(`.seg__btn[data-seg="${seg}"]`).forEach((btn) => {
+    $$( `.seg__btn[data-seg="${seg}"]` ).forEach(btn => {
       const on = btn.dataset.value === value;
       btn.classList.toggle("is-on", on);
-      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      if (seg === "situation") btn.classList.toggle("is-danger", on && value === "emergency");
     });
 
-    if (state.nav === "flow") renderFlow(true);
-    if (state.nav === "switch") renderSwitch(true);
+    // If switching cmtype, clear the other selection to avoid confusion
+    if (seg === "cmtype") {
+      if (value === "icm") state.gbca = null;
+      if (value === "gbca") state.icm = null;
 
-    applyEmergencyAccent();
-  }
-
-  // ---------- RENDER: FLOW ----------
-  function renderFlow(doScroll) {
-    const out = $("#flowOutput");
-    if (!out) return;
-
-    const card = out.closest(".card") || out;
-    const data = FLOW[state.situation][state.reaction];
-
-    withTransition(card, () => {
-      out.innerHTML = `
-        <div class="output__title">${data.title}</div>
-        <ul class="output__ul">
-          ${data.bullets.map((t) => `<li>${t}</li>`).join("")}
-        </ul>
-      `;
-    });
-
-    if (doScroll) smoothScrollTo(out);
-  }
-
-  // ---------- RENDER: SWITCH ----------
-  function renderSwitch(doScroll) {
-    const out = $("#switchOutput");
-    if (!out) return;
-
-    const card = out.closest(".card") || out;
-
-    // If user hasn't selected anything yet
-    if (!state.icm) {
-      withTransition(card, () => {
-        out.innerHTML = `<div class="output__muted">Select the involved ICM group (A–D) or choose <strong>Unknown</strong>.</div>`;
-      });
-      return;
+      // clear selected states on the buttons for both groups
+      $$('.seg__btn[data-seg="icm"]').forEach(b => b.classList.remove("is-on"));
+      $$('.seg__btn[data-seg="gbca"]').forEach(b => b.classList.remove("is-on"));
     }
 
-    const block = SWITCH_ICM[state.icm];
+    renderAll();
 
-    withTransition(card, () => {
-      out.innerHTML = `
-        <div class="output__title">${block.title}</div>
-        <ul class="output__ul">
-          ${block.text.map((t) => `<li>${t}</li>`).join("")}
-        </ul>
-
-        <div class="divider"></div>
-
-        <div class="output__title">GBCA (macrocyclic) — practical note</div>
-        <ul class="output__ul">
-          ${SWITCH_GBCA_NOTE.map((t) => `<li>${t}</li>`).join("")}
-        </ul>
-      `;
-    });
-
-    if (doScroll) smoothScrollTo(out);
-  }
-
-  // ---------- RENDER: TRYPTASE ----------
-  function renderTryptase(doScroll) {
-    const out = $("#tryptaseOutput");
-    if (!out) return;
-
-    // static hint at first render
-    if (!out.dataset.ready) {
-      out.dataset.ready = "1";
-      out.innerHTML = `<div class="output__muted">Enter baseline and acute tryptase values, then tap <strong>Calculate</strong>.</div>`;
-    }
-    if (doScroll) smoothScrollTo(out);
-  }
-
-  function onCalcTryptase() {
-    const baselineEl = $("#baseline");
-    const acuteEl = $("#acute");
-    const out = $("#tryptaseOutput");
-    if (!baselineEl || !acuteEl || !out) return;
-
-    const baseline = Number(baselineEl.value);
-    const acute = Number(acuteEl.value);
-
-    const card = out.closest(".card") || out;
-
-    if (!Number.isFinite(baseline) || !Number.isFinite(acute) || baseline <= 0 || acute <= 0) {
-      withTransition(card, () => {
-        out.innerHTML = `<div class="output__warn">Please enter valid positive numbers (ng/mL).</div>`;
-      });
-      smoothScrollTo(out);
-      return;
-    }
-
-    const { threshold, significant } = computeTryptase(baseline, acute);
-
-    withTransition(card, () => {
-      out.innerHTML = `
-        <div class="output__title">Rule check</div>
-        <div class="output__kv">
-          <div><span class="k">Baseline</span> <span class="v">${baseline.toFixed(2)} ng/mL</span></div>
-          <div><span class="k">Acute</span> <span class="v">${acute.toFixed(2)} ng/mL</span></div>
-          <div><span class="k">Threshold</span> <span class="v">≥ ${threshold.toFixed(2)} ng/mL</span></div>
-        </div>
-        <div class="${significant ? "output__ok" : "output__muted"}" style="margin-top:10px">
-          ${significant
-            ? "Acute elevation meets the rule → suggests IHR."
-            : "Does not meet the rule → IHR not supported by tryptase rule alone."}
-        </div>
-      `;
-    });
-
-    smoothScrollTo(out);
-  }
-
-  // ---------- RENDER: NIHR ----------
-  function renderNihr(doScroll) {
-    const out = $("#nihrOutput");
-    if (!out) return;
-
-    // default state
-    if (!out.dataset.ready) {
-      out.dataset.ready = "1";
-      out.innerHTML = `<div class="output__muted">Tick any red flags. The assessment updates automatically.</div>`;
-    }
-
-    updateNihrAssessment();
-    if (doScroll) smoothScrollTo(out);
-  }
-
-  function updateNihrAssessment() {
-    const out = $("#nihrOutput");
-    if (!out) return;
-
-    const checks = $$(".nihr-check");
-    const selected = checks.filter((c) => c.checked).map((c) => c.value);
-
-    const card = out.closest(".card") || out;
-
-    withTransition(card, () => {
-      if (selected.length === 0) {
-        out.innerHTML = `
-          <div class="output__title">Assessment</div>
-          <div class="output__muted">No SCAR red flags selected. If symptoms evolve, reassess and follow local protocol.</div>
-          <div class="divider"></div>
-          <div class="output__muted">Timing: NIHR typically occurs 1 hour to 1 week after administration.</div>
-        `;
-        return;
-      }
-
-      const labels = selected.map((k) => NIHR_RED_FLAGS[k] || k);
-
-      out.innerHTML = `
-        <div class="output__title">Assessment</div>
-        <div class="output__danger">
-          Red flags selected → prompt specialist referral recommended (suspected SCAR).
-        </div>
-        <ul class="output__ul">
-          ${labels.map((t) => `<li>${t}</li>`).join("")}
-        </ul>
-        <div class="divider"></div>
-        <div class="output__muted">
-          Action: Avoid the culprit agent/class; prompt specialist referral. Premedication is not recommended for NIHR.
-        </div>
-      `;
+    // Emergency accent in nav if currently on Flow
+    $$(".bottomnav__btn").forEach(b => {
+      const on = b.dataset.nav === state.nav;
+      b.classList.toggle("is-danger", on && state.nav === "flow" && state.situation === "emergency");
     });
   }
 
-  // ---------- RESET ----------
+  // ---------- RESET (hard reset, no ghost output) ----------
   function resetAll() {
     // reset state
+    state.nav = "flow";
     state.situation = "elective";
     state.reaction = "moderate";
+    state.cmtype = "icm";
     state.icm = null;
+    state.gbca = null;
+    state.baseline = "";
+    state.acute = "";
 
-    // reset seg buttons
+    // reset nav
+    setNav("flow");
+
+    // reset seg UI for flow
     setSeg("situation", "elective");
     setSeg("reaction", "moderate");
 
-    // reset ICM seg buttons
-    $$(`.seg__btn[data-seg="icm"]`).forEach((btn) => {
-      btn.classList.remove("is-on");
-      btn.setAttribute("aria-pressed", "false");
-    });
+    // reset cmtype UI if present
+    const cmBtns = $$('.seg__btn[data-seg="cmtype"]');
+    if (cmBtns.length) setSeg("cmtype", "icm");
+
+    // reset ICM buttons
+    $$('.seg__btn[data-seg="icm"]').forEach(btn => btn.classList.remove("is-on"));
+
+    // reset GBCA buttons
+    $$('.seg__btn[data-seg="gbca"]').forEach(btn => btn.classList.remove("is-on"));
 
     // reset inputs
-    const baselineEl = $("#baseline");
-    const acuteEl = $("#acute");
-    if (baselineEl) baselineEl.value = "";
-    if (acuteEl) acuteEl.value = "";
+    const b = $("#baseline"); const a = $("#acute");
+    if (b) b.value = "";
+    if (a) a.value = "";
 
-    // reset NIHR checks
-    $$(".nihr-check").forEach((c) => (c.checked = false));
+    // reset checkboxes
+    $$(".nihr-check").forEach(c => c.checked = false);
 
-    // go to flow
-    setNav("flow");
-    renderFlow(true);
+    // hard reset outputs
+    $("#flowOutput").innerHTML = "";
+    $("#switchOutput").innerHTML = `<div>Select the involved ICM group above to see the recommendation.</div>`;
+    $("#tryptaseOutput").innerHTML = `Enter baseline and acute tryptase values (ng/mL).`;
+    $("#nihrOutput").innerHTML = `No SCAR red flags selected. If symptoms evolve → specialist referral.`;
+
+    // final render
+    renderAll();
   }
 
-  // ---------- BIND UI ----------
-  function bindUI() {
+  // ---------------- EVENTS ----------------
+  function bind() {
     // bottom nav
-    $$(".bottomnav__btn").forEach((btn) => {
+    $$(".bottomnav__btn").forEach(btn => {
       btn.addEventListener("click", () => setNav(btn.dataset.nav));
     });
 
-    // all seg buttons
-    $$(".seg__btn").forEach((btn) => {
+    // flow segs
+    $$('.seg__btn[data-seg="situation"]').forEach(btn => {
+      btn.addEventListener("click", () => setSeg("situation", btn.dataset.value));
+    });
+    $$('.seg__btn[data-seg="reaction"]').forEach(btn => {
+      btn.addEventListener("click", () => setSeg("reaction", btn.dataset.value));
+    });
+
+    // cmtype segs (if present)
+    $$('.seg__btn[data-seg="cmtype"]').forEach(btn => {
+      btn.addEventListener("click", () => setSeg("cmtype", btn.dataset.value));
+    });
+
+    // icm buttons
+    $$('.seg__btn[data-seg="icm"]').forEach(btn => {
       btn.addEventListener("click", () => {
-        const seg = btn.dataset.seg;
-        const val = btn.dataset.value;
-        if (!seg || !val) return;
+        state.icm = btn.dataset.value;
+        $$('.seg__btn[data-seg="icm"]').forEach(x => x.classList.toggle("is-on", x === btn));
+        renderSwitch();
+        requestAnimationFrame(() => $("#switchOutput")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      });
+    });
 
-        if (seg === "icm") {
-          state.icm = val; // A/B/C/D/unknown
+    // gbca buttons
+    $$('.seg__btn[data-seg="gbca"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.gbca = btn.dataset.value;
+        $$('.seg__btn[data-seg="gbca"]').forEach(x => x.classList.toggle("is-on", x === btn));
+        renderSwitch();
+        requestAnimationFrame(() => $("#switchOutput")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      });
+    });
 
-          // toggle UI state for ICM buttons
-          $$(`.seg__btn[data-seg="icm"]`).forEach((b) => {
-            const on = b.dataset.value === val;
-            b.classList.toggle("is-on", on);
-            b.setAttribute("aria-pressed", on ? "true" : "false");
-          });
+    // tryptase
+    $("#calcTryptase")?.addEventListener("click", () => {
+      state.baseline = $("#baseline")?.value ?? "";
+      state.acute = $("#acute")?.value ?? "";
+      renderTryptase();
+      requestAnimationFrame(() => $("#tryptaseOutput")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    });
 
-          renderSwitch(true);
-          return;
-        }
-
-        setSeg(seg, val);
+    // NIHR
+    $$(".nihr-check").forEach(chk => {
+      chk.addEventListener("change", () => {
+        renderNIHR();
+        requestAnimationFrame(() => $("#nihrOutput")?.scrollIntoView({ behavior: "smooth", block: "start" }));
       });
     });
 
     // reset
-    const resetBtn = $("#resetBtn");
-    if (resetBtn) resetBtn.addEventListener("click", resetAll);
-
-    // tryptase calc button
-    const calcBtn = $("#calcTryptase");
-    if (calcBtn) calcBtn.addEventListener("click", onCalcTryptase);
-
-    // NIHR checkboxes
-    $$(".nihr-check").forEach((c) => c.addEventListener("change", updateNihrAssessment));
+    $("#resetBtn")?.addEventListener("click", resetAll);
   }
 
-  function init() {
-    bindUI();
-
-    // Ensure initial selected states match HTML defaults
-    state.situation = "elective";
-    state.reaction = "moderate";
-
-    // Render initial view
+  // ---------------- BOOT ----------------
+  window.addEventListener("DOMContentLoaded", () => {
+    bind();
     setNav("flow");
-    renderFlow(false);
-    applyEmergencyAccent();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+    renderAll();
+  });
 })();
