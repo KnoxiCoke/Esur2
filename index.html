@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESUR CM Hypersensitivity Support</title>
+
+  <!-- GitHub Pages safe relative path -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__title">ESUR CM Hypersensitivity Support</div>
+  <button class="topbar__reset" id="resetBtn">Reset</button>
+</header>
+
+<main class="app" id="app">
+
+  <section class="banner">
+    <div class="banner__left">
+      <div class="banner__headline">Educational tool (ESUR CMSC 2025)</div>
+      <div class="banner__sub">
+        No patient data stored. Does not replace clinical judgement or local protocols.
+      </div>
+    </div>
+    <div class="banner__right">
+      <span class="badge">Offline-ready</span>
+    </div>
+  </section>
+
+  <!-- QUICK FLOW -->
+  <section class="view" id="view-flow">
+    <h1 class="h1">Quick Flow</h1>
+    <p class="p-muted">Reach an operational recommendation in ≤ 3 taps.</p>
+
+    <div class="card">
+      <div class="card__title">Step 1 — Situation</div>
+      <div class="seg">
+        <button class="seg__btn is-on" data-seg="situation" data-value="elective">Elective</button>
+        <button class="seg__btn" data-seg="situation" data-value="emergency">Emergency</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title">Step 2 — Prior reaction</div>
+      <div class="seg">
+        <button class="seg__btn is-on" data-seg="reaction" data-value="moderate">Moderate / Severe</button>
+        <button class="seg__btn" data-seg="reaction" data-value="mild">Mild / Unclear</button>
+      </div>
+    </div>
+
+    <div class="card card--output">
+      <div class="card__title">Recommendation</div>
+      <div class="output" id="flowOutput"></div>
+    </div>
+
+    <div class="card card--subtle">
+      <div class="card__title">Safety net</div>
+      <div class="output">
+        If a breakthrough reaction occurs → follow <strong>Poster 1 (Acute Management)</strong> and local emergency protocols.
+      </div>
+    </div>
+  </section>
+
+  <!-- SWITCHING ASSISTANT -->
+  <section class="view" id="view-switch" hidden>
+    <h1 class="h1">Switching Assistant</h1>
+    <p class="p-muted">Pick contrast type → select the involved group (examples shown).</p>
+
+    <!-- Contrast type -->
+    <div class="card">
+      <div class="card__title">Contrast type</div>
+      <div class="seg">
+        <button class="seg__btn is-on" data-seg="cmtype" data-value="icm">ICM (CT)</button>
+        <button class="seg__btn" data-seg="cmtype" data-value="gbca">GBCA (MRI)</button>
+      </div>
+      <div class="p-muted" style="margin-top:10px">
+        Use the examples below to identify the correct group quickly.
+      </div>
+    </div>
+
+    <!-- ICM (iodine-based) -->
+    <div class="card" id="icmCard">
+      <div class="card__title">ICM (Iodine-based)</div>
+
+      <div class="p-muted" style="margin:6px 0 12px">
+        <strong>Group A</strong>: Iohexol, Iodixanol, Iomeprol, Ioversol ·
+        <strong>Group B</strong>: Iopamidol ·
+        <strong>Group C</strong>: Iopromide ·
+        <strong>Group D</strong>: Iobitridol
+      </div>
+
+      <div class="seg" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <button class="seg__btn" data-seg="icm" data-value="A">
+          Group A
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Iohexol • Iodixanol<br/>Iomeprol • Ioversol
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="icm" data-value="B">
+          Group B
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Iopamidol
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="icm" data-value="C">
+          Group C
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Iopromide
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="icm" data-value="D">
+          Group D
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Iobitridol
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="icm" data-value="unknown" style="grid-column:1 / -1">
+          Unknown
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Use when the involved ICM is not known
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- GBCA (macrocyclic) -->
+    <div class="card" id="gbcaCard" hidden>
+      <div class="card__title">GBCA (Macrocyclic)</div>
+
+      <div class="p-muted" style="margin:6px 0 12px">
+        <strong>Group A</strong>: Gadoterate meglumine ·
+        <strong>Group B</strong>: Gadobutrol, Gadoteridol ·
+        <strong>Group C</strong>: Gadopiclenol
+      </div>
+
+      <div class="seg" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+        <button class="seg__btn" data-seg="gbca" data-value="A">
+          Group A
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Gadoterate meglumine
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="gbca" data-value="B">
+          Group B
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Gadobutrol • Gadoteridol
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="gbca" data-value="C">
+          Group C
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            Gadopiclenol
+          </div>
+        </button>
+
+        <button class="seg__btn" data-seg="gbca" data-value="unknown">
+          Unknown
+          <div class="p-muted" style="font-size:12px;margin-top:6px;line-height:1.2">
+            If the involved GBCA is not known
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card card--output">
+      <div class="card__title">Switch Recommendation</div>
+      <div class="output" id="switchOutput"></div>
+    </div>
+  </section>
+
+  <!-- TRYPTASE -->
+  <section class="view" id="view-tryptase" hidden>
+    <h1 class="h1">Tryptase Calculator</h1>
+
+    <div class="card">
+      <div class="card__title">Enter values</div>
+      <input type="number" id="baseline" placeholder="Baseline (ng/mL)" />
+      <input type="number" id="acute" placeholder="Acute (ng/mL)" />
+      <button id="calcTryptase">Calculate</button>
+    </div>
+
+    <div class="card card--output">
+      <div class="card__title">Result</div>
+      <div class="output" id="tryptaseOutput"></div>
+    </div>
+  </section>
+
+  <!-- NIHR -->
+  <section class="view" id="view-nihr" hidden>
+    <h1 class="h1">NIHR / SCAR Check</h1>
+
+    <div class="card">
+      <div class="card__title">Red Flags</div>
+      <label><input type="checkbox" class="nihr-check" value="blister" /> Blistering</label><br>
+      <label><input type="checkbox" class="nihr-check" value="mucosa" /> Mucosal involvement</label><br>
+      <label><input type="checkbox" class="nihr-check" value="erosion" /> Erosions</label><br>
+      <label><input type="checkbox" class="nihr-check" value="hemorrhagic" /> Hemorrhagic lesions</label>
+    </div>
+
+    <div class="card card--output">
+      <div class="card__title">Assessment</div>
+      <div class="output" id="nihrOutput"></div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bottomnav">
+  <button class="bottomnav__btn is-on" data-nav="flow">Flow</button>
+  <button class="bottomnav__btn" data-nav="switch">Switch</button>
+  <button class="bottomnav__btn" data-nav="tryptase">Tryptase</button>
+  <button class="bottomnav__btn" data-nav="nihr">NIHR</button>
+</nav>
+
+<script src="./script.js"></script>
+</body>
+</html>
