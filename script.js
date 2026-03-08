@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
       disclaimer_line2: "Nur zur Information. Ersetzt nicht klinische Beurteilung oder lokale Protokolle. Keine Speicherung von Patientendaten.",
 
       flow_title: "Orientierung",
-      flow_subtitle: "Kurze Orientierung bei früheren Kontrastmittelreaktionen.",
+      flow_subtitle: "Orientierung bei früheren Kontrastmittelreaktionen.",
       flow_step1: "Schritt 1 — Situation",
       flow_step2: "Schritt 2 — Frühere Reaktion",
 
