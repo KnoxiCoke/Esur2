@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +33,7 @@
   <!-- FLOW -->
   <section class="view" id="view-flow">
     <h1 class="h1" data-i18n="flow_title">Guidance</h1>
-    <p class="p-muted" data-i18n="flow_subtitle">Quick guidance for prior contrast reactions.</p>
+    <p class="p-muted" data-i18n="flow_subtitle">Quick guidance for prior contrast hypersensitivity reactions.</p>
 
     <div class="card">
       <div class="card__title" data-i18n="flow_step1">Step 1 — Situation</div>
@@ -43,10 +44,11 @@
     </div>
 
     <div class="card">
-      <div class="card__title" data-i18n="flow_step2">Step 2 — Prior reaction</div>
-      <div class="seg">
-        <button class="seg__btn active" data-seg="reaction" data-value="moderate" type="button" data-i18n="moderate_severe">Moderate / Severe</button>
-        <button class="seg__btn" data-seg="reaction" data-value="mild" type="button" data-i18n="mild_unclear">Mild / Unclear</button>
+      <div class="card__title" data-i18n="flow_step2">Step 2 — Prior reaction severity</div>
+      <div class="seg seg--stack">
+        <button class="seg__btn" data-seg="reaction" data-value="mild" type="button" data-i18n="mild">Mild</button>
+        <button class="seg__btn active" data-seg="reaction" data-value="moderate" type="button" data-i18n="moderate">Moderate</button>
+        <button class="seg__btn" data-seg="reaction" data-value="severe" type="button" data-i18n="severe">Severe</button>
       </div>
     </div>
 
@@ -64,7 +66,7 @@
   <!-- SWITCH -->
   <section class="view" id="view-switch" hidden>
     <h1 class="h1" data-i18n="switch_title">Switch</h1>
-    <p class="p-muted" data-i18n="switch_subtitle">Check possible alternative contrast groups.</p>
+    <p class="p-muted" data-i18n="switch_subtitle">Empiric switch guidance only. Allergy-based selection is preferred when available.</p>
 
     <div class="card">
       <div class="card__title" data-i18n="contrast_type">Contrast type</div>
@@ -74,8 +76,12 @@
       </div>
     </div>
 
+    <div class="card card--subtle">
+      <div class="output hint" id="switchNonvalidated"></div>
+    </div>
+
     <div class="card" id="icmCard">
-      <div class="card__title" data-i18n="icm_title">ICM (Iodine-based)</div>
+      <div class="card__title" data-i18n="icm_title">ICM (iodine-based)</div>
       <div class="hint" id="icmHint"></div>
 
       <div class="seg seg--stack">
@@ -103,7 +109,7 @@
     </div>
 
     <div class="card" id="gbcaCard" hidden>
-      <div class="card__title" data-i18n="gbca_title">GBCA (Macrocyclic)</div>
+      <div class="card__title" data-i18n="gbca_title">GBCA</div>
       <div class="hint" id="gbcaHint"></div>
 
       <div class="seg seg--stack">
@@ -134,7 +140,7 @@
     <div class="card card--subtle">
       <div class="card__title" data-i18n="safety_note">Safety note</div>
       <div class="output" data-i18n="switch_safety_note">
-        Cross-reactivity is variable. Testing is preferred when available.
+        Cross-reactivity is variable. ESUR states that empiric switching is not robustly evidence-based; allergy evaluation with testing is preferred when available.
       </div>
     </div>
   </section>
@@ -142,7 +148,9 @@
   <!-- TRYPTASE -->
   <section class="view" id="view-tryptase" hidden>
     <h1 class="h1" data-i18n="tryptase_title">Tryptase Rule</h1>
-    <p class="p-muted" data-i18n="tryptase_subtitle">Check the tryptase rule used for suspected IHR.</p>
+    <p class="p-muted" data-i18n="tryptase_subtitle">
+      Use for moderate to severe immediate hypersensitivity reactions (IHR). ESUR recommends acute sampling within 1–4 h and a baseline sample after ≥24 h.
+    </p>
 
     <div class="card">
       <div class="card__title" data-i18n="enter_values">Enter values</div>
@@ -160,15 +168,19 @@
   <!-- NIHR -->
   <section class="view" id="view-nihr" hidden>
     <h1 class="h1" data-i18n="nihr_title">NIHR Check</h1>
-    <p class="p-muted" data-i18n="nihr_subtitle">Check for possible delayed hypersensitivity.</p>
+    <p class="p-muted" data-i18n="nihr_subtitle">Check for danger signs suggesting severe delayed cutaneous reaction (SCAR).</p>
 
     <div class="card">
-      <div class="card__title" data-i18n="red_flags">Red flags</div>
+      <div class="card__title" data-i18n="red_flags">Danger signs</div>
       <div class="checklist">
         <label><input type="checkbox" class="nihr-check" value="blister" /> <span data-i18n="blistering">Blistering</span></label>
         <label><input type="checkbox" class="nihr-check" value="mucosa" /> <span data-i18n="mucosal_involvement">Mucosal involvement</span></label>
         <label><input type="checkbox" class="nihr-check" value="erosion" /> <span data-i18n="erosions">Erosions</span></label>
         <label><input type="checkbox" class="nihr-check" value="hemorrhagic" /> <span data-i18n="hemorrhagic_lesions">Hemorrhagic lesions</span></label>
+        <label><input type="checkbox" class="nihr-check" value="skin_disruption" /> <span data-i18n="skin_disruption">Skin disruption</span></label>
+        <label><input type="checkbox" class="nihr-check" value="fever" /> <span data-i18n="fever">High fever</span></label>
+        <label><input type="checkbox" class="nihr-check" value="organ_values" /> <span data-i18n="organ_values">Abnormal liver / kidney values</span></label>
+        <label><input type="checkbox" class="nihr-check" value="lymphadenopathy" /> <span data-i18n="lymphadenopathy">Lymphadenopathy</span></label>
       </div>
     </div>
 
