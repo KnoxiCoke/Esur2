@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "Acute hypersensitivity reactions should be managed according to local protocols and ESUR acute management guidance.",
 
       switch_title: "Switch",
-      switch_subtitle: "Educational support for contrast agent switch consideration.",
+      switch_subtitle:
+        "Educational support for empiric contrast agent switch consideration based on practical experience.",
       contrast_type: "Contrast type",
       icm_ct: "ICM (CT)",
       gbca_mri: "GBCA (MRI)",
@@ -46,12 +47,12 @@ document.addEventListener("DOMContentLoaded", function () {
       possible_alternatives: "Possible alternatives",
       safety_note: "Safety note",
       switch_safety_note:
-        "Cross-reactivity is variable. Selection of an alternative contrast agent should preferably follow allergy evaluation and local expertise.",
+        "These suggestions are based on practical experience only. Allergy evaluation remains preferable whenever available.",
       unknown: "Unknown",
       icm_unknown_hint: "Use when the involved ICM is not known.",
       gbca_unknown_hint: "Use when the involved GBCA is not known.",
       switch_nonvalidated:
-        "This switch overview is intended as educational support only. It does not replace allergy evaluation or local decision-making.",
+        "This switch overview is optional, non-validated guidance based on practical experience. It does not replace allergy evaluation or local decision-making.",
 
       tryptase_title: "Tryptase Rule",
       tryptase_subtitle:
@@ -103,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
       icm_hint:
         "Group A: Iohexol, Iodixanol, Iomeprol, Ioversol · Group B: Iopamidol · Group C: Iopromide · Group D: Iobitridol",
       gbca_hint:
-        "Group A: Gadoterate meglumine · Group B: Gadobutrol, Gadoteridol · Group C: Gadopiclenol",
+        "Group A: Gadoterate meglumine · Group B: Gadoteridol, Gadobutrol · Group C: Gadopiclenol",
 
       flow_titles: {
         elective_mild: "Elective imaging — prior mild immediate hypersensitivity reaction",
@@ -173,51 +174,51 @@ document.addEventListener("DOMContentLoaded", function () {
       icm_rules: {
         A: {
           title: "Group A selected",
-          text: "Selection of an alternative contrast agent (preferably from a different structural group) may be considered when contrast agent administration remains necessary.",
-          note: "Cross-reactivity is variable. Selection should preferably follow allergy evaluation and local expertise."
+          text: "Alternative ICM from Group B or D may be considered.",
+          note: "High cross-reactivity has been reported between Group A and Group C. This suggestion is based on practical experience only."
         },
         B: {
           title: "Group B selected",
-          text: "Selection of an alternative contrast agent (preferably from a different structural group) may be considered when contrast agent administration remains necessary.",
-          note: "Cross-reactivity is variable. Selection should preferably follow allergy evaluation and local expertise."
+          text: "Alternative ICM from Group A, C or D may be considered.",
+          note: "This suggestion is based on practical experience only."
         },
         C: {
           title: "Group C selected",
-          text: "Selection of an alternative contrast agent (preferably from a different structural group) may be considered when contrast agent administration remains necessary.",
-          note: "Cross-reactivity is variable. Selection should preferably follow allergy evaluation and local expertise."
+          text: "Alternative ICM from Group B may be considered.",
+          note: "High cross-reactivity has been reported between Group C and Group A. This suggestion is based on practical experience only."
         },
         D: {
           title: "Group D selected",
-          text: "Selection of an alternative contrast agent (preferably from a different structural group) may be considered when contrast agent administration remains necessary.",
-          note: "Cross-reactivity is variable. Selection should preferably follow allergy evaluation and local expertise."
+          text: "Alternative ICM from Group A or B may be considered.",
+          note: "This suggestion is based on practical experience only."
         },
         unknown: {
           title: "ICM unknown",
-          text: "Selection of an alternative contrast agent may be considered when the culprit agent is not known.",
-          note: "Allergy evaluation and local expertise remain preferable."
+          text: "Alternative ICM from Group B or D may be considered.",
+          note: "This suggestion is based on practical experience only and reflects the higher likelihood that the involved ICM belongs to Group A."
         }
       },
 
       gbca_rules: {
         A: {
           title: "Group A selected",
-          text: "Selection of an alternative contrast agent (preferably from a different structural group) may be considered when contrast agent administration remains necessary.",
-          note: "Selection should preferably follow allergy evaluation and local expertise."
+          text: "Alternative GBCA from Group B may be considered.",
+          note: "This suggestion is based on practical experience only."
         },
         B: {
           title: "Group B selected",
-          text: "Selection of an alternative contrast agent (preferably from a different structural group) may be considered when contrast agent administration remains necessary.",
-          note: "Selection should preferably follow allergy evaluation and local expertise."
+          text: "Alternative GBCA from Group A may be considered.",
+          note: "This suggestion is based on practical experience only."
         },
         C: {
           title: "Group C selected",
-          text: "Selection of an alternative contrast agent may be considered with specialist input when available.",
-          note: "Evidence for empirical switching is limited."
+          text: "Insufficient data for empiric change advice.",
+          note: "Specialist input is preferable."
         },
         unknown: {
           title: "GBCA unknown",
-          text: "Selection of an alternative contrast agent may be considered when the culprit agent is not known.",
-          note: "Allergy evaluation and local expertise remain preferable."
+          text: "No regimen can be recommended with certainty. Use of a GBCA different from the routinely administered agent may be considered.",
+          note: "This suggestion is based on practical experience only."
         }
       }
     },
@@ -248,7 +249,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "Akute Hypersensitivitätsreaktionen sollten gemäss lokalen Protokollen und der ESUR-Guidance zum Akutmanagement behandelt werden.",
 
       switch_title: "Switch",
-      switch_subtitle: "Didaktische Orientierung zum Wechsel des Kontrastmittels.",
+      switch_subtitle:
+        "Didaktische Orientierung zum empirischen Wechsel des Kontrastmittels auf Basis praktischer Erfahrung.",
       contrast_type: "Kontrastmitteltyp",
       icm_ct: "ICM (CT)",
       gbca_mri: "GBCA (MRT)",
@@ -257,12 +259,12 @@ document.addEventListener("DOMContentLoaded", function () {
       possible_alternatives: "Mögliche Alternativen",
       safety_note: "Sicherheitshinweis",
       switch_safety_note:
-        "Kreuzreaktionen sind variabel. Die Auswahl eines alternativen Kontrastmittels sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen.",
+        "Diese Vorschläge beruhen nur auf praktischer Erfahrung. Eine allergologische Abklärung bleibt vorzuziehen, wenn verfügbar.",
       unknown: "Unbekannt",
       icm_unknown_hint: "Verwenden, wenn das beteiligte ICM nicht bekannt ist.",
       gbca_unknown_hint: "Verwenden, wenn das beteiligte GBCA nicht bekannt ist.",
       switch_nonvalidated:
-        "Diese Switch-Übersicht ist nur als didaktische Orientierung gedacht. Sie ersetzt weder eine allergologische Abklärung noch lokale Entscheidungen.",
+        "Diese Switch-Übersicht ist eine optionale, nicht validierte Orientierung auf Basis praktischer Erfahrung. Sie ersetzt weder eine allergologische Abklärung noch lokale Entscheidungen.",
 
       tryptase_title: "Tryptase-Regel",
       tryptase_subtitle:
@@ -314,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
       icm_hint:
         "Gruppe A: Iohexol, Iodixanol, Iomeprol, Ioversol · Gruppe B: Iopamidol · Gruppe C: Iopromide · Gruppe D: Iobitridol",
       gbca_hint:
-        "Gruppe A: Gadoterat-Meglumin · Gruppe B: Gadobutrol, Gadoteridol · Gruppe C: Gadopiclenol",
+        "Gruppe A: Gadoterat-Meglumin · Gruppe B: Gadoteridol, Gadobutrol · Gruppe C: Gadopiclenol",
 
       flow_titles: {
         elective_mild: "Elektive Bildgebung — frühere milde unmittelbare Hypersensitivitätsreaktion",
@@ -384,51 +386,51 @@ document.addEventListener("DOMContentLoaded", function () {
       icm_rules: {
         A: {
           title: "Gruppe A ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels (vorzugsweise aus einer anderen Strukturgruppe) kann erwogen werden, wenn eine Kontrastmittelgabe weiterhin erforderlich ist.",
-          note: "Kreuzreaktionen sind variabel. Die Auswahl sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen."
+          text: "Ein alternatives ICM aus Gruppe B oder D kann erwogen werden.",
+          note: "Eine hohe Kreuzreaktivität wurde zwischen Gruppe A und Gruppe C beschrieben. Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         },
         B: {
           title: "Gruppe B ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels (vorzugsweise aus einer anderen Strukturgruppe) kann erwogen werden, wenn eine Kontrastmittelgabe weiterhin erforderlich ist.",
-          note: "Kreuzreaktionen sind variabel. Die Auswahl sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen."
+          text: "Ein alternatives ICM aus Gruppe A, C oder D kann erwogen werden.",
+          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         },
         C: {
           title: "Gruppe C ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels (vorzugsweise aus einer anderen Strukturgruppe) kann erwogen werden, wenn eine Kontrastmittelgabe weiterhin erforderlich ist.",
-          note: "Kreuzreaktionen sind variabel. Die Auswahl sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen."
+          text: "Ein alternatives ICM aus Gruppe B kann erwogen werden.",
+          note: "Eine hohe Kreuzreaktivität wurde zwischen Gruppe C und Gruppe A beschrieben. Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         },
         D: {
           title: "Gruppe D ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels (vorzugsweise aus einer anderen Strukturgruppe) kann erwogen werden, wenn eine Kontrastmittelgabe weiterhin erforderlich ist.",
-          note: "Kreuzreaktionen sind variabel. Die Auswahl sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen."
+          text: "Ein alternatives ICM aus Gruppe A oder B kann erwogen werden.",
+          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         },
         unknown: {
           title: "ICM unbekannt",
-          text: "Die Auswahl eines alternativen Kontrastmittels kann erwogen werden, wenn das auslösende Kontrastmittel nicht bekannt ist.",
-          note: "Eine allergologische Abklärung und lokale Expertise bleiben vorzuziehen."
+          text: "Ein alternatives ICM aus Gruppe B oder D kann erwogen werden.",
+          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung und berücksichtigt die höhere Wahrscheinlichkeit, dass das beteiligte ICM zu Gruppe A gehört."
         }
       },
 
       gbca_rules: {
         A: {
           title: "Gruppe A ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels (vorzugsweise aus einer anderen Strukturgruppe) kann erwogen werden, wenn eine Kontrastmittelgabe weiterhin erforderlich ist.",
-          note: "Die Auswahl sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen."
+          text: "Ein alternatives GBCA aus Gruppe B kann erwogen werden.",
+          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         },
         B: {
           title: "Gruppe B ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels (vorzugsweise aus einer anderen Strukturgruppe) kann erwogen werden, wenn eine Kontrastmittelgabe weiterhin erforderlich ist.",
-          note: "Die Auswahl sollte vorzugsweise auf einer allergologischen Abklärung und lokaler Expertise beruhen."
+          text: "Ein alternatives GBCA aus Gruppe A kann erwogen werden.",
+          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         },
         C: {
           title: "Gruppe C ausgewählt",
-          text: "Die Auswahl eines alternativen Kontrastmittels kann mit fachärztlichem Input erwogen werden, wenn verfügbar.",
-          note: "Die Evidenz für ein empirisches Switching ist limitiert."
+          text: "Für einen empirischen Wechsel besteht eine unzureichende Datenlage.",
+          note: "Fachärztlicher Input ist vorzuziehen."
         },
         unknown: {
           title: "GBCA unbekannt",
-          text: "Die Auswahl eines alternativen Kontrastmittels kann erwogen werden, wenn das auslösende Kontrastmittel nicht bekannt ist.",
-          note: "Eine allergologische Abklärung und lokale Expertise bleiben vorzuziehen."
+          text: "Es kann kein Schema mit Sicherheit empfohlen werden. Die Verwendung eines anderen als des routinemässig eingesetzten GBCA kann erwogen werden.",
+          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
         }
       }
     }
@@ -489,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setText("icm-group-c-names", "Iopromide");
     setText("icm-group-d-names", "Iobitridol");
     setText("gbca-group-a-names", state.lang === "de" ? "Gadoterat-Meglumin" : "Gadoterate meglumine");
-    setText("gbca-group-b-names", "Gadobutrol • Gadoteridol");
+    setText("gbca-group-b-names", "Gadoteridol • Gadobutrol");
     setText("gbca-group-c-names", "Gadopiclenol");
 
     const baseline = document.getElementById("baseline");
