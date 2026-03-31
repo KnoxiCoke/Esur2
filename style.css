@@ -174,6 +174,18 @@ body.emergency .langswitch__btn.active{
   padding:14px 14px 92px;
 }
 
+.view{
+  display:block;
+}
+
+.subview{
+  display:block;
+}
+
+.subview[hidden]{
+  display:none !important;
+}
+
 .h1{
   margin:16px 2px 6px;
   font-size:28px;
@@ -334,7 +346,7 @@ body.emergency .checklist input[type="checkbox"]{
   accent-color:var(--danger);
 }
 
-/* ========= VERFEINERTE OUTPUT-BOXEN ========= */
+/* ========= OUTPUT BOXEN ========= */
 
 .card--output .output{
   display:grid;
@@ -391,25 +403,36 @@ body.emergency .card--output .output li::marker{
   font-size:14px;
 }
 
-/* Schönere Tryptase-/Result-Boxen */
 #tryptaseOutput > div{
   word-break:break-word;
 }
 
-/* Platzhalter im Switch etwas ruhiger */
-#switchOutput .hint{
+#switchOutput .hint,
+#thyroidOutput .hint,
+#doseOutput .hint,
+#washoutOutput .hint{
   padding:12px;
   border:1px dashed var(--border-strong);
   border-radius:14px;
   background:rgba(255,255,255,.025);
 }
 
-/* NIHR / Assessment klarer */
 #nihrOutput > div:first-child,
 #flowOutput > div:first-child,
 #switchOutput > div:first-child,
-#tryptaseOutput > div:first-child{
+#tryptaseOutput > div:first-child,
+#thyroidOutput > div:first-child,
+#doseOutput > div:first-child,
+#washoutOutput > div:first-child{
   font-size:15px;
+}
+
+/* =========================
+   HSR / CALC SUBNAV
+   ========================= */
+
+.hsr-subnav{
+  grid-template-columns:repeat(2,1fr);
 }
 
 /* =========================
@@ -823,7 +846,10 @@ body.emergency .card--output .output li::marker{
   line-height:1.5;
 }
 
-/* Bottomnav now has 5 tabs */
+/* =========================
+   BOTTOM NAV
+   ========================= */
+
 .bottomnav{
   position:fixed;
   left:0;
@@ -831,7 +857,7 @@ body.emergency .card--output .output li::marker{
   bottom:0;
   z-index:40;
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:10px;
   padding:10px;
   background:var(--surface);
@@ -885,10 +911,14 @@ body.emergency .card--output .output li::marker{
     grid-template-columns:1fr 1fr;
   }
 
+  .hsr-subnav{
+    grid-template-columns:1fr 1fr;
+  }
+
   .bottomnav{
     gap:8px;
     padding:8px;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(2,1fr);
   }
 
   .bottomnav__btn{
