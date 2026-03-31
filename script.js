@@ -1,12 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
   const state = {
-    nav: "flow",
+    mainNav: "hsr",          // hsr | thyroid | calculators | changes
+    hsrTab: "guidance",      // guidance | switch | tryptase | nihr
+    calcTab: "dose",         // dose | washout
+
+    // HSR
     situation: "elective",
-    reaction: "moderate", // mild | moderate | severe | unclear
+    reaction: "moderate",    // mild | moderate | severe
     cmtype: "icm",
     nihrCmtype: "icm",
     icm: null,
     gbca: null,
+
+    // Thyroid
+    thyroidSituation: "elective",
+    thyroidStatus: "normal",           // normal | manifest | subclinical | autonomy | graves
+    thyroidMedication: "none",         // none | levothyroxine | thyreostatics
+    thyroidRit: "no",                  // no | planned_soon
+
+    // Dose
+    doseRegion: "head",
+
+    // Global
     lang: "en",
 
     // Practice Changes tab
@@ -18,12 +33,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const i18n = {
     en: {
-      app_title: "ESUR Contrast Media Hypersensitivity Support",
+      app_title: "Radiology Contrast & Safety App",
       reset: "Reset",
 
-      disclaimer_line1: "Educational support tool based on ESUR CMSC guidance (2025).",
-      disclaimer_line2: "Information only. Clinical decisions should follow local protocols and clinical judgement. No patient data are stored.",
-      disclaimer_line3: "Content adapted from the ESUR Contrast Media Safety Committee guidelines (2025).",
+      disclaimer_line1: "Educational support tool based on ESUR CMSC guidance (2025) and related official sources.",
+      disclaimer_line2: "Information only. Clinical decisions should follow local protocols, source documents and clinical judgement. No patient data are stored.",
+      disclaimer_line3: "Contrast safety content adapted from ESUR Contrast Media Safety Committee guidance.",
+
+      nav_hsr: "HSR",
+      nav_thyroid: "Thyroid",
+      nav_calculators: "Calculators",
+      nav_changes: "Practice Changes",
+
+      // HSR main
+      hsr_title: "HSR",
+      hsr_subtitle: "Hypersensitivity guidance, empiric switch support, tryptase interpretation and NIHR red-flag check.",
+      hsr_tools_title: "HSR tools",
+      hsr_guidance_tab: "Guidance",
+      hsr_switch_tab: "Switch",
+      hsr_tryptase_tab: "Tryptase",
+      hsr_nihr_tab: "NIHR",
 
       flow_title: "Guidance",
       flow_subtitle: "Educational support for prior contrast media hypersensitivity reactions.",
@@ -46,6 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
       switch_subtitle:
         "Educational support for empiric contrast agent switch consideration based on practical experience.",
       contrast_type: "Contrast type",
+      nihr_cmtype_title: "Contrast type",
       icm_ct: "ICM (CT)",
       gbca_mri: "GBCA (MRI)",
       icm_title: "ICM (iodinated)",
@@ -228,6 +258,87 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       },
 
+      // Thyroid
+      thyroid_title: "Thyroid",
+      thyroid_subtitle: "Decision support for iodine-based contrast media in patients with thyroid-related risk constellations.",
+      thyroid_step1: "Step 1 — Clinical situation",
+      thyroid_step2: "Step 2 — Thyroid status",
+      thyroid_step3: "Step 3 — Medication",
+      thyroid_step4: "Step 4 — Planned radioiodine",
+      thyroid_status_normal: "Normal thyroid function",
+      thyroid_status_manifest: "Manifest hyperthyroidism",
+      thyroid_status_subclinical: "Subclinical / low TSH / unclear risk",
+      thyroid_status_autonomy: "Known autonomy / multinodular goitre",
+      thyroid_status_graves: "Untreated Graves’ disease",
+      thyroid_med_none: "No thyroid medication",
+      thyroid_med_levothyroxine: "Levothyroxine",
+      thyroid_med_thyreostatics: "Thyreostatics",
+      thyroid_rit_no: "No / not relevant",
+      thyroid_rit_yes: "Planned soon",
+      thyroid_placeholder: "Thyroid decision support will appear here after the JavaScript logic is connected.",
+      thyroid_safety_note:
+        "This module should distinguish between ESUR core guidance and local or endocrinology-led prophylaxis pathways.",
+      thyroid_level_ok: "Low current thyroid-related concern",
+      thyroid_level_warn: "Relevant thyroid-related caution",
+      thyroid_level_danger: "High thyroid-related concern",
+      thyroid_level_ok_detail: "Iodinated contrast can generally be considered.",
+      thyroid_level_warn_detail: "Iodinated contrast may still be possible, but clarification, timing or specialist input should be considered.",
+      thyroid_level_danger_detail: "Iodinated contrast should generally be avoided unless clinically unavoidable.",
+      thyroid_reasoning: "Reasoning",
+      thyroid_next_steps: "Recommended next step",
+      thyroid_local_note: "Local / specialist note",
+      thyroid_rit_note:
+        "Planned radioiodine diagnostics or therapy soon after iodinated contrast is a separate problem. Timing should be discussed explicitly with Nuclear Medicine / Endocrinology.",
+      thyroid_local_prophylaxis_note:
+        "Perchlorate / thiamazole-based prophylaxis pathways are not universal ESUR bedside rules. Treat them as local or endocrinology-led protocols.",
+
+      // Calculators
+      calculators_title: "Calculators",
+      calculators_subtitle: "Educational calculation tools for dose estimation and adrenal washout.",
+      calculators_tools_title: "Calculator tools",
+      dose_tab: "Dose",
+      washout_tab: "Washout",
+
+      // Dose
+      dose_input_title: "Dose input",
+      dose_region_head: "Head",
+      dose_region_thorax: "Thorax",
+      dose_region_abdomen_pelvis: "Abdomen / Pelvis",
+      dose_dlp_placeholder: "DLP",
+      dose_placeholder: "Dose estimation will appear here after the JavaScript logic is connected.",
+      dose_invalid: "Please enter a valid DLP value.",
+      dose_estimated_msv: "Estimated effective dose",
+      dose_region_label: "Region",
+      dose_comparison_background: "Approximate natural background radiation",
+      dose_comparison_cxr: "Approximate chest X-rays",
+      dose_comparison_flights: "Approximate long-haul flights",
+      dose_disclaimer:
+        "This is an educational estimate based on a region-specific conversion factor. It is not a patient-specific dose or cancer-risk calculation.",
+      dose_safety_note:
+        "Estimated mSv values and everyday comparisons should be labeled as educational approximations, not as patient-specific risk.",
+
+      // Washout
+      washout_input_title: "Washout input",
+      washout_unenhanced_placeholder: "Unenhanced HU",
+      washout_enhanced_placeholder: "Enhanced HU",
+      washout_delayed_placeholder: "Delayed HU",
+      washout_delay_placeholder: "Delay (minutes, optional)",
+      washout_placeholder: "Washout calculation will appear here after the JavaScript logic is connected.",
+      washout_invalid: "Please enter valid numeric HU values.",
+      washout_invalid_formula: "Washout calculation is not possible with these values. Check the HU inputs.",
+      washout_absolute: "Absolute washout",
+      washout_relative: "Relative washout",
+      washout_classic: "Classic interpretation",
+      washout_delay_label: "Delay",
+      washout_classic_positive:
+        "By classic radiology thresholds, the values support adenoma-style washout behavior (absolute >60% and/or relative >40%).",
+      washout_classic_negative:
+        "By classic radiology thresholds, the values do not show typical adenoma-style washout behavior.",
+      washout_caution:
+        "Interpret washout only in context: unenhanced HU, lesion homogeneity, measurement quality, oncologic setting and current guideline caution still matter.",
+      washout_safety_note:
+        "Washout values should be interpreted with unenhanced HU, lesion homogeneity and the broader clinical context.",
+
       // Practice Changes tab — static UI
       changes_title: "Practice Changes 2025",
       changes_subtitle:
@@ -256,14 +367,28 @@ document.addEventListener("DOMContentLoaded", function () {
     },
 
     de: {
-      app_title: "ESUR Support-Tool zu Hypersensitivitätsreaktionen auf Kontrastmittel",
+      app_title: "Radiology Contrast & Safety App",
       reset: "Zurücksetzen",
 
-      disclaimer_line1: "Didaktisches Support-Tool auf Grundlage der ESUR-CMSC-Guidance (2025).",
-      disclaimer_line2: "Nur zur Information. Klinische Entscheidungen sollten lokalen Protokollen und der klinischen Beurteilung folgen. Es werden keine Patientendaten gespeichert.",
-      disclaimer_line3: "Inhaltlich adaptiert aus den Leitlinien des ESUR Contrast Media Safety Committee (2025).",
+      disclaimer_line1: "Didaktisches Support-Tool auf Grundlage der ESUR-CMSC-Guidance (2025) und verwandter offizieller Quellen.",
+      disclaimer_line2: "Nur zur Information. Klinische Entscheidungen sollten lokalen Protokollen, den Quellendokumenten und der klinischen Beurteilung folgen. Es werden keine Patientendaten gespeichert.",
+      disclaimer_line3: "Inhalt zur Kontrastmittelsicherheit adaptiert aus der Guidance des ESUR Contrast Media Safety Committee.",
 
-      flow_title: "Orientierung",
+      nav_hsr: "HSR",
+      nav_thyroid: "Schilddrüse",
+      nav_calculators: "Rechner",
+      nav_changes: "Practice Changes",
+
+      // HSR main
+      hsr_title: "HSR",
+      hsr_subtitle: "Hypersensitivitäts-Guidance, empirische Switch-Hilfe, Tryptase-Interpretation und NIHR-Red-Flag-Check.",
+      hsr_tools_title: "HSR-Tools",
+      hsr_guidance_tab: "Guidance",
+      hsr_switch_tab: "Switch",
+      hsr_tryptase_tab: "Tryptase",
+      hsr_nihr_tab: "NIHR",
+
+      flow_title: "Guidance",
       flow_subtitle: "Didaktische Orientierung bei früheren Hypersensitivitätsreaktionen auf Kontrastmittel.",
       flow_step1: "Schritt 1 — Klinische Situation",
       flow_step2: "Schritt 2 — Schweregrad der früheren Reaktion",
@@ -284,6 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
       switch_subtitle:
         "Didaktische Orientierung zum empirischen Wechsel des Kontrastmittels auf Basis praktischer Erfahrung.",
       contrast_type: "Kontrastmitteltyp",
+      nihr_cmtype_title: "Kontrastmitteltyp",
       icm_ct: "ICM (CT)",
       gbca_mri: "GBCA (MRT)",
       icm_title: "ICM (jodhaltig)",
@@ -466,6 +592,87 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       },
 
+      // Thyroid
+      thyroid_title: "Schilddrüse",
+      thyroid_subtitle: "Entscheidungshilfe für iodhaltige Kontrastmittel bei schilddrüsenbezogenen Risikokonstellationen.",
+      thyroid_step1: "Schritt 1 — Klinische Situation",
+      thyroid_step2: "Schritt 2 — Schilddrüsenstatus",
+      thyroid_step3: "Schritt 3 — Medikation",
+      thyroid_step4: "Schritt 4 — Geplante Radioiod-Anwendung",
+      thyroid_status_normal: "Normale Schilddrüsenfunktion",
+      thyroid_status_manifest: "Manifeste Hyperthyreose",
+      thyroid_status_subclinical: "Subklinisch / niedriges TSH / unklarer Risikostatus",
+      thyroid_status_autonomy: "Bekannte Autonomie / multinodöse Struma",
+      thyroid_status_graves: "Unbehandelter Morbus Basedow",
+      thyroid_med_none: "Keine Schilddrüsenmedikation",
+      thyroid_med_levothyroxine: "Levothyroxin",
+      thyroid_med_thyreostatics: "Thyreostatika",
+      thyroid_rit_no: "Nein / nicht relevant",
+      thyroid_rit_yes: "Bald geplant",
+      thyroid_placeholder: "Die Schilddrüsen-Entscheidungshilfe erscheint hier, sobald die JavaScript-Logik verbunden ist.",
+      thyroid_safety_note:
+        "Dieses Modul sollte zwischen ESUR-Kernempfehlungen und lokalen bzw. endokrinologisch geführten Prophylaxe-Pfaden unterscheiden.",
+      thyroid_level_ok: "Aktuell geringe schilddrüsenbezogene Sorge",
+      thyroid_level_warn: "Relevante schilddrüsenbezogene Vorsicht",
+      thyroid_level_danger: "Hohe schilddrüsenbezogene Relevanz",
+      thyroid_level_ok_detail: "Iodhaltiges Kontrastmittel kann im Allgemeinen erwogen werden.",
+      thyroid_level_warn_detail: "Iodhaltiges Kontrastmittel kann weiterhin möglich sein, aber Abklärung, Timing oder fachärztlicher Input sollten erwogen werden.",
+      thyroid_level_danger_detail: "Iodhaltiges Kontrastmittel sollte im Allgemeinen vermieden werden, ausser wenn es klinisch unvermeidbar ist.",
+      thyroid_reasoning: "Begründung",
+      thyroid_next_steps: "Empfohlener nächster Schritt",
+      thyroid_local_note: "Lokaler / fachärztlicher Hinweis",
+      thyroid_rit_note:
+        "Eine bald geplante Radioioddiagnostik oder Radioiodtherapie nach iodhaltigem Kontrastmittel ist ein separates Problem. Das Timing sollte explizit mit Nuklearmedizin / Endokrinologie besprochen werden.",
+      thyroid_local_prophylaxis_note:
+        "Perchlorat- / Thiamazol-basierte Prophylaxe-Pfade sind keine universellen ESUR-Bedside-Regeln. Sie sollten als lokale oder endokrinologisch geführte Protokolle behandelt werden.",
+
+      // Calculators
+      calculators_title: "Rechner",
+      calculators_subtitle: "Didaktische Rechentools für Dosisabschätzung und Nebennieren-Washout.",
+      calculators_tools_title: "Rechner-Tools",
+      dose_tab: "Dosis",
+      washout_tab: "Washout",
+
+      // Dose
+      dose_input_title: "Dosis-Eingabe",
+      dose_region_head: "Kopf",
+      dose_region_thorax: "Thorax",
+      dose_region_abdomen_pelvis: "Abdomen / Becken",
+      dose_dlp_placeholder: "DLP",
+      dose_placeholder: "Die Dosisabschätzung erscheint hier, sobald die JavaScript-Logik verbunden ist.",
+      dose_invalid: "Bitte einen gültigen DLP-Wert eingeben.",
+      dose_estimated_msv: "Geschätzte effektive Dosis",
+      dose_region_label: "Region",
+      dose_comparison_background: "Ungefähre natürliche Hintergrundstrahlung",
+      dose_comparison_cxr: "Ungefähre Thorax-Röntgenbilder",
+      dose_comparison_flights: "Ungefähre Langstreckenflüge",
+      dose_disclaimer:
+        "Dies ist eine didaktische Schätzung auf Grundlage eines regionsspezifischen Konversionsfaktors. Es handelt sich nicht um eine patientenspezifische Dosis- oder Krebsrisikoberechnung.",
+      dose_safety_note:
+        "Geschätzte mSv-Werte und Alltagsvergleiche sollten als didaktische Näherungen gekennzeichnet werden, nicht als patientenspezifisches Risiko.",
+
+      // Washout
+      washout_input_title: "Washout-Eingabe",
+      washout_unenhanced_placeholder: "Nativ-HU",
+      washout_enhanced_placeholder: "KM-HU",
+      washout_delayed_placeholder: "Verzögert-HU",
+      washout_delay_placeholder: "Delay (Minuten, optional)",
+      washout_placeholder: "Die Washout-Berechnung erscheint hier, sobald die JavaScript-Logik verbunden ist.",
+      washout_invalid: "Bitte gültige numerische HU-Werte eingeben.",
+      washout_invalid_formula: "Mit diesen Werten ist keine sinnvolle Washout-Berechnung möglich. Bitte die HU-Eingaben prüfen.",
+      washout_absolute: "Absoluter Washout",
+      washout_relative: "Relativer Washout",
+      washout_classic: "Klassische Interpretation",
+      washout_delay_label: "Delay",
+      washout_classic_positive:
+        "Nach klassischen radiologischen Schwellen sprechen die Werte für ein adenomatypisches Washout-Verhalten (absolut >60% und/oder relativ >40%).",
+      washout_classic_negative:
+        "Nach klassischen radiologischen Schwellen zeigen die Werte kein typisches adenomatöses Washout-Verhalten.",
+      washout_caution:
+        "Washout immer im Kontext interpretieren: Nativ-HU, Homogenität der Läsion, Messqualität, onkologisches Setting und aktuelle Guideline-Vorsicht bleiben relevant.",
+      washout_safety_note:
+        "Washout-Werte sollten zusammen mit Nativ-HU, Homogenität der Läsion und dem weiteren klinischen Kontext interpretiert werden.",
+
       // Practice Changes tab — static UI
       changes_title: "Practice Changes 2025",
       changes_subtitle:
@@ -492,6 +699,31 @@ document.addEventListener("DOMContentLoaded", function () {
       changes_compare_mode_badge: "Vergleich",
       changes_action_mode_badge: "Action mode"
     }
+  };
+
+  const doseFactors = {
+    head: 0.0021,
+    thorax: 0.014,
+    abdomen_pelvis: 0.015
+  };
+
+  const doseRegionLabels = {
+    en: {
+      head: "Head",
+      thorax: "Thorax",
+      abdomen_pelvis: "Abdomen / Pelvis"
+    },
+    de: {
+      head: "Kopf",
+      thorax: "Thorax",
+      abdomen_pelvis: "Abdomen / Becken"
+    }
+  };
+
+  const doseComparisons = {
+    chestXray: 0.1,
+    longHaulFlight: 0.03,
+    annualBackground: 3.0
   };
 
   const changesLibrary = {
@@ -743,64 +975,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "This topic should not be reduced to one generic eGFR rule. The 2025 guidance differentiates between mixed GBCA → ICM workflows, two ICM injections, and two GBCA injections."
               ],
               variant: "impact"
-            }
-          ],
-          nested: [
-            {
-              title: "1. Mixed elective MRI + CT/(coronary) angiography",
-              sections: [
-                {
-                  label: "2018",
-                  paragraphs: [
-                    "Same-day iodine + gadolinium combinations were already discussed, but in a less explicit operational format."
-                  ]
-                },
-                {
-                  label: "2025",
-                  bullets: [
-                    "For elective same-day combinations, ESUR 2025 states it is better to start with MRI, except CT urography.",
-                    "GBCA → ICM: eGFR >60: minimum 2 h, optimal 6 h.",
-                    "GBCA → ICM: eGFR 30–60: minimum 16 h, optimal 48 h.",
-                    "GBCA → ICM: eGFR <30: minimum 60 h, optimal 168 h.",
-                    "In emergency or life-threatening situations, no waiting time / back-to-back administration may be used."
-                  ]
-                },
-                {
-                  label: "Practical impact",
-                  paragraphs: [
-                    "The order of studies matters. Mixed same-day contrast workflows should be planned more deliberately than before."
-                  ],
-                  variant: "impact"
-                }
-              ]
-            },
-            {
-              title: "2. Two iodine-based contrast administrations",
-              sections: [
-                {
-                  label: "2025",
-                  bullets: [
-                    "eGFR >60: minimum 4 h, optimal 12 h.",
-                    "eGFR 30–60: minimum 16 h, optimal 48 h.",
-                    "eGFR <30: minimum 60 h, optimal 168 h.",
-                    "Dialysis without remnant renal function: at least 3 dialysis sessions."
-                  ]
-                }
-              ]
-            },
-            {
-              title: "3. Two gadolinium-based contrast administrations",
-              sections: [
-                {
-                  label: "2025",
-                  bullets: [
-                    "Without known renal impairment: minimum 4 h, optimal 12 h.",
-                    "eGFR 30–60: minimum 16 h, optimal 48 h.",
-                    "eGFR <30: minimum 60 h, optimal 168 h.",
-                    "Dialysis without remnant renal function: at least 3 dialysis sessions."
-                  ]
-                }
-              ]
             }
           ],
           refs: [
@@ -1965,11 +2139,22 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const views = {
-    flow: document.getElementById("view-flow"),
-    switch: document.getElementById("view-switch"),
-    tryptase: document.getElementById("view-tryptase"),
-    nihr: document.getElementById("view-nihr"),
+    hsr: document.getElementById("view-hsr"),
+    thyroid: document.getElementById("view-thyroid"),
+    calculators: document.getElementById("view-calculators"),
     changes: document.getElementById("view-changes")
+  };
+
+  const hsrTabs = {
+    guidance: document.getElementById("hsr-tab-guidance"),
+    switch: document.getElementById("hsr-tab-switch"),
+    tryptase: document.getElementById("hsr-tab-tryptase"),
+    nihr: document.getElementById("hsr-tab-nihr")
+  };
+
+  const calcTabs = {
+    dose: document.getElementById("calc-tab-dose"),
+    washout: document.getElementById("calc-tab-washout")
   };
 
   const flowOutput = document.getElementById("flowOutput");
@@ -1977,6 +2162,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const switchOutput = document.getElementById("switchOutput");
   const tryptaseOutput = document.getElementById("tryptaseOutput");
   const nihrOutput = document.getElementById("nihrOutput");
+  const thyroidOutput = document.getElementById("thyroidOutput");
+  const doseOutput = document.getElementById("doseOutput");
+  const washoutOutput = document.getElementById("washoutOutput");
 
   const icmCard = document.getElementById("icmCard");
   const gbcaCard = document.getElementById("gbcaCard");
@@ -1996,6 +2184,10 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  function fmt(value, digits = 2) {
+    return Number(value).toFixed(digits);
   }
 
   function levelLabel(level) {
@@ -2091,6 +2283,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function applyStaticTranslations() {
     document.documentElement.lang = state.lang;
+    document.title = t("app_title");
 
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.dataset.i18n;
@@ -2148,16 +2341,40 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.classList.toggle("emergency", state.situation === "emergency");
   }
 
-  function showView(name) {
+  function showMainView(name) {
     Object.keys(views).forEach((key) => {
       if (views[key]) views[key].hidden = key !== name;
     });
 
     document.querySelectorAll(".bottomnav__btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.nav === name);
+      btn.classList.toggle("active", btn.dataset.mainNav === name);
     });
 
-    state.nav = name;
+    state.mainNav = name;
+  }
+
+  function showHsrTab(name) {
+    Object.keys(hsrTabs).forEach((key) => {
+      if (hsrTabs[key]) hsrTabs[key].hidden = key !== name;
+    });
+
+    document.querySelectorAll("[data-hsr-tab]").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.hsrTab === name);
+    });
+
+    state.hsrTab = name;
+  }
+
+  function showCalcTab(name) {
+    Object.keys(calcTabs).forEach((key) => {
+      if (calcTabs[key]) calcTabs[key].hidden = key !== name;
+    });
+
+    document.querySelectorAll("[data-calc-tab]").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.calcTab === name);
+    });
+
+    state.calcTab = name;
   }
 
   function setSegment(seg, value) {
@@ -2254,9 +2471,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const significant = acute >= threshold;
 
     tryptaseOutput.innerHTML = `
-      <div><strong>${escapeHtml(t("tryptase_threshold"))}:</strong> ${threshold.toFixed(2)} ng/mL</div>
-      <div><strong>${escapeHtml(t("tryptase_acute"))}:</strong> ${acute.toFixed(2)} ng/mL</div>
-      <div><strong>${escapeHtml(t("tryptase_baseline"))}:</strong> ${baseline.toFixed(2)} ng/mL</div>
+      <div><strong>${escapeHtml(t("tryptase_threshold"))}:</strong> ${fmt(threshold)} ng/mL</div>
+      <div><strong>${escapeHtml(t("tryptase_acute"))}:</strong> ${fmt(acute)} ng/mL</div>
+      <div><strong>${escapeHtml(t("tryptase_baseline"))}:</strong> ${fmt(baseline)} ng/mL</div>
       <div class="hint" style="margin-top:10px">${escapeHtml(t("tryptase_formula"))}</div>
       <div style="margin-top:10px"><strong>${escapeHtml(significant ? t("tryptase_positive") : t("tryptase_negative"))}</strong></div>
       <div class="hint" style="margin-top:10px">${escapeHtml(t("tryptase_note"))}</div>
@@ -2284,6 +2501,235 @@ document.addEventListener("DOMContentLoaded", function () {
       <div><strong>${escapeHtml(t("nihr_positive_title"))}</strong></div>
       <ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
     `;
+  }
+
+  function renderThyroid() {
+    if (!thyroidOutput) return;
+
+    const status = state.thyroidStatus;
+    const ritSoon = state.thyroidRit === "planned_soon";
+    const situation = state.thyroidSituation;
+    const medication = state.thyroidMedication;
+
+    let level = "ok";
+    let title = t("thyroid_level_ok");
+    let lead = t("thyroid_level_ok_detail");
+    let reasoning = [];
+    let nextSteps = [];
+    let localNote = t("thyroid_local_prophylaxis_note");
+
+    if (status === "manifest") {
+      level = "danger";
+      title = t("thyroid_level_danger");
+      lead = t("thyroid_level_danger_detail");
+      reasoning.push(
+        state.lang === "de"
+          ? "ESUR 2025 beschreibt manifeste Hyperthyreose als Konstellation, in der iodhaltiges Kontrastmittel nicht gegeben werden sollte."
+          : "ESUR 2025 describes manifest hyperthyroidism as a setting in which iodinated contrast should not be given."
+      );
+      nextSteps.push(
+        situation === "emergency"
+          ? (state.lang === "de"
+              ? "Nur bei zwingender klinischer Indikation erwägen und die Situation eng mit Endokrinologie / behandelndem Team abstimmen."
+              : "Only consider if clinically unavoidable and coordinate closely with Endocrinology / the treating team.")
+          : (state.lang === "de"
+              ? "Alternative Bildgebung prüfen und iodhaltiges Kontrastmittel möglichst vermeiden."
+              : "Consider alternative imaging and avoid iodinated contrast where possible.")
+      );
+    } else if (status === "graves") {
+      level = situation === "emergency" ? "danger" : "warn";
+      title = level === "danger" ? t("thyroid_level_danger") : t("thyroid_level_warn");
+      lead = level === "danger" ? t("thyroid_level_danger_detail") : t("thyroid_level_warn_detail");
+      reasoning.push(
+        state.lang === "de"
+          ? "Unbehandelter Morbus Basedow gehört zu den klaren Risikokonstellationen für iodinduzierte thyreotoxische Probleme."
+          : "Untreated Graves’ disease is one of the clear risk constellations for iodine-induced thyrotoxic problems."
+      );
+      nextSteps.push(
+        state.lang === "de"
+          ? "TSH / klinische Situation prüfen und endokrinologische Rücksprache erwägen."
+          : "Check TSH / clinical status and consider endocrinology input."
+      );
+    } else if (status === "autonomy") {
+      level = "warn";
+      title = t("thyroid_level_warn");
+      lead = t("thyroid_level_warn_detail");
+      reasoning.push(
+        state.lang === "de"
+          ? "Bekannte Autonomie oder multinodöse Struma gehört zu den ESUR-Risikogruppen."
+          : "Known autonomy or multinodular goitre belongs to the ESUR risk groups."
+      );
+      nextSteps.push(
+        state.lang === "de"
+          ? "Risikonutzen abwägen, TSH / endokrinologische Abklärung gezielt erwägen und lokale Protokolle beachten."
+          : "Weigh benefit versus risk, consider targeted TSH / endocrinology assessment, and follow local protocols."
+      );
+    } else if (status === "subclinical") {
+      level = "warn";
+      title = t("thyroid_level_warn");
+      lead = t("thyroid_level_warn_detail");
+      reasoning.push(
+        state.lang === "de"
+          ? "Ein niedriges TSH oder unklare Risikokonstellationen sind keine automatische absolute Kontraindikation, brauchen aber Kontext."
+          : "Low TSH or unclear thyroid-risk constellations are not automatic absolute contraindications, but they need context."
+      );
+      nextSteps.push(
+        state.lang === "de"
+          ? "Wenn zeitlich möglich, Ursache und Relevanz vor elektiver Kontrastgabe klären."
+          : "If time allows, clarify the cause and relevance before elective contrast administration."
+      );
+    } else {
+      level = "ok";
+      title = t("thyroid_level_ok");
+      lead = t("thyroid_level_ok_detail");
+      reasoning.push(
+        state.lang === "de"
+          ? "Normale Schilddrüsenfunktion gilt in ESUR nicht als spezielle Risikokonstellation."
+          : "Normal thyroid function is not considered a special ESUR thyroid-risk constellation."
+      );
+      nextSteps.push(
+        state.lang === "de"
+          ? "Iodhaltiges Kontrastmittel ist im Allgemeinen möglich."
+          : "Iodinated contrast is generally possible."
+      );
+    }
+
+    if (status === "normal" && medication === "levothyroxine") {
+      reasoning.push(
+        state.lang === "de"
+          ? "Eine reine Levothyroxin-Substitution bei sonst normaler Funktion ist für sich allein kein typischer Hochrisikofaktor."
+          : "Levothyroxine replacement alone with otherwise normal function is not by itself a typical high-risk factor."
+      );
+    }
+
+    if (medication === "thyreostatics" && (status === "manifest" || status === "graves" || status === "autonomy" || status === "subclinical")) {
+      reasoning.push(
+        state.lang === "de"
+          ? "Laufende Thyreostatika ändern den Kontext, heben eine relevante Risikokonstellation aber nicht automatisch auf."
+          : "Ongoing thyrostatic treatment changes the context, but does not automatically remove a relevant thyroid-risk constellation."
+      );
+    }
+
+    if (ritSoon) {
+      if (level === "ok") level = "warn";
+      if (title !== t("thyroid_level_danger")) title = t("thyroid_level_warn");
+      if (lead === t("thyroid_level_ok_detail")) lead = t("thyroid_level_warn_detail");
+      reasoning.push(t("thyroid_rit_note"));
+      nextSteps.push(
+        state.lang === "de"
+          ? "Vor KM-Gabe explizit mit Nuklearmedizin / Endokrinologie Timing und Konsequenzen für Radioiod-Anwendung abstimmen."
+          : "Before contrast administration, explicitly coordinate timing and implications for radioiodine use with Nuclear Medicine / Endocrinology."
+      );
+    }
+
+    const levelClass =
+      level === "danger"
+        ? "rgba(255,74,74,.12); border-color:rgba(255,74,74,.28);"
+        : level === "warn"
+          ? "rgba(255,255,255,.06); border-color:rgba(255,255,255,.18);"
+          : "rgba(75,140,255,.10); border-color:rgba(75,140,255,.24);";
+
+    thyroidOutput.innerHTML = `
+      <div style="background:${levelClass.split(';')[0].replace('background:','')}; border:1px solid ${levelClass.split('border-color:')[1].replace(';','')}; border-radius:14px; padding:11px 12px;">
+        <strong>${escapeHtml(title)}</strong><br />
+        <span>${escapeHtml(lead)}</span>
+      </div>
+      <div>
+        <strong>${escapeHtml(t("thyroid_reasoning"))}:</strong>
+        <ul>${reasoning.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      </div>
+      <div>
+        <strong>${escapeHtml(t("thyroid_next_steps"))}:</strong>
+        <ul>${nextSteps.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      </div>
+      <div class="hint">
+        <strong>${escapeHtml(t("thyroid_local_note"))}:</strong> ${escapeHtml(localNote)}
+      </div>
+    `;
+  }
+
+  function renderDose() {
+    if (!doseOutput) return;
+    if (!doseOutput.dataset.ready) {
+      doseOutput.innerHTML = `<div class="hint">${escapeHtml(t("dose_placeholder"))}</div>`;
+    }
+  }
+
+  function calcDose() {
+    if (!doseOutput) return;
+
+    const dlp = Number(document.getElementById("doseDlp")?.value);
+    const factor = doseFactors[state.doseRegion];
+
+    if (!isFinite(dlp) || dlp < 0) {
+      doseOutput.innerHTML = `<div class="hint">${escapeHtml(t("dose_invalid"))}</div>`;
+      return;
+    }
+
+    const msv = dlp * factor;
+    const backgroundYears = msv / doseComparisons.annualBackground;
+    const chestXrays = doseComparisons.chestXray > 0 ? msv / doseComparisons.chestXray : 0;
+    const flights = doseComparisons.longHaulFlight > 0 ? msv / doseComparisons.longHaulFlight : 0;
+
+    doseOutput.innerHTML = `
+      <div><strong>${escapeHtml(t("dose_region_label"))}:</strong> ${escapeHtml(doseRegionLabels[state.lang][state.doseRegion])}</div>
+      <div><strong>${escapeHtml(t("dose_estimated_msv"))}:</strong> ${fmt(msv)} mSv</div>
+      <div><strong>${escapeHtml(t("dose_comparison_background"))}:</strong> ${fmt(backgroundYears)} ${state.lang === "de" ? "Jahre" : "years"}</div>
+      <div><strong>${escapeHtml(t("dose_comparison_cxr"))}:</strong> ${fmt(chestXrays, 0)}</div>
+      <div><strong>${escapeHtml(t("dose_comparison_flights"))}:</strong> ${fmt(flights, 0)}</div>
+      <div class="hint">${escapeHtml(t("dose_disclaimer"))}</div>
+    `;
+
+    doseOutput.dataset.ready = "1";
+  }
+
+  function renderWashout() {
+    if (!washoutOutput) return;
+    if (!washoutOutput.dataset.ready) {
+      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_placeholder"))}</div>`;
+    }
+  }
+
+  function calcWashout() {
+    if (!washoutOutput) return;
+
+    const unenhanced = Number(document.getElementById("washoutUnenhanced")?.value);
+    const enhanced = Number(document.getElementById("washoutEnhanced")?.value);
+    const delayed = Number(document.getElementById("washoutDelayed")?.value);
+    const delayMinRaw = document.getElementById("washoutDelayMin")?.value ?? "";
+    const delayMin = delayMinRaw === "" ? null : Number(delayMinRaw);
+
+    if (
+      !isFinite(unenhanced) ||
+      !isFinite(enhanced) ||
+      !isFinite(delayed) ||
+      (delayMinRaw !== "" && (!isFinite(delayMin) || delayMin < 0))
+    ) {
+      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_invalid"))}</div>`;
+      return;
+    }
+
+    const absDenominator = enhanced - unenhanced;
+    const relDenominator = enhanced;
+
+    if (absDenominator === 0 || relDenominator === 0) {
+      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_invalid_formula"))}</div>`;
+      return;
+    }
+
+    const absoluteWashout = ((enhanced - delayed) / absDenominator) * 100;
+    const relativeWashout = ((enhanced - delayed) / relDenominator) * 100;
+    const classicPositive = absoluteWashout > 60 || relativeWashout > 40;
+
+    washoutOutput.innerHTML = `
+      <div><strong>${escapeHtml(t("washout_absolute"))}:</strong> ${fmt(absoluteWashout)}%</div>
+      <div><strong>${escapeHtml(t("washout_relative"))}:</strong> ${fmt(relativeWashout)}%</div>
+      ${delayMin !== null ? `<div><strong>${escapeHtml(t("washout_delay_label"))}:</strong> ${fmt(delayMin, 0)} ${state.lang === "de" ? "Minuten" : "minutes"}</div>` : ""}
+      <div><strong>${escapeHtml(t("washout_classic"))}:</strong> ${escapeHtml(classicPositive ? t("washout_classic_positive") : t("washout_classic_negative"))}</div>
+      <div class="hint">${escapeHtml(t("washout_caution"))}</div>
+    `;
+
+    washoutOutput.dataset.ready = "1";
   }
 
   function getChanges() {
@@ -2500,6 +2946,39 @@ document.addEventListener("DOMContentLoaded", function () {
     renderSwitch();
     renderTryptase();
     renderNihr();
+    renderThyroid();
+    renderDose();
+    renderWashout();
+    renderChanges();
+  }
+
+  function refreshComputedModulesAfterLanguageChange() {
+    const baselineVal = document.getElementById("baseline")?.value ?? "";
+    const acuteVal = document.getElementById("acute")?.value ?? "";
+    if (baselineVal !== "" && acuteVal !== "") {
+      calcTryptase();
+    } else {
+      renderTryptase();
+    }
+
+    const dlpVal = document.getElementById("doseDlp")?.value ?? "";
+    if (dlpVal !== "") {
+      calcDose();
+    } else {
+      renderDose();
+    }
+
+    const uVal = document.getElementById("washoutUnenhanced")?.value ?? "";
+    const eVal = document.getElementById("washoutEnhanced")?.value ?? "";
+    const dVal = document.getElementById("washoutDelayed")?.value ?? "";
+    if (uVal !== "" && eVal !== "" && dVal !== "") {
+      calcWashout();
+    } else {
+      renderWashout();
+    }
+
+    renderNihr();
+    renderThyroid();
     renderChanges();
   }
 
@@ -2510,13 +2989,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function resetAll() {
-    state.nav = "flow";
+    state.mainNav = "hsr";
+    state.hsrTab = "guidance";
+    state.calcTab = "dose";
+
     state.situation = "elective";
     state.reaction = "moderate";
     state.cmtype = "icm";
     state.nihrCmtype = "icm";
     state.icm = null;
     state.gbca = null;
+
+    state.thyroidSituation = "elective";
+    state.thyroidStatus = "normal";
+    state.thyroidMedication = "none";
+    state.thyroidRit = "no";
+
+    state.doseRegion = "head";
 
     state.changesFilter = "all";
     state.changesMode = "compare";
@@ -2525,16 +3014,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.body.classList.remove("emergency");
 
-    ["situation", "reaction", "cmtype", "nihrCmtype"].forEach((seg) => {
+    const defaults = {
+      situation: "elective",
+      reaction: "moderate",
+      cmtype: "icm",
+      nihrCmtype: "icm",
+      thyroidSituation: "elective",
+      thyroidStatus: "normal",
+      thyroidMedication: "none",
+      thyroidRit: "no",
+      doseRegion: "head"
+    };
+
+    Object.keys(defaults).forEach((seg) => {
       document.querySelectorAll(`.seg__btn[data-seg="${seg}"]`).forEach((btn) => {
-        const defaults = {
-          situation: "elective",
-          reaction: "moderate",
-          cmtype: "icm",
-          nihrCmtype: "icm"
-        };
         btn.classList.toggle("active", btn.dataset.value === defaults[seg]);
       });
+    });
+
+    clearButtons("icm");
+    clearButtons("gbca");
+
+    document.querySelectorAll("[data-hsr-tab]").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.hsrTab === "guidance");
+    });
+
+    document.querySelectorAll("[data-calc-tab]").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.calcTab === "dose");
+    });
+
+    document.querySelectorAll(".bottomnav__btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.mainNav === "hsr");
     });
 
     document.querySelectorAll("[data-change-filter]").forEach((btn) => {
@@ -2545,35 +3055,83 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.classList.toggle("active", btn.dataset.changeMode === "compare");
     });
 
-    clearButtons("icm");
-    clearButtons("gbca");
+    const idsToClear = [
+      "baseline",
+      "acute",
+      "doseDlp",
+      "washoutUnenhanced",
+      "washoutEnhanced",
+      "washoutDelayed",
+      "washoutDelayMin",
+      "changesSearch"
+    ];
 
-    const baseline = document.getElementById("baseline");
-    const acute = document.getElementById("acute");
-    if (baseline) baseline.value = "";
-    if (acute) acute.value = "";
-    if (changesSearchInput) changesSearchInput.value = "";
+    idsToClear.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
 
     document.querySelectorAll(".nihr-check").forEach((el) => (el.checked = false));
 
-    if (tryptaseOutput) delete tryptaseOutput.dataset.ready;
+    if (tryptaseOutput) {
+      delete tryptaseOutput.dataset.ready;
+      tryptaseOutput.innerHTML = "";
+    }
+    if (doseOutput) {
+      delete doseOutput.dataset.ready;
+      doseOutput.innerHTML = "";
+    }
+    if (washoutOutput) {
+      delete washoutOutput.dataset.ready;
+      washoutOutput.innerHTML = "";
+    }
 
-    showView("flow");
+    showMainView("hsr");
+    showHsrTab("guidance");
+    showCalcTab("dose");
+    setBodyMode();
     renderAll();
   }
 
+  // Main nav
   document.querySelectorAll(".bottomnav__btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      showView(btn.dataset.nav);
+      showMainView(btn.dataset.mainNav);
     });
   });
 
-  ["situation", "reaction", "cmtype", "nihrCmtype"].forEach((seg) => {
+  // HSR subnav
+  document.querySelectorAll("[data-hsr-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      showHsrTab(btn.dataset.hsrTab);
+    });
+  });
+
+  // Calculator subnav
+  document.querySelectorAll("[data-calc-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      showCalcTab(btn.dataset.calcTab);
+    });
+  });
+
+  // Generic segment buttons
+  [
+    "situation",
+    "reaction",
+    "cmtype",
+    "nihrCmtype",
+    "thyroidSituation",
+    "thyroidStatus",
+    "thyroidMedication",
+    "thyroidRit",
+    "doseRegion"
+  ].forEach((seg) => {
     document.querySelectorAll(`.seg__btn[data-seg="${seg}"]`).forEach((btn) => {
       btn.addEventListener("click", () => setSegment(seg, btn.dataset.value));
     });
   });
 
+  // ICM/GBCA group selectors
   document.querySelectorAll('.seg__btn[data-seg="icm"]').forEach((btn) => {
     btn.addEventListener("click", () => {
       state.icm = btn.dataset.value;
@@ -2592,6 +3150,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Practice Changes controls
   document.querySelectorAll("[data-change-filter]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.changesFilter = btn.dataset.changeFilter;
@@ -2613,8 +3172,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Calculator buttons
   const calcBtn = document.getElementById("calcTryptase");
   if (calcBtn) calcBtn.addEventListener("click", calcTryptase);
+
+  const calcDoseBtn = document.getElementById("calcDose");
+  if (calcDoseBtn) calcDoseBtn.addEventListener("click", calcDose);
+
+  const calcWashoutBtn = document.getElementById("calcWashout");
+  if (calcWashoutBtn) calcWashoutBtn.addEventListener("click", calcWashout);
 
   document.querySelectorAll(".nihr-check").forEach((el) => el.addEventListener("change", renderNihr));
 
@@ -2630,11 +3196,7 @@ document.addEventListener("DOMContentLoaded", function () {
       langEn.classList.add("active");
       if (langDe) langDe.classList.remove("active");
       renderAll();
-
-      if ((document.getElementById("baseline")?.value ?? "") !== "" && (document.getElementById("acute")?.value ?? "") !== "") {
-        calcTryptase();
-      }
-      renderNihr();
+      refreshComputedModulesAfterLanguageChange();
     });
   }
 
@@ -2644,15 +3206,13 @@ document.addEventListener("DOMContentLoaded", function () {
       langDe.classList.add("active");
       if (langEn) langEn.classList.remove("active");
       renderAll();
-
-      if ((document.getElementById("baseline")?.value ?? "") !== "" && (document.getElementById("acute")?.value ?? "") !== "") {
-        calcTryptase();
-      }
-      renderNihr();
+      refreshComputedModulesAfterLanguageChange();
     });
   }
 
-  showView("flow");
+  showMainView("hsr");
+  showHsrTab("guidance");
+  showCalcTab("dose");
   setBodyMode();
   renderAll();
 });
