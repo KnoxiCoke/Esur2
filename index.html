@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ESUR CM Hypersensitivity Support</title>
+  <title>Radiology Contrast & Safety App</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
 <header class="topbar">
   <div class="topbar__left">
-    <div class="topbar__title" data-i18n="app_title">ESUR CM Hypersensitivity Support</div>
+    <div class="topbar__title" data-i18n="app_title">Radiology Contrast &amp; Safety App</div>
   </div>
 
   <div class="topbar__right">
@@ -29,164 +29,312 @@
 
 <main class="app">
 
-  <!-- FLOW -->
-  <section class="view" id="view-flow">
-    <h1 class="h1" data-i18n="flow_title">Guidance</h1>
-    <p class="p-muted" data-i18n="flow_subtitle">Quick guidance for prior contrast hypersensitivity reactions.</p>
+  <!-- HSR MAIN VIEW -->
+  <section class="view" id="view-hsr">
+    <h1 class="h1" data-i18n="hsr_title">HSR</h1>
+    <p class="p-muted" data-i18n="hsr_subtitle">
+      Hypersensitivity guidance, empiric switch support, tryptase interpretation and NIHR red-flag check.
+    </p>
 
     <div class="card">
-      <div class="card__title" data-i18n="flow_step1">Step 1 — Situation</div>
+      <div class="card__title" data-i18n="hsr_tools_title">HSR tools</div>
+      <div class="seg seg--stack hsr-subnav">
+        <button class="seg__btn active" data-hsr-tab="guidance" type="button" data-i18n="hsr_guidance_tab">Guidance</button>
+        <button class="seg__btn" data-hsr-tab="switch" type="button" data-i18n="hsr_switch_tab">Switch</button>
+        <button class="seg__btn" data-hsr-tab="tryptase" type="button" data-i18n="hsr_tryptase_tab">Tryptase</button>
+        <button class="seg__btn" data-hsr-tab="nihr" type="button" data-i18n="hsr_nihr_tab">NIHR</button>
+      </div>
+    </div>
+
+    <!-- HSR: GUIDANCE -->
+    <section class="subview" id="hsr-tab-guidance">
+      <div class="card">
+        <div class="card__title" data-i18n="flow_step1">Step 1 — Situation</div>
+        <div class="seg">
+          <button class="seg__btn active" data-seg="situation" data-value="elective" type="button" data-i18n="elective">Elective</button>
+          <button class="seg__btn" data-seg="situation" data-value="emergency" type="button" data-i18n="emergency">Emergency</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title" data-i18n="flow_step2">Step 2 — Prior reaction severity</div>
+        <div class="seg seg--stack">
+          <button class="seg__btn" data-seg="reaction" data-value="mild" type="button" data-i18n="mild">Mild</button>
+          <button class="seg__btn active" data-seg="reaction" data-value="moderate" type="button" data-i18n="moderate">Moderate</button>
+          <button class="seg__btn" data-seg="reaction" data-value="severe" type="button" data-i18n="severe">Severe</button>
+        </div>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="recommendation">Recommendation</div>
+        <div class="output" id="flowOutput"></div>
+      </div>
+
+      <div class="card card--subtle">
+        <div class="card__title" data-i18n="safety_net">Safety net</div>
+        <div class="output" id="flowSafety"></div>
+      </div>
+    </section>
+
+    <!-- HSR: SWITCH -->
+    <section class="subview" id="hsr-tab-switch" hidden>
+      <div class="card card--subtle">
+        <div class="output hint" id="switchNonvalidated"></div>
+      </div>
+
+      <div class="card">
+        <div class="card__title" data-i18n="contrast_type">Contrast type</div>
+        <div class="seg">
+          <button class="seg__btn active" data-seg="cmtype" data-value="icm" type="button" data-i18n="icm_ct">ICM (CT)</button>
+          <button class="seg__btn" data-seg="cmtype" data-value="gbca" type="button" data-i18n="gbca_mri">GBCA (MRI)</button>
+        </div>
+      </div>
+
+      <div class="card" id="icmCard">
+        <div class="card__title" data-i18n="icm_title">ICM (iodine-based)</div>
+        <div class="hint" id="icmHint"></div>
+
+        <div class="seg seg--stack">
+          <button class="seg__btn" data-seg="icm" data-value="A" type="button">
+            <span>Group A</span>
+            <div class="small" id="icm-group-a-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="icm" data-value="B" type="button">
+            <span>Group B</span>
+            <div class="small" id="icm-group-b-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="icm" data-value="C" type="button">
+            <span>Group C</span>
+            <div class="small" id="icm-group-c-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="icm" data-value="D" type="button">
+            <span>Group D</span>
+            <div class="small" id="icm-group-d-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="icm" data-value="unknown" type="button">
+            <span data-i18n="unknown">Unknown</span>
+            <div class="small" data-i18n="icm_unknown_hint">Use when the involved ICM is not known.</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="gbcaCard" hidden>
+        <div class="card__title" data-i18n="gbca_title">GBCA</div>
+        <div class="hint" id="gbcaHint"></div>
+
+        <div class="seg seg--stack">
+          <button class="seg__btn" data-seg="gbca" data-value="A" type="button">
+            <span>Group A</span>
+            <div class="small" id="gbca-group-a-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="gbca" data-value="B" type="button">
+            <span>Group B</span>
+            <div class="small" id="gbca-group-b-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="gbca" data-value="C" type="button">
+            <span>Group C</span>
+            <div class="small" id="gbca-group-c-names"></div>
+          </button>
+          <button class="seg__btn" data-seg="gbca" data-value="unknown" type="button">
+            <span data-i18n="unknown">Unknown</span>
+            <div class="small" data-i18n="gbca_unknown_hint">Use when the involved GBCA is not known.</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="possible_alternatives">Possible alternatives</div>
+        <div class="output" id="switchOutput"></div>
+      </div>
+
+      <div class="card card--subtle">
+        <div class="card__title" data-i18n="safety_note">Safety note</div>
+        <div class="output" data-i18n="switch_safety_note">
+          Cross-reactivity is variable. ESUR states that empiric switching is not robustly evidence-based; allergy evaluation with testing is preferred when available.
+        </div>
+      </div>
+    </section>
+
+    <!-- HSR: TRYPTASE -->
+    <section class="subview" id="hsr-tab-tryptase" hidden>
+      <div class="card">
+        <div class="card__title" data-i18n="enter_values">Enter values</div>
+        <input type="number" id="baseline" placeholder="Baseline (ng/mL)" />
+        <input type="number" id="acute" placeholder="Acute (ng/mL)" />
+        <button class="btn" id="calcTryptase" type="button" data-i18n="calculate">Calculate</button>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="result">Result</div>
+        <div class="output" id="tryptaseOutput"></div>
+      </div>
+    </section>
+
+    <!-- HSR: NIHR -->
+    <section class="subview" id="hsr-tab-nihr" hidden>
+      <div class="card">
+        <div class="card__title" data-i18n="nihr_cmtype_title">Contrast type</div>
+        <div class="seg">
+          <button class="seg__btn active" data-seg="nihrCmtype" data-value="icm" type="button" data-i18n="icm_ct">ICM (CT)</button>
+          <button class="seg__btn" data-seg="nihrCmtype" data-value="gbca" type="button" data-i18n="gbca_mri">GBCA (MRI)</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title" data-i18n="red_flags">Danger signs</div>
+        <div class="checklist">
+          <label><input type="checkbox" class="nihr-check" value="blister" /> <span data-i18n="blistering">Blistering</span></label>
+          <label><input type="checkbox" class="nihr-check" value="mucosa" /> <span data-i18n="mucosal_involvement">Mucosal involvement</span></label>
+          <label><input type="checkbox" class="nihr-check" value="erosion" /> <span data-i18n="erosions">Erosions</span></label>
+          <label><input type="checkbox" class="nihr-check" value="hemorrhagic" /> <span data-i18n="hemorrhagic_lesions">Hemorrhagic lesions</span></label>
+          <label><input type="checkbox" class="nihr-check" value="skin_disruption" /> <span data-i18n="skin_disruption">Skin disruption</span></label>
+          <label><input type="checkbox" class="nihr-check" value="fever" /> <span data-i18n="fever">High fever</span></label>
+          <label><input type="checkbox" class="nihr-check" value="organ_values" /> <span data-i18n="organ_values">Abnormal liver / kidney values</span></label>
+          <label><input type="checkbox" class="nihr-check" value="lymphadenopathy" /> <span data-i18n="lymphadenopathy">Lymphadenopathy</span></label>
+        </div>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="assessment">Assessment</div>
+        <div class="output" id="nihrOutput"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- THYROID MAIN VIEW -->
+  <section class="view" id="view-thyroid" hidden>
+    <h1 class="h1" data-i18n="thyroid_title">Thyroid</h1>
+    <p class="p-muted" data-i18n="thyroid_subtitle">
+      Decision support for iodine-based contrast media in patients with thyroid-related risk constellations.
+    </p>
+
+    <div class="card">
+      <div class="card__title" data-i18n="thyroid_step1">Step 1 — Clinical situation</div>
       <div class="seg">
-        <button class="seg__btn active" data-seg="situation" data-value="elective" type="button" data-i18n="elective">Elective</button>
-        <button class="seg__btn" data-seg="situation" data-value="emergency" type="button" data-i18n="emergency">Emergency</button>
+        <button class="seg__btn active" data-seg="thyroidSituation" data-value="elective" type="button" data-i18n="elective">Elective</button>
+        <button class="seg__btn" data-seg="thyroidSituation" data-value="emergency" type="button" data-i18n="emergency">Emergency</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="card__title" data-i18n="flow_step2">Step 2 — Prior reaction severity</div>
+      <div class="card__title" data-i18n="thyroid_step2">Step 2 — Thyroid status</div>
       <div class="seg seg--stack">
-        <button class="seg__btn" data-seg="reaction" data-value="mild" type="button" data-i18n="mild">Mild</button>
-        <button class="seg__btn active" data-seg="reaction" data-value="moderate" type="button" data-i18n="moderate">Moderate</button>
-        <button class="seg__btn" data-seg="reaction" data-value="severe" type="button" data-i18n="severe">Severe</button>
+        <button class="seg__btn active" data-seg="thyroidStatus" data-value="normal" type="button" data-i18n="thyroid_status_normal">Normal thyroid function</button>
+        <button class="seg__btn" data-seg="thyroidStatus" data-value="manifest" type="button" data-i18n="thyroid_status_manifest">Manifest hyperthyroidism</button>
+        <button class="seg__btn" data-seg="thyroidStatus" data-value="subclinical" type="button" data-i18n="thyroid_status_subclinical">Subclinical / low TSH / unclear risk</button>
+        <button class="seg__btn" data-seg="thyroidStatus" data-value="autonomy" type="button" data-i18n="thyroid_status_autonomy">Known autonomy / multinodular goitre</button>
+        <button class="seg__btn" data-seg="thyroidStatus" data-value="graves" type="button" data-i18n="thyroid_status_graves">Untreated Graves’ disease</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title" data-i18n="thyroid_step3">Step 3 — Medication</div>
+      <div class="seg seg--stack">
+        <button class="seg__btn active" data-seg="thyroidMedication" data-value="none" type="button" data-i18n="thyroid_med_none">No thyroid medication</button>
+        <button class="seg__btn" data-seg="thyroidMedication" data-value="levothyroxine" type="button" data-i18n="thyroid_med_levothyroxine">Levothyroxine</button>
+        <button class="seg__btn" data-seg="thyroidMedication" data-value="thyreostatics" type="button" data-i18n="thyroid_med_thyreostatics">Thyreostatics</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__title" data-i18n="thyroid_step4">Step 4 — Planned radioiodine</div>
+      <div class="seg">
+        <button class="seg__btn active" data-seg="thyroidRit" data-value="no" type="button" data-i18n="thyroid_rit_no">No / not relevant</button>
+        <button class="seg__btn" data-seg="thyroidRit" data-value="planned_soon" type="button" data-i18n="thyroid_rit_yes">Planned soon</button>
       </div>
     </div>
 
     <div class="card card--output">
       <div class="card__title" data-i18n="recommendation">Recommendation</div>
-      <div class="output" id="flowOutput"></div>
-    </div>
-
-    <div class="card card--subtle">
-      <div class="card__title" data-i18n="safety_net">Safety net</div>
-      <div class="output" id="flowSafety"></div>
-    </div>
-  </section>
-
-  <!-- SWITCH -->
-  <section class="view" id="view-switch" hidden>
-    <h1 class="h1" data-i18n="switch_title">Switch</h1>
-    <p class="p-muted" data-i18n="switch_subtitle">Empiric switch guidance only. Allergy-based selection is preferred when available.</p>
-
-    <div class="card">
-      <div class="card__title" data-i18n="contrast_type">Contrast type</div>
-      <div class="seg">
-        <button class="seg__btn active" data-seg="cmtype" data-value="icm" type="button" data-i18n="icm_ct">ICM (CT)</button>
-        <button class="seg__btn" data-seg="cmtype" data-value="gbca" type="button" data-i18n="gbca_mri">GBCA (MRI)</button>
+      <div class="output" id="thyroidOutput">
+        <div class="hint" data-i18n="thyroid_placeholder">
+          Thyroid decision support will appear here after the JavaScript logic is connected.
+        </div>
       </div>
-    </div>
-
-    <div class="card card--subtle">
-      <div class="output hint" id="switchNonvalidated"></div>
-    </div>
-
-    <div class="card" id="icmCard">
-      <div class="card__title" data-i18n="icm_title">ICM (iodine-based)</div>
-      <div class="hint" id="icmHint"></div>
-
-      <div class="seg seg--stack">
-        <button class="seg__btn" data-seg="icm" data-value="A" type="button">
-          <span>Group A</span>
-          <div class="small" id="icm-group-a-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="icm" data-value="B" type="button">
-          <span>Group B</span>
-          <div class="small" id="icm-group-b-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="icm" data-value="C" type="button">
-          <span>Group C</span>
-          <div class="small" id="icm-group-c-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="icm" data-value="D" type="button">
-          <span>Group D</span>
-          <div class="small" id="icm-group-d-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="icm" data-value="unknown" type="button">
-          <span data-i18n="unknown">Unknown</span>
-          <div class="small" data-i18n="icm_unknown_hint">Use when the involved ICM is not known.</div>
-        </button>
-      </div>
-    </div>
-
-    <div class="card" id="gbcaCard" hidden>
-      <div class="card__title" data-i18n="gbca_title">GBCA</div>
-      <div class="hint" id="gbcaHint"></div>
-
-      <div class="seg seg--stack">
-        <button class="seg__btn" data-seg="gbca" data-value="A" type="button">
-          <span>Group A</span>
-          <div class="small" id="gbca-group-a-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="gbca" data-value="B" type="button">
-          <span>Group B</span>
-          <div class="small" id="gbca-group-b-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="gbca" data-value="C" type="button">
-          <span>Group C</span>
-          <div class="small" id="gbca-group-c-names"></div>
-        </button>
-        <button class="seg__btn" data-seg="gbca" data-value="unknown" type="button">
-          <span data-i18n="unknown">Unknown</span>
-          <div class="small" data-i18n="gbca_unknown_hint">Use when the involved GBCA is not known.</div>
-        </button>
-      </div>
-    </div>
-
-    <div class="card card--output">
-      <div class="card__title" data-i18n="possible_alternatives">Possible alternatives</div>
-      <div class="output" id="switchOutput"></div>
     </div>
 
     <div class="card card--subtle">
       <div class="card__title" data-i18n="safety_note">Safety note</div>
-      <div class="output" data-i18n="switch_safety_note">
-        Cross-reactivity is variable. ESUR states that empiric switching is not robustly evidence-based; allergy evaluation with testing is preferred when available.
+      <div class="output" id="thyroidSafety" data-i18n="thyroid_safety_note">
+        This module should distinguish between ESUR core guidance and local or endocrinology-led prophylaxis pathways.
       </div>
     </div>
   </section>
 
-  <!-- TRYPTASE -->
-  <section class="view" id="view-tryptase" hidden>
-    <h1 class="h1" data-i18n="tryptase_title">Tryptase Rule</h1>
-    <p class="p-muted" data-i18n="tryptase_subtitle">
-      Use for moderate to severe immediate hypersensitivity reactions (IHR). ESUR recommends acute sampling within 1–4 h and a baseline sample after ≥24 h.
+  <!-- CALCULATORS MAIN VIEW -->
+  <section class="view" id="view-calculators" hidden>
+    <h1 class="h1" data-i18n="calculators_title">Calculators</h1>
+    <p class="p-muted" data-i18n="calculators_subtitle">
+      Educational calculation tools for dose estimation and adrenal washout.
     </p>
 
     <div class="card">
-      <div class="card__title" data-i18n="enter_values">Enter values</div>
-      <input type="number" id="baseline" placeholder="Baseline (ng/mL)" />
-      <input type="number" id="acute" placeholder="Acute (ng/mL)" />
-      <button class="btn" id="calcTryptase" type="button" data-i18n="calculate">Calculate</button>
-    </div>
-
-    <div class="card card--output">
-      <div class="card__title" data-i18n="result">Result</div>
-      <div class="output" id="tryptaseOutput"></div>
-    </div>
-  </section>
-
-  <!-- NIHR -->
-  <section class="view" id="view-nihr" hidden>
-    <h1 class="h1" data-i18n="nihr_title">NIHR Check</h1>
-    <p class="p-muted" data-i18n="nihr_subtitle">Check for danger signs suggesting severe delayed cutaneous reaction (SCAR).</p>
-
-    <div class="card">
-      <div class="card__title" data-i18n="red_flags">Danger signs</div>
-      <div class="checklist">
-        <label><input type="checkbox" class="nihr-check" value="blister" /> <span data-i18n="blistering">Blistering</span></label>
-        <label><input type="checkbox" class="nihr-check" value="mucosa" /> <span data-i18n="mucosal_involvement">Mucosal involvement</span></label>
-        <label><input type="checkbox" class="nihr-check" value="erosion" /> <span data-i18n="erosions">Erosions</span></label>
-        <label><input type="checkbox" class="nihr-check" value="hemorrhagic" /> <span data-i18n="hemorrhagic_lesions">Hemorrhagic lesions</span></label>
-        <label><input type="checkbox" class="nihr-check" value="skin_disruption" /> <span data-i18n="skin_disruption">Skin disruption</span></label>
-        <label><input type="checkbox" class="nihr-check" value="fever" /> <span data-i18n="fever">High fever</span></label>
-        <label><input type="checkbox" class="nihr-check" value="organ_values" /> <span data-i18n="organ_values">Abnormal liver / kidney values</span></label>
-        <label><input type="checkbox" class="nihr-check" value="lymphadenopathy" /> <span data-i18n="lymphadenopathy">Lymphadenopathy</span></label>
+      <div class="card__title" data-i18n="calculators_tools_title">Calculator tools</div>
+      <div class="seg">
+        <button class="seg__btn active" data-calc-tab="dose" type="button" data-i18n="dose_tab">Dose</button>
+        <button class="seg__btn" data-calc-tab="washout" type="button" data-i18n="washout_tab">Washout</button>
       </div>
     </div>
 
-    <div class="card card--output">
-      <div class="card__title" data-i18n="assessment">Assessment</div>
-      <div class="output" id="nihrOutput"></div>
-    </div>
+    <!-- DOSE -->
+    <section class="subview" id="calc-tab-dose">
+      <div class="card">
+        <div class="card__title" data-i18n="dose_input_title">Dose input</div>
+
+        <div class="seg seg--stack">
+          <button class="seg__btn active" data-seg="doseRegion" data-value="head" type="button" data-i18n="dose_region_head">Head</button>
+          <button class="seg__btn" data-seg="doseRegion" data-value="thorax" type="button" data-i18n="dose_region_thorax">Thorax</button>
+          <button class="seg__btn" data-seg="doseRegion" data-value="abdomen_pelvis" type="button" data-i18n="dose_region_abdomen_pelvis">Abdomen / Pelvis</button>
+        </div>
+
+        <input type="number" id="doseDlp" placeholder="DLP" data-i18n-placeholder="dose_dlp_placeholder" />
+        <button class="btn" id="calcDose" type="button" data-i18n="calculate">Calculate</button>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="result">Result</div>
+        <div class="output" id="doseOutput">
+          <div class="hint" data-i18n="dose_placeholder">
+            Dose estimation will appear here after the JavaScript logic is connected.
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--subtle">
+        <div class="card__title" data-i18n="safety_note">Safety note</div>
+        <div class="output" id="doseSafety" data-i18n="dose_safety_note">
+          Estimated mSv values and everyday comparisons should be labeled as educational approximations, not as patient-specific risk.
+        </div>
+      </div>
+    </section>
+
+    <!-- WASHOUT -->
+    <section class="subview" id="calc-tab-washout" hidden>
+      <div class="card">
+        <div class="card__title" data-i18n="washout_input_title">Washout input</div>
+        <input type="number" id="washoutUnenhanced" placeholder="Unenhanced HU" data-i18n-placeholder="washout_unenhanced_placeholder" />
+        <input type="number" id="washoutEnhanced" placeholder="Enhanced HU" data-i18n-placeholder="washout_enhanced_placeholder" />
+        <input type="number" id="washoutDelayed" placeholder="Delayed HU" data-i18n-placeholder="washout_delayed_placeholder" />
+        <input type="number" id="washoutDelayMin" placeholder="Delay (minutes, optional)" data-i18n-placeholder="washout_delay_placeholder" />
+        <button class="btn" id="calcWashout" type="button" data-i18n="calculate">Calculate</button>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="result">Result</div>
+        <div class="output" id="washoutOutput">
+          <div class="hint" data-i18n="washout_placeholder">
+            Washout calculation will appear here after the JavaScript logic is connected.
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--subtle">
+        <div class="card__title" data-i18n="safety_note">Safety note</div>
+        <div class="output" id="washoutSafety" data-i18n="washout_safety_note">
+          Washout values should be interpreted with unenhanced HU, lesion homogeneity and the broader clinical context.
+        </div>
+      </div>
+    </section>
   </section>
 
   <!-- PRACTICE CHANGES -->
@@ -253,14 +401,12 @@
 </main>
 
 <nav class="bottomnav">
-  <button class="bottomnav__btn active" data-nav="flow" type="button" data-i18n="flow_title">Guidance</button>
-  <button class="bottomnav__btn" data-nav="switch" type="button" data-i18n="switch_title">Switch</button>
-  <button class="bottomnav__btn" data-nav="tryptase" type="button" data-i18n="tryptase_title">Tryptase Rule</button>
-  <button class="bottomnav__btn" data-nav="nihr" type="button" data-i18n="nihr_title">NIHR Check</button>
-  <button class="bottomnav__btn" data-nav="changes" type="button" data-i18n="changes_title">Practice Changes 2025</button>
+  <button class="bottomnav__btn active" data-main-nav="hsr" type="button" data-i18n="nav_hsr">HSR</button>
+  <button class="bottomnav__btn" data-main-nav="thyroid" type="button" data-i18n="nav_thyroid">Thyroid</button>
+  <button class="bottomnav__btn" data-main-nav="calculators" type="button" data-i18n="nav_calculators">Calculators</button>
+  <button class="bottomnav__btn" data-main-nav="changes" type="button" data-i18n="nav_changes">Practice Changes</button>
 </nav>
 
 <script src="./script.js"></script>
 </body>
 </html>
-```
