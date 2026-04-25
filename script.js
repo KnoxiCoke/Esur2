@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const state = {
     mainNav: "hsr",          // hsr | thyroid | calculators | changes
-    hsrTab: "guidance",      // guidance | switch | tryptase | nihr
+    hsrTab: "guidance",      // guidance | acute | switch | tryptase | nihr
     calcTab: "dose",         // dose | washout
 
     // HSR
@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     reaction: "moderate",    // mild | moderate | severe
     cmtype: "icm",
     nihrCmtype: "icm",
+    acuteSeverity: "mild",   // mild | moderate | severe
+    acutePattern: "mild_general",
     icm: null,
     gbca: null,
 
@@ -47,14 +49,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // HSR main
       hsr_title: "HSR",
-      hsr_subtitle: "Hypersensitivity guidance, empiric switch support, tryptase interpretation and delayed reaction check.",
+      hsr_subtitle: "Previous-reaction planning, acute management, empiric switch support, tryptase interpretation and delayed reaction check.",
       hsr_tools_title: "HSR tools",
-      hsr_guidance_tab: "Guidance",
+      hsr_guidance_tab: "Previous reaction",
+      hsr_acute_tab: "Acute management",
       hsr_switch_tab: "Switch",
       hsr_tryptase_tab: "Tryptase",
       hsr_nihr_tab: "Delayed reaction check",
 
-      flow_title: "Guidance",
+      flow_title: "Previous reaction",
       flow_subtitle: "Educational support for prior contrast media hypersensitivity reactions.",
       flow_step1: "Step 1 — Clinical situation",
       flow_step2: "Step 2 — Prior reaction severity",
@@ -126,6 +129,121 @@ document.addEventListener("DOMContentLoaded", function () {
         "The result does not support a significant acute tryptase increase.",
       tryptase_note:
         "Results should always be interpreted in the clinical context. A normal tryptase value does not exclude a true immediate hypersensitivity reaction.",
+
+      acute_title: "Acute management",
+      acute_subtitle:
+        "ESUR acute algorithm. Follow local emergency protocol and verify medication concentration before administration.",
+      acute_immediate_title: "Immediate assessment and general actions",
+      acute_severity_title: "Severity selector",
+      acute_pattern_title: "Dominant reaction pattern",
+      acute_output_title: "ESUR acute management",
+      acute_dose_reference_title: "Dose safety note",
+      acute_dose_reference_note:
+        "ESUR dose reference. Verify concentration, route, patient factors and local emergency protocol before administration.",
+      acute_severity_mild: "Mild reactions",
+      acute_severity_moderate: "Moderate reactions",
+      acute_severity_severe: "Severe reactions",
+      acute_pattern_mild_general: "Mild reactions",
+      acute_pattern_moderate_urticaria: "Generalised urticaria / diffuse erythema",
+      acute_pattern_moderate_angioedema: "Facial / angioedema",
+      acute_pattern_moderate_bronchospasm: "Mild bronchospasm",
+      acute_pattern_severe_anaphylaxis: "Anaphylaxis",
+      acute_section_clinical: "Clinical pattern / warning",
+      acute_section_management: "Management",
+      acute_section_escalation: "Escalation / rapid response",
+      acute_warning_label: "Warning",
+      acute_arrest_title: "Cardiac or respiratory arrest",
+      acute_immediate_actions: [
+        "History and physical exam by radiology physician.",
+        "A — Airway: wheezing, stridor.",
+        "B — Breathing: auscultation of lungs/throat, SaO₂.",
+        "C — Circulation: pulse, blood pressure, pulsations.",
+        "D — Disability: responsiveness.",
+        "E — Environment: inspection of the entire skin.",
+        "Stop infusing contrast agent and replace IV line with crystalloid.",
+        "Determine serum tryptase within 1–4 h in all moderate to severe reactions."
+      ],
+      acute_content: {
+        mild_general: {
+clinical:
+  "Nasal congestion, sneezing, conjunctivitis, rhinorrhoea, cutaneous oedema, itchy throat, mild scattered urticaria, e.g. <10.",
+management: [
+  "Reassure patient.",
+  "Maintain IV access.",
+  "IV drip 500 mL NaCl 0.9%.",
+  "Observation with regular intervals until symptoms resolve, minimum 30 minutes.",
+  "When vomiting is protracted: ondansetron 4 mg IV.",
+  "When persisting cutaneous reaction or itching: non-sedating H1-antihistamine, e.g. desloratadine 5 mg PO once daily or cetirizine 10 mg PO once daily."
+],
+escalation: [
+  "When needed, consult rapid response team."
+]
+        },
+        moderate_urticaria: {
+clinical: "Generalised urticaria / diffuse erythema.",
+warning: "Cave hypotension.",
+management: [
+  "IV 1000 mL NaCl 0.9% in 1 h.",
+  "H1-antihistamine IV, e.g. clemastine 2 mg.",
+  "When needed, repeat H1-antihistamine IV after 5 minutes.",
+  "When hypotensive (SBP <90): active elevation of legs."
+],
+escalation: [
+  "When hypotensive (SBP <90): treat as anaphylaxis.",
+  "When needed, consult rapid response team."
+]
+        },
+        moderate_angioedema: {
+clinical: "Facial / angioedema.",
+warning: "Cave laryngeal oedema.",
+management: [
+  "O₂ via mask 10–15 L/min.",
+  "IV 1000 mL NaCl 0.9% in 1 h.",
+  "H1-antihistamine IV, e.g. clemastine 2 mg.",
+  "When needed, repeat H1-antihistamine IV after 5 minutes."
+],
+escalation: [
+  "If severe or stridor/laryngeal oedema: sitting position.",
+  "If severe or stridor/laryngeal oedema: treat as anaphylaxis.",
+  "If severe or stridor/laryngeal oedema: consult rapid response team."
+]
+        },
+        moderate_bronchospasm: {
+clinical: "Mild bronchospasm.",
+warning: "Cave respiratory threat.",
+management: [
+  "O₂ via mask 10–15 L/min.",
+  "SABA dose-aerosol: 2–3 deep inhalations of 100 µg, or nebulization in 3 mL saline until improved, according to ESUR/source text.",
+  "When needed, repeat SABA nebulization until improved."
+],
+escalation: [
+  "When increasing in severity: adrenaline 1 mg/mL, 0.5 mg IM.",
+  "When increasing in severity: when needed, repeat adrenaline 1 mg/mL, 0.5 mg IM after 5 minutes, guided by heart rate.",
+  "When protracted >5 h: consider adding corticosteroid slowly IV, e.g. prednisolone 50 mg.",
+  "When needed, consult rapid response team."
+]
+        },
+        severe_anaphylaxis: {
+clinical: "Anaphylaxis.",
+management: [
+  "Consult rapid response team.",
+  "O₂ via mask 10–15 L/min.",
+  "IV 500 mL NaCl 0.9% in 10 minutes.",
+  "When needed, repeat IV NaCl 0.9%.",
+  "Adrenaline 1 mg/mL, 0.5 mg IM.",
+  "When needed, repeat adrenaline 1 mg/mL, 0.5 mg IM after 5 minutes, guided by heart rate.",
+  "H1-antihistamine IV, e.g. clemastine 2 mg.",
+  "When needed, SABA dose-aerosol 2–10 deep inhalations of 100 µg or nebulization in 3 mL saline up to 1 hour, according to ESUR/source text.",
+  "Consider adding corticosteroid slowly IV, e.g. prednisolone 50 mg.",
+  "When needed, intubation and ICU."
+],
+arrest: [
+  "CALL RESUSCITATION TEAM.",
+  "Start cardio-pulmonary resuscitation.",
+  "Adrenaline 0.1 mg/mL IV only via resuscitation team."
+]
+        }
+      },
 
       nihr_title: "Delayed reaction check",
       nihr_subtitle:
@@ -398,14 +516,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // HSR main
       hsr_title: "HSR",
-      hsr_subtitle: "Hypersensitivitäts-Guidance, empirische Switch-Hilfe, Tryptase-Interpretation und Spätreaktions-Check.",
+      hsr_subtitle: "Planung nach früherer Reaktion, Akutmanagement, empirische Switch-Hilfe, Tryptase-Interpretation und Spätreaktions-Check.",
       hsr_tools_title: "HSR-Tools",
-      hsr_guidance_tab: "Guidance",
+      hsr_guidance_tab: "Frühere Reaktion",
+      hsr_acute_tab: "Akutmanagement",
       hsr_switch_tab: "Switch",
       hsr_tryptase_tab: "Tryptase",
       hsr_nihr_tab: "Spätreaktions-Check",
 
-      flow_title: "Guidance",
+      flow_title: "Frühere Reaktion",
       flow_subtitle: "Didaktische Orientierung bei früheren Hypersensitivitätsreaktionen auf Kontrastmittel.",
       flow_step1: "Schritt 1 — Klinische Situation",
       flow_step2: "Schritt 2 — Schweregrad der früheren Reaktion",
@@ -477,6 +596,121 @@ document.addEventListener("DOMContentLoaded", function () {
         "Das Ergebnis stützt keinen signifikanten akuten Tryptaseanstieg.",
       tryptase_note:
         "Die Resultate sollten immer im klinischen Kontext interpretiert werden. Ein normaler Tryptasewert schliesst eine echte unmittelbare Hypersensitivitätsreaktion nicht aus.",
+
+      acute_title: "Akutmanagement",
+      acute_subtitle:
+        "ESUR-Akutalgorithmus. Lokales Notfallprotokoll beachten und Medikamentenkonzentration vor Gabe prüfen.",
+      acute_immediate_title: "Sofortbeurteilung und allgemeine Maßnahmen",
+      acute_severity_title: "Schweregrad-Auswahl",
+      acute_pattern_title: "Dominantes Reaktionsmuster",
+      acute_output_title: "ESUR-Akutmanagement",
+      acute_dose_reference_title: "Dosissicherheit",
+      acute_dose_reference_note:
+        "ESUR-Dosisreferenz. Vor Gabe Konzentration, Applikationsweg, Patientensituation und lokales Notfallprotokoll prüfen.",
+      acute_severity_mild: "Milde Reaktionen",
+      acute_severity_moderate: "Moderate Reaktionen",
+      acute_severity_severe: "Schwere Reaktionen",
+      acute_pattern_mild_general: "Milde Reaktionen",
+      acute_pattern_moderate_urticaria: "Generalisierte Urtikaria / diffuses Erythem",
+      acute_pattern_moderate_angioedema: "Faziales Ödem / Angioödem",
+      acute_pattern_moderate_bronchospasm: "Milder Bronchospasmus",
+      acute_pattern_severe_anaphylaxis: "Anaphylaxie",
+      acute_section_clinical: "Klinisches Muster / Warnhinweis",
+      acute_section_management: "Management",
+      acute_section_escalation: "Eskalation / Rapid Response",
+      acute_warning_label: "Warnhinweis",
+      acute_arrest_title: "Herz- oder Atemstillstand",
+      acute_immediate_actions: [
+        "Anamnese und körperliche Untersuchung durch Radiologin/Radiologen.",
+        "A — Airway/Atemweg: Giemen, Stridor.",
+        "B — Breathing/Atmung: Auskultation von Lunge/Rachen, SaO₂.",
+        "C — Circulation/Kreislauf: Puls, Blutdruck, Pulsationen.",
+        "D — Disability/Neurologie: Ansprechbarkeit.",
+        "E — Environment/Exposition: Inspektion der gesamten Haut.",
+        "Kontrastmittelinfusion stoppen und i.v.-Leitung mit kristalloider Infusion weiterführen.",
+        "Serumtryptase innerhalb von 1–4 h bei allen moderaten bis schweren Reaktionen bestimmen."
+      ],
+      acute_content: {
+        mild_general: {
+clinical:
+  "Nasale Kongestion, Niesen, Konjunktivitis, Rhinorrhö, kutanes Ödem, juckender Hals, milde vereinzelte Urtikaria, z. B. <10.",
+management: [
+  "Patientin/Patient beruhigen.",
+  "IV-Zugang belassen.",
+  "500 mL NaCl 0,9% i.v. als Infusion.",
+  "Regelmäßige Beobachtung bis zum Abklingen der Symptome, mindestens 30 Minuten.",
+  "Bei prolongiertem Erbrechen: Ondansetron 4 mg i.v.",
+  "Bei persistierender Hautreaktion oder Juckreiz: nicht sedierendes H1-Antihistaminikum, z. B. Desloratadin 5 mg p.o. 1× täglich oder Cetirizin 10 mg p.o. 1× täglich."
+],
+escalation: [
+  "Bei Bedarf Rapid-Response-Team hinzuziehen."
+]
+        },
+        moderate_urticaria: {
+clinical: "Generalisierte Urtikaria / diffuses Erythem.",
+warning: "Achtung Hypotonie.",
+management: [
+  "1000 mL NaCl 0,9% i.v. in 1 h.",
+  "H1-Antihistaminikum i.v., z. B. Clemastin 2 mg.",
+  "Bei Bedarf H1-Antihistaminikum i.v. nach 5 Minuten wiederholen.",
+  "Bei Hypotonie (SBP <90): Beine aktiv hochlagern."
+],
+escalation: [
+  "Bei Hypotonie (SBP <90): wie Anaphylaxie behandeln.",
+  "Bei Bedarf Rapid-Response-Team hinzuziehen."
+]
+        },
+        moderate_angioedema: {
+clinical: "Faziales Ödem / Angioödem.",
+warning: "Achtung Larynxödem.",
+management: [
+  "O₂ über Maske 10–15 L/min.",
+  "1000 mL NaCl 0,9% i.v. in 1 h.",
+  "H1-Antihistaminikum i.v., z. B. Clemastin 2 mg.",
+  "Bei Bedarf H1-Antihistaminikum i.v. nach 5 Minuten wiederholen."
+],
+escalation: [
+  "Bei schwerem Verlauf oder Stridor/Larynxödem: sitzende Position.",
+  "Bei schwerem Verlauf oder Stridor/Larynxödem: wie Anaphylaxie behandeln.",
+  "Bei schwerem Verlauf oder Stridor/Larynxödem: Rapid-Response-Team hinzuziehen."
+]
+        },
+        moderate_bronchospasm: {
+clinical: "Milder Bronchospasmus.",
+warning: "Achtung respiratorische Bedrohung.",
+management: [
+  "O₂ über Maske 10–15 L/min.",
+  "SABA-Dosieraerosol: 2–3 tiefe Inhalationen à 100 µg oder Vernebelung in 3 mL NaCl bis zur Besserung, gemäß ESUR/Quelltext.",
+  "Bei Bedarf SABA-Vernebelung bis zur Besserung wiederholen."
+],
+escalation: [
+  "Bei zunehmender Schwere: Adrenalin 1 mg/mL, 0,5 mg i.m.",
+  "Bei zunehmender Schwere: bei Bedarf Adrenalin 1 mg/mL, 0,5 mg i.m. nach 5 Minuten wiederholen, herzfrequenzgesteuert.",
+  "Bei protrahiertem Verlauf >5 h: Kortikosteroid langsam i.v. erwägen, z. B. Prednisolon 50 mg.",
+  "Bei Bedarf Rapid-Response-Team hinzuziehen."
+]
+        },
+        severe_anaphylaxis: {
+clinical: "Anaphylaxie.",
+management: [
+  "Rapid-Response-Team hinzuziehen.",
+  "O₂ über Maske 10–15 L/min.",
+  "500 mL NaCl 0,9% i.v. in 10 Minuten.",
+  "Bei Bedarf NaCl 0,9% i.v. wiederholen.",
+  "Adrenalin 1 mg/mL, 0,5 mg i.m.",
+  "Bei Bedarf Adrenalin 1 mg/mL, 0,5 mg i.m. nach 5 Minuten wiederholen, herzfrequenzgesteuert.",
+  "H1-Antihistaminikum i.v., z. B. Clemastin 2 mg.",
+  "Bei Bedarf SABA-Dosieraerosol 2–10 tiefe Inhalationen à 100 µg oder Vernebelung in 3 mL NaCl bis zu 1 Stunde, gemäß ESUR/Quelltext.",
+  "Kortikosteroid langsam i.v. erwägen, z. B. Prednisolon 50 mg.",
+  "Bei Bedarf Intubation und ICU/Intensivstation."
+],
+arrest: [
+  "REANIMATIONSTEAM RUFEN.",
+  "Kardiopulmonale Reanimation starten.",
+  "Adrenalin 0,1 mg/mL i.v. nur durch das Reanimationsteam."
+]
+        }
+      },
 
       nihr_title: "Spätreaktions-Check",
       nihr_subtitle:
@@ -2181,6 +2415,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const hsrTabs = {
     guidance: document.getElementById("hsr-tab-guidance"),
+    acute: document.getElementById("hsr-tab-acute"),
     switch: document.getElementById("hsr-tab-switch"),
     tryptase: document.getElementById("hsr-tab-tryptase"),
     nihr: document.getElementById("hsr-tab-nihr")
@@ -2193,6 +2428,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const flowOutput = document.getElementById("flowOutput");
   const flowSafety = document.getElementById("flowSafety");
+  const acuteImmediateOutput = document.getElementById("acuteImmediateOutput");
+  const acuteOutput = document.getElementById("acuteOutput");
   const switchOutput = document.getElementById("switchOutput");
   const tryptaseOutput = document.getElementById("tryptaseOutput");
   const nihrOutput = document.getElementById("nihrOutput");
@@ -2429,8 +2666,18 @@ document.addEventListener("DOMContentLoaded", function () {
     state.calcTab = name;
   }
 
+  function defaultAcutePattern(severity) {
+    if (severity === "moderate") return "moderate_urticaria";
+    if (severity === "severe") return "severe_anaphylaxis";
+    return "mild_general";
+  }
+
   function setSegment(seg, value) {
     state[seg] = value;
+
+    if (seg === "acuteSeverity") {
+      state.acutePattern = defaultAcutePattern(value);
+    }
 
     document.querySelectorAll(`.seg__btn[data-seg="${seg}"]`).forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.value === value);
@@ -2459,6 +2706,77 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (flowSafety) flowSafety.textContent = t("flow_safety");
+  }
+
+
+  function renderAcuteList(items) {
+    return `<ul>${(items || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+  }
+
+  function renderAcuteManagement() {
+    const contentByPattern = t("acute_content");
+    if (!contentByPattern[state.acutePattern]) {
+      state.acutePattern = defaultAcutePattern(state.acuteSeverity);
+    }
+
+    document.querySelectorAll('.seg__btn[data-seg="acuteSeverity"]').forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.value === state.acuteSeverity);
+    });
+
+    document.querySelectorAll('.seg__btn[data-seg="acutePattern"]').forEach((btn) => {
+      const isVisible = btn.dataset.acuteSeverity === state.acuteSeverity;
+      btn.hidden = !isVisible;
+      btn.classList.toggle("active", isVisible && btn.dataset.value === state.acutePattern);
+    });
+
+    if (acuteImmediateOutput) {
+  const immediateActions = t("acute_immediate_actions") || [];
+  const intro = immediateActions[0] || "";
+  const actions = immediateActions.slice(1);
+
+  acuteImmediateOutput.innerHTML = `
+    ${intro ? `<div>${escapeHtml(intro)}</div>` : ""}
+    ${renderAcuteList(actions)}
+  `;
+}
+
+    if (!acuteOutput) return;
+
+    const content = contentByPattern[state.acutePattern];
+    const warning = content.warning
+      ? `<div><strong>${escapeHtml(t("acute_warning_label"))}:</strong> ${escapeHtml(content.warning)}</div>`
+      : "";
+    const escalation = (content.escalation || []).length
+      ? renderAcuteList(content.escalation)
+      : "";
+    const arrest = (content.arrest || []).length
+      ? `
+        <div>
+<strong>${escapeHtml(t("acute_arrest_title"))}:</strong>
+${renderAcuteList(content.arrest)}
+        </div>
+      `
+      : "";
+
+    acuteOutput.innerHTML = `
+      <div>
+        <strong>${escapeHtml(t("acute_section_clinical"))}</strong>
+        <div>${escapeHtml(content.clinical)}</div>
+        ${warning}
+      </div>
+      <div>
+        <strong>${escapeHtml(t("acute_section_management"))}</strong>
+        ${renderAcuteList(content.management)}
+      </div>
+      <div>
+        <strong>${escapeHtml(t("acute_section_escalation"))}</strong>
+        ${escalation}
+        ${arrest}
+      </div>
+      <div class="hint">
+        <strong>${escapeHtml(t("acute_dose_reference_title"))}:</strong> ${escapeHtml(t("acute_dose_reference_note"))}
+      </div>
+    `;
   }
 
   function renderSwitch() {
@@ -2999,6 +3317,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderAll() {
     applyStaticTranslations();
     renderFlow();
+    renderAcuteManagement();
     renderSwitch();
     renderTryptase();
     renderNihr();
@@ -3053,6 +3372,8 @@ document.addEventListener("DOMContentLoaded", function () {
     state.reaction = "moderate";
     state.cmtype = "icm";
     state.nihrCmtype = "icm";
+    state.acuteSeverity = "mild";
+    state.acutePattern = "mild_general";
     state.icm = null;
     state.gbca = null;
 
@@ -3075,6 +3396,8 @@ document.addEventListener("DOMContentLoaded", function () {
       reaction: "moderate",
       cmtype: "icm",
       nihrCmtype: "icm",
+      acuteSeverity: "mild",
+      acutePattern: "mild_general",
       thyroidSituation: "elective",
       thyroidStatus: "normal",
       thyroidMedication: "none",
@@ -3197,6 +3520,8 @@ if (stickyDisclaimer) {
     "reaction",
     "cmtype",
     "nihrCmtype",
+    "acuteSeverity",
+    "acutePattern",
     "thyroidSituation",
     "thyroidStatus",
     "thyroidMedication",
