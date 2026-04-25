@@ -3337,7 +3337,6 @@ ${renderAcuteList(content.arrest)}
   renderWashout();
   renderChanges();
 }
-  }
 
   function refreshComputedModulesAfterLanguageChange() {
     const baselineVal = document.getElementById("baseline")?.value ?? "";
