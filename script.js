@@ -2643,7 +2643,10 @@ arrest: [
     isRelevantView && isEmergencySelected
   );
 }
-
+  
+  document.addEventListener("click", function () {
+  window.requestAnimationFrame(setBodyMode);
+});
   function showMainView(name) {
     Object.keys(views).forEach((key) => {
       if (views[key]) views[key].hidden = key !== name;
