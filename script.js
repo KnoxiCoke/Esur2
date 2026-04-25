@@ -3324,17 +3324,19 @@ ${renderAcuteList(content.arrest)}
 }
 
   function renderAll() {
-    
-    applyStaticTranslations();
-    renderFlow();
-    renderAcuteManagement();
-    renderSwitch();
-    renderTryptase();
-    renderNihr();
-    renderThyroid();
-    renderDose();
-    renderWashout();
-    renderChanges();
+  setBodyMode();
+
+  applyStaticTranslations();
+  renderFlow();
+  renderAcuteManagement();
+  renderSwitch();
+  renderTryptase();
+  renderNihr();
+  renderThyroid();
+  renderDose();
+  renderWashout();
+  renderChanges();
+}
   }
 
   function refreshComputedModulesAfterLanguageChange() {
