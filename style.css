@@ -30,7 +30,7 @@
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
   --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.12);
 
-  --maxw: 920px;
+  --maxw: 1120px;
 }
 
 *,
@@ -312,7 +312,7 @@ body.emergency .bottomnav__btn.active {
 }
 
 .hsr-subnav {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 
 /* =========================
@@ -883,7 +883,11 @@ body.emergency .checklist input[type="checkbox"] {
   .hsr-subnav {
     grid-template-columns: 1fr 1fr;
   }
-
+.hsr-subnav .seg__btn:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc((100% - 10px) / 2);
+}
   .change-card__header {
     padding: 13px;
   }
