@@ -2,7 +2,7 @@
   /* Injector-console-inspired dark grey UI */
 
   --bg: #1f272b;
-  --bg-emergency: #241417;
+  --bg-emergency: #211719;
 
   --surface: #263034;
   --card: #303a3f;
@@ -54,6 +54,7 @@ body {
 
 body.emergency {
   background: var(--bg-emergency);
+  box-shadow: inset 0 12px 80px rgba(211, 91, 91, 0.04);
 }
 
 button,
@@ -271,7 +272,7 @@ body.emergency .card--output {
   border-left-color: var(--danger);
   background: linear-gradient(
     180deg,
-    rgba(255, 49, 98, 0.06),
+    rgba(211, 91, 91, 0.06),
     rgba(255, 255, 255, 0.03)
   );
 }
@@ -311,8 +312,10 @@ box-shadow: inset 0 0 0 1px rgba(220, 230, 232, 0.18);
 
 body.emergency .seg__btn.active,
 body.emergency .bottomnav__btn.active {
-  background: var(--danger-soft);
-border-color: rgba(211, 91, 91, 0.35);
+  background: rgba(211, 91, 91, 0.14);
+  border-color: rgba(211, 91, 91, 0.55);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(211, 91, 91, 0.22);
 }
 
 .hsr-subnav {
