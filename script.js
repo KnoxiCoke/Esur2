@@ -2627,9 +2627,14 @@ arrest: [
   }
 
   function setBodyMode() {
-     const isRelevantView =
-    state.mainNav === "hsr" &&
-    state.hsrTab === "guidance";
+  const hsrView = document.getElementById("view-hsr");
+  const guidanceView = document.getElementById("hsr-tab-guidance");
+
+  const isRelevantView =
+    hsrView &&
+    !hsrView.hidden &&
+    guidanceView &&
+    !guidanceView.hidden;
 
   const isEmergencySelected = state.situation === "emergency";
 
@@ -2637,7 +2642,7 @@ arrest: [
     "emergency",
     isRelevantView && isEmergencySelected
   );
-  }
+}
 
   function showMainView(name) {
     Object.keys(views).forEach((key) => {
