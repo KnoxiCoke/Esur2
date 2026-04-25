@@ -2627,7 +2627,16 @@ arrest: [
   }
 
   function setBodyMode() {
-    document.body.classList.toggle("emergency", state.situation === "emergency");
+     const isRelevantView =
+    state.mainNav === "hsr" &&
+    state.hsrTab === "guidance";
+
+  const isEmergencySelected = state.situation === "emergency";
+
+  document.body.classList.toggle(
+    "emergency",
+    isRelevantView && isEmergencySelected
+  );
   }
 
   function showMainView(name) {
@@ -3315,6 +3324,7 @@ ${renderAcuteList(content.arrest)}
 }
 
   function renderAll() {
+    
     applyStaticTranslations();
     renderFlow();
     renderAcuteManagement();
