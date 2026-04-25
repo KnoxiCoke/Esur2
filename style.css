@@ -14,9 +14,9 @@
   --border: rgba(180, 195, 200, 0.18);
   --border-strong: rgba(180, 195, 200, 0.32);
 
-  --accent: #8fc7d4;
-  --accent-soft: rgba(143, 199, 212, 0.18);
-  --accent-faint: rgba(143, 199, 212, 0.07);
+  --accent: #9fb4bb;
+  --accent-soft: rgba(159, 180, 187, 0.22);
+  --accent-faint: rgba(159, 180, 187, 0.08);
 
   --danger: #d35b5b;
   --danger-soft: rgba(211, 91, 91, 0.16);
@@ -306,13 +306,13 @@ body.emergency .card--output {
   background: var(--accent-soft);
   border-color: var(--accent);
   color: var(--text);
-  box-shadow: inset 0 0 0 1px rgba(143, 199, 212, 0.35);
+box-shadow: inset 0 0 0 1px rgba(220, 230, 232, 0.18);
 }
 
 body.emergency .seg__btn.active,
 body.emergency .bottomnav__btn.active {
   background: var(--danger-soft);
-  border-color: rgba(255, 49, 98, 0.35);
+border-color: rgba(211, 91, 91, 0.35);
 }
 
 .hsr-subnav {
