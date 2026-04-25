@@ -36,23 +36,23 @@ document.addEventListener("DOMContentLoaded", function () {
       app_title: "Radiology Contrast & Safety App",
       reset: "Reset",
 
-      disclaimer_line1: "Educational support tool based on ESUR CMSC guidance (2025) and related official sources.",
+      disclaimer_line1: "Educational tool. Follow local protocols.",
       disclaimer_line2: "Information only. Clinical decisions should follow local protocols, source documents and clinical judgement. No patient data are stored.",
       disclaimer_line3: "Contrast safety content adapted from ESUR Contrast Media Safety Committee guidance.",
 
       nav_hsr: "HSR",
       nav_thyroid: "Thyroid",
       nav_calculators: "Calculators",
-      nav_changes: "Practice Changes",
+      nav_changes: "Changes",
 
       // HSR main
       hsr_title: "HSR",
-      hsr_subtitle: "Hypersensitivity guidance, empiric switch support, tryptase interpretation and NIHR red-flag check.",
+      hsr_subtitle: "Hypersensitivity guidance, empiric switch support, tryptase interpretation and delayed reaction check.",
       hsr_tools_title: "HSR tools",
       hsr_guidance_tab: "Guidance",
       hsr_switch_tab: "Switch",
       hsr_tryptase_tab: "Tryptase",
-      hsr_nihr_tab: "NIHR",
+      hsr_nihr_tab: "Delayed reaction check",
 
       flow_title: "Guidance",
       flow_subtitle: "Educational support for prior contrast media hypersensitivity reactions.",
@@ -87,6 +87,22 @@ document.addEventListener("DOMContentLoaded", function () {
       unknown: "Unknown",
       icm_unknown_hint: "Use when the involved ICM is not known.",
       gbca_unknown_hint: "Use when the involved GBCA is not known.",
+      icm_group_a_label: "Group A",
+      icm_group_b_label: "Group B",
+      icm_group_c_label: "Group C",
+      icm_group_d_label: "Group D",
+      gbca_group_a_label: "Group A",
+      gbca_group_b_label: "Group B",
+      gbca_group_c_label: "Group C",
+      icm_group_a_names:
+        "Omnipaque (iohexol) · Visipaque (iodixanol) · Iomeron (iomeprol) · Optiray (ioversol)",
+      icm_group_b_names: "Iopamiro / Isovue (iopamidol)",
+      icm_group_c_names: "Ultravist (iopromide)",
+      icm_group_d_names: "Xenetix (iobitridol)",
+      gbca_group_a_names: "Dotarem / Clariscan (gadoterate meglumine)",
+      gbca_group_b_names:
+        "Gadovist / Gadavist (gadobutrol) · ProHance (gadoteridol)",
+      gbca_group_c_names: "Elucirem / Vueway (gadopiclenol)",
       switch_nonvalidated:
         "This switch overview is optional, non-validated guidance based on practical experience. It does not replace allergy evaluation or local decision-making.",
 
@@ -111,9 +127,9 @@ document.addEventListener("DOMContentLoaded", function () {
       tryptase_note:
         "Results should always be interpreted in the clinical context. A normal tryptase value does not exclude a true immediate hypersensitivity reaction.",
 
-      nihr_title: "NIHR Check",
+      nihr_title: "Delayed reaction check",
       nihr_subtitle:
-        "Assessment for clinical features suggesting a severe cutaneous adverse reaction (SCAR).",
+        "For delayed skin reactions after contrast media, including SCAR red flags.",
       red_flags: "Danger signs",
       blistering: "Blistering",
       mucosal_involvement: "Mucosal involvement",
@@ -138,9 +154,9 @@ document.addEventListener("DOMContentLoaded", function () {
       ],
 
       icm_hint:
-        "Group A: Iohexol, Iodixanol, Iomeprol, Ioversol · Group B: Iopamidol · Group C: Iopromide · Group D: Iobitridol",
+        "ICM group examples\nBrand examples; availability and trademarks may vary by country.",
       gbca_hint:
-        "Group A: Gadoterate meglumine · Group B: Gadoteridol, Gadobutrol · Group C: Gadopiclenol",
+        "GBCA group examples\nBrand examples; availability and trademarks may vary by country.",
 
       flow_titles: {
         elective_mild: "Elective imaging — prior mild immediate hypersensitivity reaction",
@@ -325,6 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
       washout_delay_placeholder: "Delay (minutes, optional)",
       washout_placeholder: "Washout calculation will appear here after the JavaScript logic is connected.",
       washout_invalid: "Please enter valid numeric HU values.",
+      washout_no_enhancement: "No relevant enhancement pattern (Enhanced HU ≤ Unenhanced HU). Classical adrenal washout calculation is not applicable. Check ROI placement, phase selection and HU values.",
       washout_invalid_formula: "Washout calculation is not possible with these values. Check the HU inputs.",
       washout_absolute: "Absolute washout",
       washout_relative: "Relative washout",
@@ -342,9 +359,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // Practice Changes tab — static UI
       changes_title: "Practice Changes 2025",
       changes_subtitle:
-        "ESUR-based summary of what changed from ESUR 10.0 (2018) to ESUR 2025. Educational support only.",
+        "ESUR 2025 vs ESUR 10.0 — key practical differences.",
       changes_intro:
-        "This tab highlights practice-relevant differences between ESUR 10.0 (2018) and ESUR 2025, with transparent source attribution. It is intended as educational support and not as a stand-alone clinical decision tool.",
+        "Compact overview of practice-relevant changes. Educational support only.",
       badge_practice_changing: "Practice-changing",
       badge_refined: "Refined",
       badge_structural: "Structural / terminological",
@@ -370,23 +387,23 @@ document.addEventListener("DOMContentLoaded", function () {
       app_title: "Radiology Contrast & Safety App",
       reset: "Zurücksetzen",
 
-      disclaimer_line1: "Didaktisches Support-Tool auf Grundlage der ESUR-CMSC-Guidance (2025) und verwandter offizieller Quellen.",
+      disclaimer_line1: "Didaktisches Support-Tool. Lokale Protokolle beachten..",
       disclaimer_line2: "Nur zur Information. Klinische Entscheidungen sollten lokalen Protokollen, den Quellendokumenten und der klinischen Beurteilung folgen. Es werden keine Patientendaten gespeichert.",
       disclaimer_line3: "Inhalt zur Kontrastmittelsicherheit adaptiert aus der Guidance des ESUR Contrast Media Safety Committee.",
 
       nav_hsr: "HSR",
       nav_thyroid: "Schilddrüse",
       nav_calculators: "Rechner",
-      nav_changes: "Practice Changes",
+      nav_changes: "Changes",
 
       // HSR main
       hsr_title: "HSR",
-      hsr_subtitle: "Hypersensitivitäts-Guidance, empirische Switch-Hilfe, Tryptase-Interpretation und NIHR-Red-Flag-Check.",
+      hsr_subtitle: "Hypersensitivitäts-Guidance, empirische Switch-Hilfe, Tryptase-Interpretation und Spätreaktions-Check.",
       hsr_tools_title: "HSR-Tools",
       hsr_guidance_tab: "Guidance",
       hsr_switch_tab: "Switch",
       hsr_tryptase_tab: "Tryptase",
-      hsr_nihr_tab: "NIHR",
+      hsr_nihr_tab: "Spätreaktions-Check",
 
       flow_title: "Guidance",
       flow_subtitle: "Didaktische Orientierung bei früheren Hypersensitivitätsreaktionen auf Kontrastmittel.",
@@ -419,8 +436,24 @@ document.addEventListener("DOMContentLoaded", function () {
       switch_safety_note:
         "Diese Vorschläge beruhen nur auf praktischer Erfahrung. Eine allergologische Abklärung bleibt vorzuziehen, wenn verfügbar.",
       unknown: "Unbekannt",
-      icm_unknown_hint: "Verwenden, wenn das beteiligte ICM nicht bekannt ist.",
-      gbca_unknown_hint: "Verwenden, wenn das beteiligte GBCA nicht bekannt ist.",
+      icm_unknown_hint: "Verwenden, wenn das auslösende ICM nicht bekannt ist.",
+      gbca_unknown_hint: "Verwenden, wenn das auslösende GBCA nicht bekannt ist.",
+      icm_group_a_label: "Gruppe A",
+      icm_group_b_label: "Gruppe B",
+      icm_group_c_label: "Gruppe C",
+      icm_group_d_label: "Gruppe D",
+      gbca_group_a_label: "Gruppe A",
+      gbca_group_b_label: "Gruppe B",
+      gbca_group_c_label: "Gruppe C",
+      icm_group_a_names:
+        "Omnipaque (Iohexol) · Visipaque (Iodixanol) · Iomeron (Iomeprol) · Optiray (Ioversol)",
+      icm_group_b_names: "Iopamiro / Isovue (Iopamidol)",
+      icm_group_c_names: "Ultravist (Iopromid)",
+      icm_group_d_names: "Xenetix (Iobitridol)",
+      gbca_group_a_names: "Dotarem / Clariscan (Gadotersäure / Gadoterat-Meglumin)",
+      gbca_group_b_names:
+        "Gadovist / Gadavist (Gadobutrol) · ProHance (Gadoteridol)",
+      gbca_group_c_names: "Elucirem / Vueway (Gadopiclenol)",
       switch_nonvalidated:
         "Diese Switch-Übersicht ist eine optionale, nicht validierte Orientierung auf Basis praktischer Erfahrung. Sie ersetzt weder eine allergologische Abklärung noch lokale Entscheidungen.",
 
@@ -445,9 +478,9 @@ document.addEventListener("DOMContentLoaded", function () {
       tryptase_note:
         "Die Resultate sollten immer im klinischen Kontext interpretiert werden. Ein normaler Tryptasewert schliesst eine echte unmittelbare Hypersensitivitätsreaktion nicht aus.",
 
-      nihr_title: "NIHR-Check",
+      nihr_title: "Spätreaktions-Check",
       nihr_subtitle:
-        "Beurteilung klinischer Merkmale, die auf eine schwere kutane Nebenwirkung (SCAR) hinweisen können.",
+        "Für verzögerte Hautreaktionen nach Kontrastmittelgabe inklusive SCAR-Warnzeichen.",
       red_flags: "Warnzeichen",
       blistering: "Blasenbildung",
       mucosal_involvement: "Schleimhautbeteiligung",
@@ -472,9 +505,9 @@ document.addEventListener("DOMContentLoaded", function () {
       ],
 
       icm_hint:
-        "Gruppe A: Iohexol, Iodixanol, Iomeprol, Ioversol · Gruppe B: Iopamidol · Gruppe C: Iopromide · Gruppe D: Iobitridol",
+        "ICM-Gruppenbeispiele\nMarkenbeispiele; Verfügbarkeit und Markenrechte können je nach Land variieren.",
       gbca_hint:
-        "Gruppe A: Gadoterat-Meglumin · Gruppe B: Gadoteridol, Gadobutrol · Gruppe C: Gadopiclenol",
+        "GBCA-Gruppenbeispiele\nMarkenbeispiele; Verfügbarkeit und Markenrechte können je nach Land variieren.",
 
       flow_titles: {
         elective_mild: "Elektive Bildgebung — frühere milde unmittelbare Hypersensitivitätsreaktion",
@@ -659,6 +692,7 @@ document.addEventListener("DOMContentLoaded", function () {
       washout_delay_placeholder: "Delay (Minuten, optional)",
       washout_placeholder: "Die Washout-Berechnung erscheint hier, sobald die JavaScript-Logik verbunden ist.",
       washout_invalid: "Bitte gültige numerische HU-Werte eingeben.",
+      washout_no_enhancement: "Kein plausibles Enhancement-Muster (KM-HU ≤ Nativ-HU). Eine klassische Nebennieren-Washout-Berechnung ist nicht sinnvoll anwendbar. ROI-Platzierung, Phase und HU-Werte prüfen.",
       washout_invalid_formula: "Mit diesen Werten ist keine sinnvolle Washout-Berechnung möglich. Bitte die HU-Eingaben prüfen.",
       washout_absolute: "Absoluter Washout",
       washout_relative: "Relativer Washout",
@@ -676,9 +710,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // Practice Changes tab — static UI
       changes_title: "Practice Changes 2025",
       changes_subtitle:
-        "ESUR-basierte Zusammenfassung der Unterschiede zwischen ESUR 10.0 (2018) und ESUR 2025. Nur zur didaktischen Unterstützung.",
+        "ESUR 2025 vs. ESUR 10.0 — wichtigste Praxisunterschiede.",
       changes_intro:
-        "Dieser Tab hebt praxisrelevante Unterschiede zwischen ESUR 10.0 (2018) und ESUR 2025 hervor und zeigt die Quellen transparent an. Er dient der didaktischen Unterstützung und nicht als eigenständiges klinisches Entscheidungstool.",
+        "Kompakte Übersicht praxisrelevanter Änderungen. Nur zur didaktischen Unterstützung.",
       badge_practice_changing: "Praxisrelevant verändert",
       badge_refined: "Präzisiert",
       badge_structural: "Strukturell / terminologisch",
@@ -2315,17 +2349,35 @@ document.addEventListener("DOMContentLoaded", function () {
       if (el) el.textContent = value;
     };
 
-    setText("icmHint", t("icm_hint"));
-    setText("gbcaHint", t("gbca_hint"));
+    const setMultilineText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = escapeHtml(value).replace(/\n/g, "<br />");
+    };
+
+    const setGroupLabel = (seg, value, label) => {
+      const el = document.querySelector(`.seg__btn[data-seg="${seg}"][data-value="${value}"] > span`);
+      if (el) el.textContent = label;
+    };
+
+    setMultilineText("icmHint", t("icm_hint"));
+    setMultilineText("gbcaHint", t("gbca_hint"));
     setText("switchNonvalidated", t("switch_nonvalidated"));
 
-    setText("icm-group-a-names", "Iohexol • Iodixanol • Iomeprol • Ioversol");
-    setText("icm-group-b-names", "Iopamidol");
-    setText("icm-group-c-names", "Iopromide");
-    setText("icm-group-d-names", "Iobitridol");
-    setText("gbca-group-a-names", state.lang === "de" ? "Gadoterat-Meglumin" : "Gadoterate meglumine");
-    setText("gbca-group-b-names", "Gadoteridol • Gadobutrol");
-    setText("gbca-group-c-names", "Gadopiclenol");
+    setGroupLabel("icm", "A", t("icm_group_a_label"));
+    setGroupLabel("icm", "B", t("icm_group_b_label"));
+    setGroupLabel("icm", "C", t("icm_group_c_label"));
+    setGroupLabel("icm", "D", t("icm_group_d_label"));
+    setGroupLabel("gbca", "A", t("gbca_group_a_label"));
+    setGroupLabel("gbca", "B", t("gbca_group_b_label"));
+    setGroupLabel("gbca", "C", t("gbca_group_c_label"));
+
+    setText("icm-group-a-names", t("icm_group_a_names"));
+    setText("icm-group-b-names", t("icm_group_b_names"));
+    setText("icm-group-c-names", t("icm_group_c_names"));
+    setText("icm-group-d-names", t("icm_group_d_names"));
+    setText("gbca-group-a-names", t("gbca_group_a_names"));
+    setText("gbca-group-b-names", t("gbca_group_b_names"));
+    setText("gbca-group-c-names", t("gbca_group_c_names"));
 
     const baseline = document.getElementById("baseline");
     const acute = document.getElementById("acute");
@@ -2709,6 +2761,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    if (enhanced <= unenhanced) {
+      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_no_enhancement"))}</div>`;
+      return;
+    }
+
     const absDenominator = enhanced - unenhanced;
     const relDenominator = enhanced;
 
@@ -2921,24 +2978,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderChanges() {
-    if (!changesSummaryGrid || !changesList) return;
+  if (!changesSummaryGrid || !changesList) return;
 
-    updateChangeControlButtons();
+  updateChangeControlButtons();
+  changesSummaryGrid.innerHTML = "";
 
-    const visible = getVisibleChanges();
+  const visible = getVisibleChanges();
 
-    if (!visible.length) {
-      const empty = `<div class="change-empty">${escapeHtml(t("changes_no_results"))}</div>`;
-      changesSummaryGrid.innerHTML = empty;
-      changesList.innerHTML = "";
-      return;
-    }
-
-    changesSummaryGrid.innerHTML = visible.map(renderChangeSummary).join("");
-    changesList.innerHTML = visible.map(renderChangeCard).join("");
-
-    attachChangeEvents();
+  if (!visible.length) {
+    const empty = `<div class="change-empty">${escapeHtml(t("changes_no_results"))}</div>`;
+    changesList.innerHTML = empty;
+    return;
   }
+
+  changesList.innerHTML = visible.map(renderChangeCard).join("");
+
+  attachChangeEvents();
+}
 
   function renderAll() {
     applyStaticTranslations();
@@ -3092,6 +3148,27 @@ document.addEventListener("DOMContentLoaded", function () {
     setBodyMode();
     renderAll();
   }
+const stickyDisclaimer = document.getElementById("stickyDisclaimer");
+
+if (stickyDisclaimer) {
+  stickyDisclaimer.setAttribute("role", "button");
+  stickyDisclaimer.setAttribute("tabindex", "0");
+  stickyDisclaimer.setAttribute("aria-expanded", "false");
+
+  const toggleDisclaimer = () => {
+    const isOpen = stickyDisclaimer.classList.toggle("is-open");
+    stickyDisclaimer.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  };
+
+  stickyDisclaimer.addEventListener("click", toggleDisclaimer);
+
+  stickyDisclaimer.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleDisclaimer();
+    }
+  });
+}
 
   // Main nav
   document.querySelectorAll(".bottomnav__btn").forEach((btn) => {
