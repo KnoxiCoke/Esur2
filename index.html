@@ -36,13 +36,14 @@
   <section class="view" id="view-hsr">
     <h1 class="h1" data-i18n="hsr_title">HSR</h1>
     <p class="p-muted" data-i18n="hsr_subtitle">
-      Hypersensitivity guidance, empiric switch support, tryptase interpretation and delayed reaction check.
+      Previous-reaction planning, acute management, empiric switch support, tryptase interpretation and delayed reaction check.
     </p>
 
     <div class="card">
       <div class="card__title" data-i18n="hsr_tools_title">HSR tools</div>
       <div class="seg seg--stack hsr-subnav">
-        <button class="seg__btn active" data-hsr-tab="guidance" type="button" data-i18n="hsr_guidance_tab">Guidance</button>
+        <button class="seg__btn active" data-hsr-tab="guidance" type="button" data-i18n="hsr_guidance_tab">Previous reaction</button>
+        <button class="seg__btn" data-hsr-tab="acute" type="button" data-i18n="hsr_acute_tab">Acute management</button>
         <button class="seg__btn" data-hsr-tab="switch" type="button" data-i18n="hsr_switch_tab">Switch</button>
         <button class="seg__btn" data-hsr-tab="tryptase" type="button" data-i18n="hsr_tryptase_tab">Tryptase</button>
         <button class="seg__btn" data-hsr-tab="nihr" type="button" data-i18n="hsr_nihr_tab">Delayed reaction check</button>
@@ -76,6 +77,47 @@
       <div class="card card--subtle">
         <div class="card__title" data-i18n="safety_net">Safety net</div>
         <div class="output" id="flowSafety"></div>
+      </div>
+    </section>
+
+
+    <!-- HSR: ACUTE MANAGEMENT -->
+    <section class="subview" id="hsr-tab-acute" hidden>
+      <div class="card card--subtle">
+        <div class="card__title" data-i18n="acute_title">Acute management</div>
+        <div class="output hint" data-i18n="acute_subtitle">
+ESUR acute algorithm. Follow local emergency protocol and verify medication concentration before administration.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title" data-i18n="acute_immediate_title">Immediate assessment and general actions</div>
+        <div class="output" id="acuteImmediateOutput"></div>
+      </div>
+
+      <div class="card">
+        <div class="card__title" data-i18n="acute_severity_title">Severity selector</div>
+        <div class="seg seg--stack">
+<button class="seg__btn active" data-seg="acuteSeverity" data-value="mild" type="button" data-i18n="acute_severity_mild">Mild reactions</button>
+<button class="seg__btn" data-seg="acuteSeverity" data-value="moderate" type="button" data-i18n="acute_severity_moderate">Moderate reactions</button>
+<button class="seg__btn" data-seg="acuteSeverity" data-value="severe" type="button" data-i18n="acute_severity_severe">Severe reactions</button>
+        </div>
+      </div>
+
+      <div class="card" id="acutePatternCard">
+        <div class="card__title" data-i18n="acute_pattern_title">Dominant reaction pattern</div>
+        <div class="seg seg--stack" id="acutePatternOptions">
+<button class="seg__btn active" data-seg="acutePattern" data-value="mild_general" data-acute-severity="mild" type="button" data-i18n="acute_pattern_mild_general">Mild reactions</button>
+<button class="seg__btn" data-seg="acutePattern" data-value="moderate_urticaria" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_urticaria" hidden>Generalised urticaria / diffuse erythema</button>
+<button class="seg__btn" data-seg="acutePattern" data-value="moderate_angioedema" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_angioedema" hidden>Facial / angioedema</button>
+<button class="seg__btn" data-seg="acutePattern" data-value="moderate_bronchospasm" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_bronchospasm" hidden>Mild bronchospasm</button>
+<button class="seg__btn" data-seg="acutePattern" data-value="severe_anaphylaxis" data-acute-severity="severe" type="button" data-i18n="acute_pattern_severe_anaphylaxis" hidden>Anaphylaxis</button>
+        </div>
+      </div>
+
+      <div class="card card--output">
+        <div class="card__title" data-i18n="acute_output_title">ESUR acute management</div>
+        <div class="output" id="acuteOutput"></div>
       </div>
     </section>
 
