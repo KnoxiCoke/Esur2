@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0F172B" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Radiology Contrast & Safety App</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
@@ -33,7 +36,7 @@
   <section class="view" id="view-hsr">
     <h1 class="h1" data-i18n="hsr_title">HSR</h1>
     <p class="p-muted" data-i18n="hsr_subtitle">
-      Hypersensitivity guidance, empiric switch support, tryptase interpretation and NIHR red-flag check.
+      Hypersensitivity guidance, empiric switch support, tryptase interpretation and delayed reaction check.
     </p>
 
     <div class="card">
@@ -42,7 +45,7 @@
         <button class="seg__btn active" data-hsr-tab="guidance" type="button" data-i18n="hsr_guidance_tab">Guidance</button>
         <button class="seg__btn" data-hsr-tab="switch" type="button" data-i18n="hsr_switch_tab">Switch</button>
         <button class="seg__btn" data-hsr-tab="tryptase" type="button" data-i18n="hsr_tryptase_tab">Tryptase</button>
-        <button class="seg__btn" data-hsr-tab="nihr" type="button" data-i18n="hsr_nihr_tab">NIHR</button>
+        <button class="seg__btn" data-hsr-tab="nihr" type="button" data-i18n="hsr_nihr_tab">Delayed reaction check</button>
       </div>
     </div>
 
@@ -159,8 +162,8 @@
     <section class="subview" id="hsr-tab-tryptase" hidden>
       <div class="card">
         <div class="card__title" data-i18n="enter_values">Enter values</div>
-        <input type="number" id="baseline" placeholder="Baseline (ng/mL)" />
-        <input type="number" id="acute" placeholder="Acute (ng/mL)" />
+        <input type="number" id="baseline" inputmode="decimal" aria-label="Baseline tryptase in ng/mL" placeholder="Baseline (ng/mL)" />
+        <input type="number" id="acute" inputmode="decimal" aria-label="Acute tryptase in ng/mL" placeholder="Acute (ng/mL)" />
         <button class="btn" id="calcTryptase" type="button" data-i18n="calculate">Calculate</button>
       </div>
 
@@ -287,7 +290,7 @@
           <button class="seg__btn" data-seg="doseRegion" data-value="abdomen_pelvis" type="button" data-i18n="dose_region_abdomen_pelvis">Abdomen / Pelvis</button>
         </div>
 
-        <input type="number" id="doseDlp" placeholder="DLP" data-i18n-placeholder="dose_dlp_placeholder" />
+        <input type="number" id="doseDlp" inputmode="decimal" aria-label="Dose length product" placeholder="DLP" data-i18n-placeholder="dose_dlp_placeholder" />
         <button class="btn" id="calcDose" type="button" data-i18n="calculate">Calculate</button>
       </div>
 
@@ -312,10 +315,10 @@
     <section class="subview" id="calc-tab-washout" hidden>
       <div class="card">
         <div class="card__title" data-i18n="washout_input_title">Washout input</div>
-        <input type="number" id="washoutUnenhanced" placeholder="Unenhanced HU" data-i18n-placeholder="washout_unenhanced_placeholder" />
-        <input type="number" id="washoutEnhanced" placeholder="Enhanced HU" data-i18n-placeholder="washout_enhanced_placeholder" />
-        <input type="number" id="washoutDelayed" placeholder="Delayed HU" data-i18n-placeholder="washout_delayed_placeholder" />
-        <input type="number" id="washoutDelayMin" placeholder="Delay (minutes, optional)" data-i18n-placeholder="washout_delay_placeholder" />
+        <input type="number" id="washoutUnenhanced" inputmode="decimal" aria-label="Unenhanced HU" placeholder="Unenhanced HU" data-i18n-placeholder="washout_unenhanced_placeholder" />
+        <input type="number" id="washoutEnhanced" inputmode="decimal" aria-label="Enhanced HU" placeholder="Enhanced HU" data-i18n-placeholder="washout_enhanced_placeholder" />
+        <input type="number" id="washoutDelayed" inputmode="decimal" aria-label="Delayed HU" placeholder="Delayed HU" data-i18n-placeholder="washout_delayed_placeholder" />
+        <input type="number" id="washoutDelayMin" inputmode="decimal" aria-label="Delay in minutes" placeholder="Delay (minutes, optional)" data-i18n-placeholder="washout_delay_placeholder" />
         <button class="btn" id="calcWashout" type="button" data-i18n="calculate">Calculate</button>
       </div>
 
