@@ -1636,6 +1636,10 @@ body.emergency .flow-severity-hint__row.is-selected {
   font-weight: 800;
 }
 
+#acuteSeverityHint .flow-severity-hint__row {
+  grid-template-columns: minmax(86px, 100px) minmax(0, 1fr);
+}
+
 /* Neutral output pane without touching script.js or adding medical logic. */
 #hsr-tab-guidance::before {
   content: "Select situation and severity";

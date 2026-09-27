@@ -159,6 +159,10 @@ document.addEventListener("DOMContentLoaded", function () {
       acute_severity_mild: "Mild reactions",
       acute_severity_moderate: "Moderate reactions",
       acute_severity_severe: "Severe reactions",
+      acute_severity_scope: "Acute immediate hypersensitivity reactions in adults (ACR classification). Use the most intense symptom for classification.",
+      acute_severity_mild_help: "Nasal congestion; sneezing/conjunctivitis/rhinorrhoea; limited/scattered urticaria and pruritus; cutaneous oedema; limited itchy/scratchy throat.",
+      acute_severity_moderate_help: "Diffuse urticaria and pruritus; diffuse erythema without hypotension; facial oedema without dyspnoea; throat hoarseness without dyspnoea; mild bronchospasm without hypoxia.",
+      acute_severity_severe_help: "Diffuse/facial oedema with dyspnoea; diffuse erythema with hypotension; laryngeal oedema with hypoxia; severe bronchospasm with hypoxia; anaphylactic shock; cardiopulmonary arrest.",
       acute_pattern_mild_general: "Mild reactions",
       acute_pattern_moderate_urticaria: "Diffuse urticaria / diffuse erythema",
       acute_pattern_moderate_angioedema: "Facial edema without stridor",
@@ -616,6 +620,10 @@ arrest: [
       acute_severity_mild: "Milde Reaktionen",
       acute_severity_moderate: "Moderate Reaktionen",
       acute_severity_severe: "Schwere Reaktionen",
+      acute_severity_scope: "Akute unmittelbare Hypersensitivitätsreaktionen bei Erwachsenen (ACR-Klassifikation). Für die Einstufung das am stärksten ausgeprägte Symptom verwenden.",
+      acute_severity_mild_help: "Nasale Kongestion; Niesen/Konjunktivitis/Rhinorrhö; begrenzte/vereinzelte Urtikaria und Pruritus; kutanes Ödem; begrenztes Jucken/Kratzen im Hals.",
+      acute_severity_moderate_help: "Diffuse Urtikaria und Pruritus; diffuses Erythem ohne Hypotonie; Gesichtsödem ohne Dyspnoe; Heiserkeit ohne Dyspnoe; milder Bronchospasmus ohne Hypoxie.",
+      acute_severity_severe_help: "Diffuses Ödem oder Gesichtsödem, jeweils mit Dyspnoe; diffuses Erythem mit Hypotonie; Larynxödem mit Hypoxie; schwerer Bronchospasmus mit Hypoxie; anaphylaktischer Schock; kardiopulmonaler Stillstand.",
       acute_pattern_mild_general: "Milde Reaktionen",
       acute_pattern_moderate_urticaria: "Diffuse Urtikaria / diffuses Erythem",
       acute_pattern_moderate_angioedema: "Faziales Ödem ohne Stridor",
@@ -3252,8 +3260,14 @@ ${renderAcuteList(content.arrest)}
 
   function renderFlowSeverityHint() {
     const selected = document.querySelector('#hsr-tab-guidance .seg__btn[data-seg="reaction"].active')?.dataset.value;
-    document.querySelectorAll(".flow-severity-hint__row").forEach((row) => {
+    document.querySelectorAll("#flowSeverityHint .flow-severity-hint__row").forEach((row) => {
       row.classList.toggle("is-selected", row.dataset.level === selected);
+    });
+  }
+
+  function renderAcuteSeverityHint() {
+    document.querySelectorAll("#acuteSeverityHint .flow-severity-hint__row").forEach((row) => {
+      row.classList.toggle("is-selected", row.dataset.level === state.acuteSeverity);
     });
   }
 
@@ -3262,6 +3276,7 @@ ${renderAcuteList(content.arrest)}
 
   applyStaticTranslations();
   renderFlowSeverityHint();
+  renderAcuteSeverityHint();
   renderNihrSeverityHint();
   renderFlow();
   renderAcuteManagement();
