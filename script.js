@@ -3201,10 +3201,52 @@ ${renderAcuteList(content.arrest)}
     attachChangeEvents();
   }
 
+  // Split only the existing translated hint for display; keep every source character.
+  function renderNihrSeverityHint() {
+    const hint = document.querySelector('#hsr-tab-nihr [data-i18n="nihr_severity_hint"]');
+    if (!hint) return;
+
+    const source = t("nihr_severity_hint");
+    const levels = [
+      ["mild", t("nihr_severity_mild")],
+      ["moderate", t("nihr_severity_moderate")],
+      ["severe", t("nihr_severity_severe")]
+    ];
+    const starts = [0];
+    for (let i = 1; i < levels.length; i += 1) {
+      const marker = ` ${levels[i][1]}: `;
+      const position = source.indexOf(marker, starts[i - 1] + 1);
+      if (position < 0) return; // The untranslated paragraph remains visible.
+      starts.push(position + 1);
+    }
+    const pieces = levels.map(([value, label], i) => {
+      const text = source.slice(starts[i], starts[i + 1] ?? source.length);
+      return text.startsWith(`${label}: `) ? { value, label, text } : null;
+    });
+    if (pieces.some((piece) => !piece) || pieces.map((piece) => piece.text).join("") !== source) return;
+
+    const selected = document.querySelector('#hsr-tab-nihr .seg__btn[data-seg="nihrSeverity"].active')?.dataset.value;
+    const rows = document.createDocumentFragment();
+    pieces.forEach(({ value, label, text }) => {
+      const row = document.createElement("div");
+      row.className = "nihr-severity-hint__row";
+      if (value === selected) row.classList.add("is-selected");
+      const heading = document.createElement("span");
+      heading.className = "nihr-severity-hint__label";
+      heading.textContent = `${label}:`;
+      const definition = document.createElement("span");
+      definition.textContent = text.slice(heading.textContent.length);
+      row.append(heading, definition);
+      rows.appendChild(row);
+    });
+    hint.replaceChildren(rows);
+  }
+
   function renderAll() {
   setBodyMode();
 
   applyStaticTranslations();
+  renderNihrSeverityHint();
   renderFlow();
   renderAcuteManagement();
   renderSwitch();

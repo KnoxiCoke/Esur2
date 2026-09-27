@@ -2546,9 +2546,31 @@ input {
 
 #hsr-tab-nihr > .card:nth-child(3) > .hint {
   margin-top: 8px;
-  color: #75899c;
-  font-size: 10.8px;
-  line-height: 1.42;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.nihr-severity-hint__row {
+  display: grid;
+  grid-template-columns: minmax(68px, auto) minmax(0, 1fr);
+  gap: 7px;
+  padding: 5px 7px;
+  border-left: 2px solid transparent;
+}
+
+.nihr-severity-hint__row + .nihr-severity-hint__row {
+  border-top: 1px solid var(--border);
+}
+
+.nihr-severity-hint__row.is-selected {
+  border-left-color: var(--accent);
+  background: var(--accent-faint);
+}
+
+.nihr-severity-hint__label {
+  color: var(--text);
+  font-weight: 800;
 }
 
 #hsr-tab-nihr .checklist {
