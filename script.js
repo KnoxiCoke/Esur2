@@ -1,27 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
   const state = {
-    mainNav: "hsr",          // hsr | thyroid | calculators | changes
+    mainNav: "hsr",          // hsr | changes
     hsrTab: "guidance",      // guidance | acute | switch | tryptase | nihr
-    calcTab: "dose",         // dose | washout
 
     // HSR
-    situation: "elective",
-    reaction: "moderate",    // mild | moderate | severe
+    situation: null,
+    reaction: null,          // mild | moderate | severe
     cmtype: "icm",
-    nihrCmtype: "icm",
+    nihrCmtype: null,
+    nihrSeverity: null,
+    nihrCulpritKnown: null,
     acuteSeverity: "mild",   // mild | moderate | severe
     acutePattern: "mild_general",
     icm: null,
     gbca: null,
-
-    // Thyroid
-    thyroidSituation: "elective",
-    thyroidStatus: "normal",           // normal | manifest | subclinical | autonomy | graves
-    thyroidMedication: "none",         // none | levothyroxine | thyreostatics
-    thyroidRit: "no",                  // no | planned_soon
-
-    // Dose
-    doseRegion: "head",
 
     // Global
     lang: "en",
@@ -43,31 +35,36 @@ document.addEventListener("DOMContentLoaded", function () {
       disclaimer_line3: "Contrast safety content adapted from ESUR Contrast Media Safety Committee guidance.",
 
       nav_hsr: "HSR",
-      nav_thyroid: "Thyroid",
-      nav_calculators: "Calculators",
       nav_changes: "Changes",
 
       // HSR main
       hsr_title: "HSR",
-      hsr_subtitle: "Previous-reaction planning, acute management, empiric switch support, tryptase interpretation and delayed reaction check.",
+      hsr_subtitle: "Previous-reaction planning, acute management, empiric switch support, tryptase interpretation and NIHR decision support.",
       hsr_tools_title: "HSR tools",
       hsr_guidance_tab: "Previous reaction",
       hsr_acute_tab: "Acute management",
       hsr_switch_tab: "Switch",
       hsr_tryptase_tab: "Tryptase",
-      hsr_nihr_tab: "Delayed reaction check",
+      hsr_nihr_tab: "NIHR",
 
       flow_title: "Previous reaction",
       flow_subtitle: "Educational support for prior contrast media hypersensitivity reactions.",
       flow_step1: "Step 1 — Clinical situation",
       flow_step2: "Step 2 — Prior reaction severity",
 
+      flow_routing_note:
+        "Educational support for prior immediate hypersensitivity reactions. For non-immediate reactions, use the NIHR module.",
+      hsr_referral_title: "Referral & documentation",
+      hsr_referral_specify:
+        "When referring the patient to a drug allergy specialist, always specify the used contrast medium.",
+      hsr_referral_document:
+        "Detailed documentation of the culprit contrast agent and the severity of the reaction, including a grading scheme, is mandatory.",
+
       elective: "Elective",
       emergency: "Emergency",
       mild: "Mild",
       moderate: "Moderate",
       severe: "Severe",
-      unclear: "Unclear",
 
       recommendation: "Recommendation",
       safety_net: "Safety net",
@@ -76,17 +73,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
       switch_title: "Switch",
       switch_subtitle:
-        "Educational support for empiric contrast agent switch consideration based on practical experience.",
+        "Optional, non-validated contrast-agent grouping and practical-experience suggestions for empiric switch consideration.",
       contrast_type: "Contrast type",
       nihr_cmtype_title: "Contrast type",
       icm_ct: "ICM (CT)",
       gbca_mri: "GBCA (MRI)",
-      icm_title: "ICM (iodinated)",
+      icm_title: "ICM (iodine-based)",
       gbca_title: "GBCA (gadolinium-based)",
       possible_alternatives: "Possible alternatives",
       safety_note: "Safety note",
+      switch_status_optional:
+        "This switch overview is optional and based on a non-validated classification and practical experience.",
+      switch_cmsc:
+        "The CMSC cannot make evidence-based recommendations on a robust scientific basis for change to an alternative contrast agent based on practical experience.",
+      switch_cr_structure:
+        "Cross-reactivity cannot be predicted on the basis of the chemical structure.",
+      switch_cr_frequency:
+        "Cross-reactivity can occur with a higher frequency among iodine-based contrast media with a N-(2,3-hydroxypropyl)-carbamoyl side chain and among macrocyclic gadolinium-based contrast agents.",
+      switch_best_option:
+        "The best option is to choose an alternative based on the results of an allergy evaluation.",
+      switch_brand_governance:
+        "Brand names are shown for product identification only. ESUR grouping and switch guidance are based on the generic contrast-agent substance.",
       switch_safety_note:
-        "These suggestions are based on practical experience only. Allergy evaluation remains preferable whenever available.",
+        "This switch overview is optional and based on a non-validated classification and practical experience. The CMSC cannot make evidence-based recommendations on a robust scientific basis for change to an alternative contrast agent based on practical experience. Cross-reactivity cannot be predicted on the basis of the chemical structure. The best option is to choose an alternative based on the results of an allergy evaluation.",
       unknown: "Unknown",
       icm_unknown_hint: "Use when the involved ICM is not known.",
       gbca_unknown_hint: "Use when the involved GBCA is not known.",
@@ -98,39 +107,43 @@ document.addEventListener("DOMContentLoaded", function () {
       gbca_group_b_label: "Group B",
       gbca_group_c_label: "Group C",
       icm_group_a_names:
-        "Omnipaque (iohexol) · Visipaque (iodixanol) · Iomeron (iomeprol) · Optiray (ioversol)",
-      icm_group_b_names: "Iopamiro / Isovue (iopamidol)",
-      icm_group_c_names: "Ultravist (iopromide)",
-      icm_group_d_names: "Xenetix (iobitridol)",
-      gbca_group_a_names: "Dotarem / Clariscan (gadoterate meglumine)",
+        "Omnipaque® — iohexol · Visipaque® — iodixanol · Iomeron® — iomeprol · Optiray® — ioversol",
+      icm_group_b_names: "Iopamiro® / Isovue® — iopamidol",
+      icm_group_c_names: "Ultravist® — iopromide",
+      icm_group_d_names: "Xenetix® — iobitridol",
+      gbca_group_a_names: "Dotarem® / Clariscan® — gadoterate meglumine",
       gbca_group_b_names:
-        "Gadovist / Gadavist (gadobutrol) · ProHance (gadoteridol)",
-      gbca_group_c_names: "Elucirem / Vueway (gadopiclenol)",
+        "ProHance® — gadoteridol · Gadovist® / Gadavist® — gadobutrol",
+      gbca_group_c_names: "Elucirem® / Vueway® — gadopiclenol",
       switch_nonvalidated:
-        "This switch overview is optional, non-validated guidance based on practical experience. It does not replace allergy evaluation or local decision-making.",
+        "This switch overview is optional and based on a non-validated classification and practical experience.",
 
-      tryptase_title: "Tryptase Rule",
-      tryptase_subtitle:
-        "ESUR ideally recommends three samples: one as early as possible during the reaction, one 1–2 hours later (no later than 4 hours after symptom onset), and one more than 24 hours after complete resolution as baseline. For the calculation below, the highest available acute tryptase value and the baseline value should be entered.",
+      tryptase_title: "Serum tryptase",
+      tryptase_sample_measure:
+        "Measure serum tryptase within 1–4 h from the start of all moderate-to-severe immediate hypersensitivity reactions to contrast media.",
+      tryptase_sample_baseline:
+        "A second measurement after ≥ 24 h serves as a baseline for further allergologic examinations.",
+      tryptase_sample_ideal:
+        "Ideally, three samples should be obtained: the first as early as possible during a suspected hypersensitivity reaction, the second at 1–2 h after the first but no later than 4 h after the onset of the reaction, and the third more than 24 h after all signs and symptoms have subsided.",
       enter_values: "Enter values",
       calculate: "Calculate",
       result: "Result",
       tryptase_default:
-        "For the calculation below, the highest available acute tryptase value and the baseline value should be entered.",
+        "Enter an acute tryptase value obtained during or within 4 h after symptoms and a baseline tryptase value.",
       tryptase_invalid: "Please enter valid numeric values.",
       tryptase_threshold: "Threshold",
       tryptase_acute: "Acute tryptase",
       tryptase_baseline: "Baseline tryptase",
       tryptase_formula:
-        "Relevant acute increase if acute tryptase ≥ (1.2 × baseline) + 2 ng/mL.",
+        "An acute-over-baseline elevation of tryptase of at least 2 ng/mL + (1.2 × baseline tryptase) during or within 4 h after symptoms is suggestive of an IHR.",
       tryptase_positive:
-        "The result suggests the presence of an immediate hypersensitivity reaction (IHR).",
+        "The result is suggestive of an IHR.",
       tryptase_negative:
-        "The result does not support a significant acute tryptase increase.",
+        "The result does not show an acute-over-baseline elevation of at least 2 ng/mL + (1.2 × baseline tryptase).",
       tryptase_note:
-        "Results should always be interpreted in the clinical context. A normal tryptase value does not exclude a true immediate hypersensitivity reaction.",
+        "In mild or moderate IHR, tryptase levels typically remain normal, and the absence of elevation does not exclude the possibility of a genuine IHR.",
 
-      acute_title: "Acute management",
+            acute_title: "Acute management",
       acute_subtitle:
         "ESUR acute algorithm. Follow local emergency protocol and verify medication concentration before administration.",
       acute_immediate_title: "Immediate assessment and general actions",
@@ -144,197 +157,241 @@ document.addEventListener("DOMContentLoaded", function () {
       acute_severity_moderate: "Moderate reactions",
       acute_severity_severe: "Severe reactions",
       acute_pattern_mild_general: "Mild reactions",
-      acute_pattern_moderate_urticaria: "Generalised urticaria / diffuse erythema",
-      acute_pattern_moderate_angioedema: "Facial / angioedema",
+      acute_pattern_moderate_urticaria: "Diffuse urticaria / diffuse erythema",
+      acute_pattern_moderate_angioedema: "Facial edema without stridor",
       acute_pattern_moderate_bronchospasm: "Mild bronchospasm",
-      acute_pattern_severe_anaphylaxis: "Anaphylaxis",
+      acute_pattern_severe_anaphylaxis: "Anaphylactic reaction or stridor",
       acute_section_clinical: "Clinical pattern / warning",
       acute_section_management: "Management",
       acute_section_escalation: "Escalation / rapid response",
       acute_warning_label: "Warning",
       acute_arrest_title: "Cardiac or respiratory arrest",
       acute_immediate_actions: [
-        "History and physical exam by radiology physician.",
-        "A — Airway: wheezing, stridor.",
-        "B — Breathing: auscultation of lungs/throat, SaO₂.",
-        "C — Circulation: pulse, blood pressure, pulsations.",
-        "D — Disability: responsiveness.",
-        "E — Environment: inspection of the entire skin.",
-        "Stop infusing contrast agent and replace IV line with crystalloid.",
-        "Determine serum tryptase within 1–4 h in all moderate to severe reactions."
+        "Monitor the patient closely and judge for progression of the reaction.",
+        "Observe closely for mucosal edema of the nose, mouth, throat, or larynx.",
+        "In case of symptoms, check heart rate, arterial blood pressure, and consciousness.",
+        "Check and stabilize the patient according to the ABCDE method.",
+        "Stop infusing contrast agent and replace the IV line with crystalloid.",
+        "Dyspnoea or stridor: let the patient sit up.",
+        "Consider measuring serum tryptase, ideally 1–2 h after start of the reaction.",
+        "Record acute allergic reactions and the culprit contrast medium in the allergy registry of the electronic health record of the patient."
       ],
       acute_content: {
         mild_general: {
 clinical:
-  "Nasal congestion, sneezing, conjunctivitis, rhinorrhoea, cutaneous oedema, itchy throat, mild scattered urticaria, e.g. <10.",
+  "Mild features: nasal congestion; sneezing, conjunctivitis, rhinorrhoea; limited or scattered urticaria and pruritus; cutaneous oedema; limited itchy or scratchy throat. Classify by the most intense symptom.",
 management: [
-  "Reassure patient.",
-  "Maintain IV access.",
-  "IV drip 500 mL NaCl 0.9%.",
-  "Observation with regular intervals until symptoms resolve, minimum 30 minutes.",
-  "When vomiting is protracted: ondansetron 4 mg IV.",
-  "When persisting cutaneous reaction or itching: non-sedating H1-antihistamine, e.g. desloratadine 5 mg PO once daily or cetirizine 10 mg PO once daily."
+  "Mild reactions may only need reassurance.",
+  "Observe vital signs until symptoms resolve.",
+  "Do not remove IV access during observation.",
+  "After a mild reaction, keep the patient under surveillance until every symptom has disappeared (minimum 30 minutes, usually less than 60 minutes).",
+  "Consider a nonsedating antihistamine for mild allergic reactions, for example desloratadine 5 mg orally or cetirizine 10 mg orally, once daily.",
+  "For protracted vomiting: ondansetron 4 mg IV."
 ],
 escalation: [
-  "When needed, consult rapid response team."
+  "Monitor closely and assess for progression of the reaction."
 ]
         },
         moderate_urticaria: {
-clinical: "Generalised urticaria / diffuse erythema.",
-warning: "Cave hypotension.",
+clinical: "Diffuse urticaria / diffuse erythema.",
 management: [
-  "IV 1000 mL NaCl 0.9% in 1 h.",
-  "H1-antihistamine IV, e.g. clemastine 2 mg.",
-  "When needed, repeat H1-antihistamine IV after 5 minutes.",
-  "When hypotensive (SBP <90): active elevation of legs."
+  "Give chlorphenamine 20 mg or clemastine 2 mg IV.",
+  "Consider transferring the patient to a department with facilities for monitoring vital functions."
 ],
 escalation: [
-  "When hypotensive (SBP <90): treat as anaphylaxis.",
-  "When needed, consult rapid response team."
+  "If accompanied by hypotension, treat as anaphylaxis."
 ]
         },
         moderate_angioedema: {
-clinical: "Facial / angioedema.",
-warning: "Cave laryngeal oedema.",
+clinical: "Facial edema without stridor.",
 management: [
-  "O₂ via mask 10–15 L/min.",
-  "IV 1000 mL NaCl 0.9% in 1 h.",
-  "H1-antihistamine IV, e.g. clemastine 2 mg.",
-  "When needed, repeat H1-antihistamine IV after 5 minutes."
+  "Give oxygen 10 to 15 L/min via a non-rebreathing mask.",
+  "Give chlorphenamine 20 mg or clemastine 2 mg IV.",
+  "Consider transferring the patient to a department with facilities for monitoring vital functions."
 ],
 escalation: [
-  "If severe or stridor/laryngeal oedema: sitting position.",
-  "If severe or stridor/laryngeal oedema: treat as anaphylaxis.",
-  "If severe or stridor/laryngeal oedema: consult rapid response team."
+  "If edema is severe, near airways, or if stridor develops, treat as anaphylaxis."
 ]
         },
         moderate_bronchospasm: {
 clinical: "Mild bronchospasm.",
-warning: "Cave respiratory threat.",
 management: [
-  "O₂ via mask 10–15 L/min.",
-  "SABA dose-aerosol: 2–3 deep inhalations of 100 µg, or nebulization in 3 mL saline until improved, according to ESUR/source text.",
-  "When needed, repeat SABA nebulization until improved."
+  "Short-acting β2-agonist: 2–4 inhalations of 100 µg of salbutamol via inhalation (depending on severity), with option to repeat every 20 min, or via nebulization (2.5–5 µg diluted in 3 mL of saline solution) until clinical improvement.",
+  "Consider transferring the patient to a department with facilities for monitoring vital functions."
 ],
 escalation: [
-  "When increasing in severity: adrenaline 1 mg/mL, 0.5 mg IM.",
-  "When increasing in severity: when needed, repeat adrenaline 1 mg/mL, 0.5 mg IM after 5 minutes, guided by heart rate.",
-  "When protracted >5 h: consider adding corticosteroid slowly IV, e.g. prednisolone 50 mg.",
-  "When needed, consult rapid response team."
+  "In case of deterioration, give adrenaline 0.5 mg IM and consider consulting the rapid response team.",
+  "When bronchospasm increases in severity, consider repeating adrenaline 0.5 mg IM, guided by heart rate."
 ]
         },
         severe_anaphylaxis: {
-clinical: "Anaphylaxis.",
+clinical: "Anaphylactic reaction or stridor.",
 management: [
-  "Consult rapid response team.",
-  "O₂ via mask 10–15 L/min.",
-  "IV 500 mL NaCl 0.9% in 10 minutes.",
-  "When needed, repeat IV NaCl 0.9%.",
-  "Adrenaline 1 mg/mL, 0.5 mg IM.",
-  "When needed, repeat adrenaline 1 mg/mL, 0.5 mg IM after 5 minutes, guided by heart rate.",
-  "H1-antihistamine IV, e.g. clemastine 2 mg.",
-  "When needed, SABA dose-aerosol 2–10 deep inhalations of 100 µg or nebulization in 3 mL saline up to 1 hour, according to ESUR/source text.",
-  "Consider adding corticosteroid slowly IV, e.g. prednisolone 50 mg.",
-  "When needed, intubation and ICU."
+  "Call the rapid response team.",
+  "Give oxygen 10 to 15 L/min with non-rebreathing mask.",
+  "Give 0.5 mg adrenaline IM in the lateral upper thigh, repeat as necessary, guided by heart rate.",
+  "Give fluid bolus of crystalloid 500 mL IV in 10 min, repeat as necessary.",
+  "Short-acting β2-agonist: 2–10 inhalations of 100 µg of salbutamol via inhalation (depending on severity), with option to repeat every 20 min, or via nebulization (2.5–5 µg diluted in 3 mL of saline solution) up to 1 h.",
+  "Give chlorphenamine 20 mg or clemastine 2 mg IV, repeat as necessary.",
+  "Consider adding corticosteroid (for example, prednisolone 50 mg IV)."
 ],
 arrest: [
-  "CALL RESUSCITATION TEAM.",
-  "Start cardio-pulmonary resuscitation.",
-  "Adrenaline 0.1 mg/mL IV only via resuscitation team."
+  "Call the CPR team.",
+  "Start CPR."
 ]
         }
       },
 
-      nihr_title: "Delayed reaction check",
+      nihr_title: "NIHR — non-immediate hypersensitivity reactions",
       nihr_subtitle:
-        "For delayed skin reactions after contrast media, including SCAR red flags.",
-      red_flags: "Danger signs",
-      blistering: "Blistering",
+        "For a previous non-immediate hypersensitivity reaction to an iodine-based contrast medium or a gadolinium-based contrast agent when re-administration is being considered.",
+      nihr_severity_title: "Previous NIHR severity",
+      nihr_severity_mild: "Mild",
+      nihr_severity_moderate: "Moderate",
+      nihr_severity_severe: "Severe",
+      nihr_severity_hint:
+        "Mild: skin lesions resolve without treatment. Moderate: skin lesions resolve with outpatient treatment. Severe: hospital admission is required for treatment.",
+      nihr_culprit_class_title: "Previous culprit contrast class",
+      nihr_cmtype_icm: "ICM",
+      nihr_cmtype_gbca: "GBCA",
+      nihr_cmtype_unknown: "Contrast class unknown",
+      nihr_culprit_known_title: "Exact culprit contrast medium known?",
+      nihr_culprit_known: "Culprit CM known",
+      nihr_culprit_unknown: "Culprit CM unknown",
+      nihr_danger_signs_title: "Danger signs",
+      erosions: "Erosive and/or haemorrhagic lesions",
+      blistering: "Blistering and skin disruption",
       mucosal_involvement: "Mucosal involvement",
-      erosions: "Erosive lesions",
-      hemorrhagic_lesions: "Hemorrhagic lesions",
-      skin_disruption: "Skin disruption",
-      fever: "High fever",
-      organ_values: "Abnormal liver or kidney values",
-      lymphadenopathy: "Lymphadenopathy",
-      assessment: "Assessment",
-      nihr_default: "No danger signs selected.",
-      nihr_positive_title: "Possible severe cutaneous adverse reaction (SCAR)",
-      nihr_positive_text_icm: [
-        "Urgent evaluation by a drug allergy or dermatology specialist is recommended.",
-        "When possible, an alternative imaging modality should be considered.",
-        "After a severe non-immediate hypersensitivity reaction to an iodine-based contrast medium, all iodine-based contrast media should be avoided."
-      ],
-      nihr_positive_text_gbca: [
-        "Urgent evaluation by a drug allergy or dermatology specialist is recommended.",
-        "When possible, an alternative imaging modality should be considered.",
-        "After a severe non-immediate hypersensitivity reaction to a gadolinium-based contrast agent, all gadolinium-based contrast agents should be avoided."
-      ],
+      extracutaneous_involvement: "Extracutaneous organ involvement (high fever, abnormal liver/kidney values, lymphadenopathy)",
+      nihr_recommendation_title: "NIHR recommendation",
+      nihr_safety_note_title: "Safety note",
+      nihr_safety_note: "",
+      nihr_recommended_actions: "Recommended actions",
+      nihr_class_specific_rule: "Class-specific rule",
+      nihr_status_scar: "Severe non-immediate hypersensitivity reaction with danger signs (SCAR)",
+      nihr_status_moderate: "Moderate NIHR without danger signs",
+      nihr_status_mild: "Mild NIHR without danger signs",
+      nihr_scope_guard:
+        "This combination is not represented as a separate management pathway in ESUR Part 2 Table 2. Reassess the NIHR severity and documented danger signs.",
+      nihr_mild_interview: "Interview the patient about their previous hypersensitivity reaction.",
+      nihr_mild_refer:
+        "Optionally, refer the patient to a drug allergy specialist (if not done before) when the local drug allergy specialist capacity is sufficient.",
+      nihr_moderate_refer: "Refer the patient to a drug allergy specialist (if not done before).",
+      nihr_optimize_ehr: "Optimize the allergy registration in the electronic health record.",
+      nihr_apply_advice:
+        "Apply the advice of the drug allergy specialist for a safe iodine-based contrast medium or gadolinium-based contrast agent.",
+      nihr_choose_different:
+        "When this advice is not available, choose a different iodine-based contrast medium or gadolinium-based contrast agent if the culprit contrast agent is known.",
+      nihr_observe:
+        "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+      nihr_written:
+        "Give the patient written instructions for a possible repeat non-immediate hypersensitivity reaction.",
+      nihr_recurrence:
+        "If a non-immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+      nihr_preventive_alt:
+        "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+      nihr_preventive_never_deny:
+        "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available.",
+      nihr_footnote_crossreact:
+        "Consider cross-reactivity of contrast media and an increased risk for non-immediate hypersensitivity reaction with the use of iso-osmolar dimeric iodine-based contrast media.",
+      nihr_scar_refer:
+        "Refer the patient immediately to a drug allergy specialist (if not done before).",
+      nihr_scar_choose_imaging: "Choose an alternative imaging modality.",
+      nihr_scar_ehr: "Optimize the allergy registration in the electronic health record.",
+      nihr_scar_do_not_give:
+        "Do not give the group of contrast media to which the severe skin reaction has occurred.",
+      nihr_scar_icm_rule:
+        "Avoid all iodine-based contrast media after a severe non-immediate hypersensitivity reaction to an iodine-based contrast medium.",
+      nihr_scar_gbca_rule:
+        "Avoid all gadolinium-based contrast agents after a severe non-immediate hypersensitivity reaction to a gadolinium-based contrast agent.",
+      nihr_scar_unknown_rule:
+        "Individualize the approach following multidisciplinary consultation after a severe reaction to an unknown CM.",
 
-      icm_hint:
-        "ICM group examples\nBrand examples; availability and trademarks may vary by country.",
+            icm_hint:
+        "ESUR grouping is based on the generic contrast-agent substance. Brand names are shown for product identification only.\nGrouping according to ESUR Part 2 Fig. 2 / Fig. 3 and Table 1.",
       gbca_hint:
-        "GBCA group examples\nBrand examples; availability and trademarks may vary by country.",
+        "ESUR grouping is based on the generic contrast-agent substance. Brand names are shown for product identification only.\nGrouping according to ESUR Part 2 Fig. 2 / Fig. 3 and Table 1.",
 
       flow_titles: {
         elective_mild: "Elective imaging — prior mild immediate hypersensitivity reaction",
         elective_moderate: "Elective imaging — prior moderate immediate hypersensitivity reaction",
         elective_severe: "Elective imaging — prior severe immediate hypersensitivity reaction",
-        elective_unclear: "Elective imaging — prior reaction severity unclear",
         emergency_mild: "Emergency imaging — prior mild immediate hypersensitivity reaction",
         emergency_moderate: "Emergency imaging — prior moderate immediate hypersensitivity reaction",
-        emergency_severe: "Emergency imaging — prior severe immediate hypersensitivity reaction",
-        emergency_unclear: "Emergency imaging — prior reaction severity unclear"
+        emergency_severe: "Emergency imaging — prior severe immediate hypersensitivity reaction"
       },
 
       flow_bullets: {
         elective_mild: [
-          "The previous reaction should be reviewed.",
-          "Allergy documentation should be optimized.",
-          "Advice from a drug allergy specialist may be followed or referral may be considered.",
-          "If the culprit contrast agent is known, use of an alternative contrast agent may be considered.",
-          "If contrast agent administration is required, observation for ≥30 minutes with intravenous access should be ensured.",
-          "Clinical vigilance for recurrent reactions should be maintained."
+          "Interview the patient about their previous hypersensitivity reaction.",
+          "Optionally, refer the patient to a drug allergy specialist (if not done before) when the local drug allergy specialist capacity is sufficient.",
+          "Optimize the allergy registration in the electronic health record.",
+          "Apply the advice of the drug allergy specialist for a safe iodine-based contrast medium or gadolinium-based contrast agent, or, when not available, choose a different iodine-based contrast medium or gadolinium-based contrast agent if the culprit contrast agent is known.",
+          "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+          "Be prepared and vigilant for a recurring immediate hypersensitivity reaction.",
+          "If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+          "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+          "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available."
         ],
         elective_moderate: [
-          "Postponement of the examination should be considered when clinically feasible.",
-          "Referral for a formal allergy evaluation is strongly recommended.",
-          "If contrast-enhanced imaging remains necessary, use of an alternative contrast agent should be considered.",
-          "Observation for ≥30 minutes with intravenous access should be ensured."
+          "Refer the patient to a drug allergy specialist (if not done before).",
+          "Optimize the allergy registration in the electronic health record.",
+          "Postpone imaging to wait for the results of the allergy analysis.",
+          "Apply the advice of the drug allergy specialist for a safe iodine-based contrast medium or gadolinium-based contrast agent.",
+          "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+          "Be prepared and vigilant for a recurring immediate hypersensitivity reaction.",
+          "If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+          "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+          "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available."
         ],
         elective_severe: [
-          "Postponement of the examination should be considered when clinically feasible.",
-          "Referral for a formal allergy evaluation is strongly recommended.",
-          "If contrast-enhanced imaging remains necessary, use of an alternative contrast agent should be considered.",
-          "Availability of a rapid response (or resuscitation) team member should be ensured.",
-          "Observation for ≥30 minutes with intravenous access should be ensured."
-        ],
-        elective_unclear: [
-          "The previous reaction should be reviewed.",
-          "Allergy documentation should be optimized.",
-          "If contrast agent administration remains necessary, clinical judgement and local protocols should guide further management."
+          "Refer the patient to a drug allergy specialist (if not done before).",
+          "Optimize the allergy registration in the electronic health record.",
+          "Have a trained rapid response (or resuscitation) team member nearby.",
+          "Postpone imaging to wait for the results of the allergy analysis.",
+          "Apply the advice of the drug allergy specialist for a safe iodine-based contrast medium or gadolinium-based contrast agent.",
+          "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+          "Be prepared and vigilant for a recurring immediate hypersensitivity reaction.",
+          "If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+          "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+          "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available."
         ],
         emergency_mild: [
-          "If contrast agent administration is required, the potential risk of recurrence should be considered.",
-          "Use of an alternative contrast agent may be considered if the culprit agent is known.",
-          "Availability of personnel trained in the management of acute hypersensitivity reactions should be ensured.",
-          "Observation for ≥30 minutes with intravenous access should be ensured."
+          "Interview the patient about their previous hypersensitivity reaction.",
+          "Optionally, refer the patient to a drug allergy specialist (if not done before) when the local drug allergy specialist capacity is sufficient.",
+          "Optimize the allergy registration in the electronic health record.",
+          "Apply the advice of the drug allergy specialist for a safe iodine-based contrast medium or gadolinium-based contrast agent, or, when not available, choose a different iodine-based contrast medium or gadolinium-based contrast agent if the culprit contrast agent is known.",
+          "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+          "Be prepared and vigilant for a recurring immediate hypersensitivity reaction.",
+          "If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+          "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+          "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available."
         ],
         emergency_moderate: [
-          "If contrast-enhanced imaging is considered necessary, use of an alternative contrast agent should be considered.",
-          "Availability of personnel trained in the management of acute hypersensitivity reactions should be ensured.",
-          "Observation for ≥30 minutes with intravenous access should be ensured."
+          "Refer the patient to a drug allergy specialist (if not done before).",
+          "Optimize the allergy registration in the electronic health record.",
+          "Have a trained imaging or emergency room physician nearby.",
+          "Choose a different iodine-based contrast medium or gadolinium-based contrast agent if the culprit contrast medium is known.",
+          "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+          "Be prepared and vigilant for a recurring immediate hypersensitivity reaction.",
+          "If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+          "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+          "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available."
         ],
         emergency_severe: [
-          "If contrast-enhanced imaging is considered unavoidable, premedication may be considered in accordance with EAACI guidance.",
-          "Use of an alternative contrast agent should be considered.",
-          "Availability of a rapid response (or resuscitation) team member should be ensured.",
-          "Observation for ≥30 minutes with intravenous access should be ensured."
-        ],
-        emergency_unclear: [
-          "If contrast agent administration is considered necessary, the potential risk of recurrence should be considered.",
-          "Availability of personnel trained in the management of acute hypersensitivity reactions should be ensured.",
-          "Clinical judgement and local protocols should guide further management."
+          "Refer the patient to a drug allergy specialist (if not done before).",
+          "Optimize the allergy registration in the electronic health record.",
+          "Have a trained rapid response (or resuscitation) team member nearby.",
+          "Consider administration of premedication (EAACI guidelines).",
+          "Emergency premedication protocol: 50 mg prednisolone IV (or equivalent) ≥ 30 min before contrast medium administration.",
+          "Emergency premedication protocol: 2 mg clemastine IV (or equivalent) ≥ 30 min before contrast medium administration.",
+          "Context from Part 2: Routine premedication is not recommended. Premedication is optional in emergency situations where an unidentified culprit contrast medium led to a severe hypersensitivity reaction.",
+          "Choose a different iodine-based contrast medium or gadolinium-based contrast agent if the culprit contrast medium is known.",
+          "When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.",
+          "Be prepared and vigilant for a recurring immediate hypersensitivity reaction.",
+          "If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.",
+          "Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.",
+          "Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available."
         ]
       },
 
@@ -344,135 +401,53 @@ arrest: [
       icm_rules: {
         A: {
           title: "Group A selected",
-          text: "Alternative ICM from Group B or D may be considered.",
-          note: "High cross-reactivity has been reported between Group A and Group C. This suggestion is based on practical experience only."
+          text: "Practical-experience suggestion: Alternative ICM from Group B or D (without classic carbamoyl sidechain).",
+          note: "High cross-reactivity between Group A and Group C."
         },
         B: {
           title: "Group B selected",
-          text: "Alternative ICM from Group A, C or D may be considered.",
-          note: "This suggestion is based on practical experience only."
+          text: "Practical-experience suggestion: Alternative ICM from Group A, C or D.",
+          note: ""
         },
         C: {
           title: "Group C selected",
-          text: "Alternative ICM from Group B may be considered.",
-          note: "High cross-reactivity has been reported between Group C and Group A. This suggestion is based on practical experience only."
+          text: "Practical-experience suggestion: Alternative ICM from Group B (without classic or methyl-modified carbamoyl sidechain).",
+          note: "High cross-reactivity between Group C and Group A."
         },
         D: {
           title: "Group D selected",
-          text: "Alternative ICM from Group A or B may be considered.",
-          note: "This suggestion is based on practical experience only."
+          text: "Practical-experience suggestion: Alternative ICM from Group A or B (without methyl-modified carbamoyl sidechain).",
+          note: ""
         },
         unknown: {
           title: "ICM unknown",
-          text: "Alternative ICM from Group B or D may be considered.",
-          note: "This suggestion is based on practical experience only and reflects the higher likelihood that the involved ICM belongs to Group A."
+          text: "Due to the higher likelihood that the involved ICM is from Group A: choose the alternative ICM from Group B or D.",
+          note: "High cross-reactivity between Group C and Group A. This is a practical-experience suggestion based on the optional, non-validated classification and is not a robust evidence-based recommendation."
         }
       },
 
       gbca_rules: {
         A: {
           title: "Group A selected",
-          text: "Alternative GBCA from Group B may be considered.",
-          note: "This suggestion is based on practical experience only."
+          text: "Practical-experience suggestion: Alternative GBCA from Group B.",
+          note: ""
         },
         B: {
           title: "Group B selected",
-          text: "Alternative GBCA from Group A may be considered.",
-          note: "This suggestion is based on practical experience only."
+          text: "Practical-experience suggestion: Alternative GBCA from Group A.",
+          note: ""
         },
         C: {
           title: "Group C selected",
           text: "Insufficient data for empiric change advice.",
-          note: "Specialist input is preferable."
+          note: ""
         },
         unknown: {
           title: "GBCA unknown",
-          text: "No regimen can be recommended with certainty. Use of a GBCA different from the routinely administered agent may be considered.",
-          note: "This suggestion is based on practical experience only."
+          text: "It is not possible to recommend a regimen with certainty. Due to the probability of involvement, using a GBCA different from the one routinely administered is suggested.",
+          note: "This is based on practical experience and is not a robust evidence-based recommendation."
         }
       },
-
-      // Thyroid
-      thyroid_title: "Thyroid",
-      thyroid_subtitle: "Decision support for iodine-based contrast media in patients with thyroid-related risk constellations.",
-      thyroid_step1: "Step 1 — Clinical situation",
-      thyroid_step2: "Step 2 — Thyroid status",
-      thyroid_step3: "Step 3 — Medication",
-      thyroid_step4: "Step 4 — Planned radioiodine",
-      thyroid_status_normal: "Normal thyroid function",
-      thyroid_status_manifest: "Manifest hyperthyroidism",
-      thyroid_status_subclinical: "Subclinical / low TSH / unclear risk",
-      thyroid_status_autonomy: "Known autonomy / multinodular goitre",
-      thyroid_status_graves: "Untreated Graves’ disease",
-      thyroid_med_none: "No thyroid medication",
-      thyroid_med_levothyroxine: "Levothyroxine",
-      thyroid_med_thyreostatics: "Thyreostatics",
-      thyroid_rit_no: "No / not relevant",
-      thyroid_rit_yes: "Planned soon",
-      thyroid_placeholder: "Thyroid decision support will appear here after the JavaScript logic is connected.",
-      thyroid_safety_note:
-        "This module should distinguish between ESUR core guidance and local or endocrinology-led prophylaxis pathways.",
-      thyroid_level_ok: "Low current thyroid-related concern",
-      thyroid_level_warn: "Relevant thyroid-related caution",
-      thyroid_level_danger: "High thyroid-related concern",
-      thyroid_level_ok_detail: "Iodinated contrast can generally be considered.",
-      thyroid_level_warn_detail: "Iodinated contrast may still be possible, but clarification, timing or specialist input should be considered.",
-      thyroid_level_danger_detail: "Iodinated contrast should generally be avoided unless clinically unavoidable.",
-      thyroid_reasoning: "Reasoning",
-      thyroid_next_steps: "Recommended next step",
-      thyroid_local_note: "Local / specialist note",
-      thyroid_rit_note:
-        "Planned radioiodine diagnostics or therapy soon after iodinated contrast is a separate problem. Timing should be discussed explicitly with Nuclear Medicine / Endocrinology.",
-      thyroid_local_prophylaxis_note:
-        "Perchlorate / thiamazole-based prophylaxis pathways are not universal ESUR bedside rules. Treat them as local or endocrinology-led protocols.",
-
-      // Calculators
-      calculators_title: "Calculators",
-      calculators_subtitle: "Educational calculation tools for dose estimation and adrenal washout.",
-      calculators_tools_title: "Calculator tools",
-      dose_tab: "Dose",
-      washout_tab: "Washout",
-
-      // Dose
-      dose_input_title: "Dose input",
-      dose_region_head: "Head",
-      dose_region_thorax: "Thorax",
-      dose_region_abdomen_pelvis: "Abdomen / Pelvis",
-      dose_dlp_placeholder: "DLP",
-      dose_placeholder: "Dose estimation will appear here after the JavaScript logic is connected.",
-      dose_invalid: "Please enter a valid DLP value.",
-      dose_estimated_msv: "Estimated effective dose",
-      dose_region_label: "Region",
-      dose_comparison_background: "Approximate natural background radiation",
-      dose_comparison_cxr: "Approximate chest X-rays",
-      dose_comparison_flights: "Approximate long-haul flights",
-      dose_disclaimer:
-        "This is an educational estimate based on a region-specific conversion factor. It is not a patient-specific dose or cancer-risk calculation.",
-      dose_safety_note:
-        "Estimated mSv values and everyday comparisons should be labeled as educational approximations, not as patient-specific risk.",
-
-      // Washout
-      washout_input_title: "Washout input",
-      washout_unenhanced_placeholder: "Unenhanced HU",
-      washout_enhanced_placeholder: "Enhanced HU",
-      washout_delayed_placeholder: "Delayed HU",
-      washout_delay_placeholder: "Delay (minutes, optional)",
-      washout_placeholder: "Washout calculation will appear here after the JavaScript logic is connected.",
-      washout_invalid: "Please enter valid numeric HU values.",
-      washout_no_enhancement: "No relevant enhancement pattern (Enhanced HU ≤ Unenhanced HU). Classical adrenal washout calculation is not applicable. Check ROI placement, phase selection and HU values.",
-      washout_invalid_formula: "Washout calculation is not possible with these values. Check the HU inputs.",
-      washout_absolute: "Absolute washout",
-      washout_relative: "Relative washout",
-      washout_classic: "Classic interpretation",
-      washout_delay_label: "Delay",
-      washout_classic_positive:
-        "By classic radiology thresholds, the values support adenoma-style washout behavior (absolute >60% and/or relative >40%).",
-      washout_classic_negative:
-        "By classic radiology thresholds, the values do not show typical adenoma-style washout behavior.",
-      washout_caution:
-        "Interpret washout only in context: unenhanced HU, lesion homogeneity, measurement quality, oncologic setting and current guideline caution still matter.",
-      washout_safety_note:
-        "Washout values should be interpreted with unenhanced HU, lesion homogeneity and the broader clinical context.",
 
       // Practice Changes tab — static UI
       changes_title: "Practice Changes 2025",
@@ -505,36 +480,41 @@ arrest: [
       app_title: "Radiology Contrast & Safety App",
       reset: "Zurücksetzen",
 
-      disclaimer_line1: "Didaktisches Support-Tool. Lokale Protokolle beachten..",
+      disclaimer_line1: "Didaktisches Support-Tool. Lokale Protokolle beachten.",
       disclaimer_line2: "Nur zur Information. Klinische Entscheidungen sollten lokalen Protokollen, den Quellendokumenten und der klinischen Beurteilung folgen. Es werden keine Patientendaten gespeichert.",
       disclaimer_line3: "Inhalt zur Kontrastmittelsicherheit adaptiert aus der Guidance des ESUR Contrast Media Safety Committee.",
 
       nav_hsr: "HSR",
-      nav_thyroid: "Schilddrüse",
-      nav_calculators: "Rechner",
       nav_changes: "Changes",
 
       // HSR main
       hsr_title: "HSR",
-      hsr_subtitle: "Planung nach früherer Reaktion, Akutmanagement, empirische Switch-Hilfe, Tryptase-Interpretation und Spätreaktions-Check.",
+      hsr_subtitle: "Planung nach früherer Reaktion, Akutmanagement, empirische Switch-Hilfe, Tryptase-Interpretation und NIHR-Entscheidungshilfe.",
       hsr_tools_title: "HSR-Tools",
       hsr_guidance_tab: "Frühere Reaktion",
       hsr_acute_tab: "Akutmanagement",
       hsr_switch_tab: "Switch",
       hsr_tryptase_tab: "Tryptase",
-      hsr_nihr_tab: "Spätreaktions-Check",
+      hsr_nihr_tab: "NIHR",
 
       flow_title: "Frühere Reaktion",
       flow_subtitle: "Didaktische Orientierung bei früheren Hypersensitivitätsreaktionen auf Kontrastmittel.",
       flow_step1: "Schritt 1 — Klinische Situation",
       flow_step2: "Schritt 2 — Schweregrad der früheren Reaktion",
 
+      flow_routing_note:
+        "Didaktische Orientierung bei früheren unmittelbaren Hypersensitivitätsreaktionen. Bei nicht unmittelbaren Reaktionen das NIHR-Modul verwenden.",
+      hsr_referral_title: "Überweisung & Dokumentation",
+      hsr_referral_specify:
+        "Bei einer Überweisung an eine Fachperson für Arzneimittelallergien immer das verwendete Kontrastmittel angeben.",
+      hsr_referral_document:
+        "Eine detaillierte Dokumentation des auslösenden Kontrastmittels und des Schweregrads der Reaktion einschließlich eines Graduierungsschemas ist verpflichtend.",
+
       elective: "Elektiv",
       emergency: "Notfall",
       mild: "Mild",
       moderate: "Moderat",
       severe: "Schwer",
-      unclear: "Unklar",
 
       recommendation: "Empfehlung",
       safety_net: "Safety net",
@@ -543,17 +523,29 @@ arrest: [
 
       switch_title: "Switch",
       switch_subtitle:
-        "Didaktische Orientierung zum empirischen Wechsel des Kontrastmittels auf Basis praktischer Erfahrung.",
+        "Optionale, nicht validierte Kontrastmittelgruppierung und Vorschläge aus praktischer Erfahrung zur empirischen Wechselorientierung.",
       contrast_type: "Kontrastmitteltyp",
       nihr_cmtype_title: "Kontrastmitteltyp",
       icm_ct: "ICM (CT)",
       gbca_mri: "GBCA (MRT)",
-      icm_title: "ICM (jodhaltig)",
-      gbca_title: "GBCA (gadoliniumhaltig)",
+      icm_title: "ICM (iodhaltig)",
+      gbca_title: "GBCA (gadoliniumbasiert)",
       possible_alternatives: "Mögliche Alternativen",
       safety_note: "Sicherheitshinweis",
+      switch_status_optional:
+        "Diese Switch-Übersicht ist optional und beruht auf einer nicht validierten Klassifikation sowie auf praktischer Erfahrung.",
+      switch_cmsc:
+        "Das CMSC kann keine evidenzbasierten Empfehlungen auf robuster wissenschaftlicher Grundlage für den Wechsel auf ein alternatives Kontrastmittel auf Basis praktischer Erfahrung geben.",
+      switch_cr_structure:
+        "Kreuzreaktivität lässt sich nicht auf Grundlage der chemischen Struktur vorhersagen.",
+      switch_cr_frequency:
+        "Kreuzreaktivität kann häufiger auftreten bei iodhaltigen Kontrastmitteln mit einer N-(2,3-Hydroxypropyl)-carbamoyl-Seitenkette und bei makrozyklischen gadoliniumbasierten Kontrastmitteln.",
+      switch_best_option:
+        "Die beste Option ist, eine Alternative anhand der Ergebnisse einer allergologischen Abklärung zu wählen.",
+      switch_brand_governance:
+        "Markennamen dienen ausschließlich der Produktidentifikation. Die ESUR-Gruppierung und die Switch-Orientierung beziehen sich auf den jeweiligen Wirkstoff des Kontrastmittels.",
       switch_safety_note:
-        "Diese Vorschläge beruhen nur auf praktischer Erfahrung. Eine allergologische Abklärung bleibt vorzuziehen, wenn verfügbar.",
+        "Diese Switch-Übersicht ist optional und beruht auf einer nicht validierten Klassifikation sowie auf praktischer Erfahrung. Das CMSC kann keine evidenzbasierten Empfehlungen auf robuster wissenschaftlicher Grundlage für den Wechsel auf ein alternatives Kontrastmittel auf Basis praktischer Erfahrung geben. Kreuzreaktivität lässt sich nicht auf Grundlage der chemischen Struktur vorhersagen. Die beste Option ist, eine Alternative anhand der Ergebnisse einer allergologischen Abklärung zu wählen.",
       unknown: "Unbekannt",
       icm_unknown_hint: "Verwenden, wenn das auslösende ICM nicht bekannt ist.",
       gbca_unknown_hint: "Verwenden, wenn das auslösende GBCA nicht bekannt ist.",
@@ -565,39 +557,43 @@ arrest: [
       gbca_group_b_label: "Gruppe B",
       gbca_group_c_label: "Gruppe C",
       icm_group_a_names:
-        "Omnipaque (Iohexol) · Visipaque (Iodixanol) · Iomeron (Iomeprol) · Optiray (Ioversol)",
-      icm_group_b_names: "Iopamiro / Isovue (Iopamidol)",
-      icm_group_c_names: "Ultravist (Iopromid)",
-      icm_group_d_names: "Xenetix (Iobitridol)",
-      gbca_group_a_names: "Dotarem / Clariscan (Gadotersäure / Gadoterat-Meglumin)",
+        "Omnipaque® — iohexol · Visipaque® — iodixanol · Iomeron® — iomeprol · Optiray® — ioversol",
+      icm_group_b_names: "Iopamiro® / Isovue® — iopamidol",
+      icm_group_c_names: "Ultravist® — iopromide",
+      icm_group_d_names: "Xenetix® — iobitridol",
+      gbca_group_a_names: "Dotarem® / Clariscan® — gadoterate meglumine",
       gbca_group_b_names:
-        "Gadovist / Gadavist (Gadobutrol) · ProHance (Gadoteridol)",
-      gbca_group_c_names: "Elucirem / Vueway (Gadopiclenol)",
+        "ProHance® — gadoteridol · Gadovist® / Gadavist® — gadobutrol",
+      gbca_group_c_names: "Elucirem® / Vueway® — gadopiclenol",
       switch_nonvalidated:
-        "Diese Switch-Übersicht ist eine optionale, nicht validierte Orientierung auf Basis praktischer Erfahrung. Sie ersetzt weder eine allergologische Abklärung noch lokale Entscheidungen.",
+        "Diese Switch-Übersicht ist optional und beruht auf einer nicht validierten Klassifikation sowie auf praktischer Erfahrung.",
 
-      tryptase_title: "Tryptase-Regel",
-      tryptase_subtitle:
-        "ESUR empfiehlt idealerweise drei Proben: eine so früh wie möglich während der Reaktion, eine weitere 1–2 Stunden später (spätestens innerhalb von 4 Stunden nach Symptombeginn) und eine mehr als 24 Stunden nach vollständigem Abklingen als Baseline. Für die Berechnung unten sollten der höchste verfügbare akute Tryptasewert und der Baseline-Wert eingegeben werden.",
+      tryptase_title: "Serumtryptase",
+      tryptase_sample_measure:
+        "Serumtryptase innerhalb von 1–4 h nach Beginn aller moderaten bis schweren unmittelbaren Hypersensitivitätsreaktionen auf Kontrastmittel messen.",
+      tryptase_sample_baseline:
+        "Eine zweite Messung nach ≥ 24 h dient als Baseline für weitere allergologische Untersuchungen.",
+      tryptase_sample_ideal:
+        "Idealerweise sollten drei Proben gewonnen werden: die erste so früh wie möglich während einer vermuteten Hypersensitivitätsreaktion, die zweite 1–2 h nach der ersten, jedoch nicht später als 4 h nach Beginn der Reaktion, und die dritte mehr als 24 h nach Abklingen aller Zeichen und Symptome.",
       enter_values: "Werte eingeben",
       calculate: "Berechnen",
       result: "Ergebnis",
       tryptase_default:
-        "Für die Berechnung unten sollten der höchste verfügbare akute Tryptasewert und der Baseline-Wert eingegeben werden.",
+        "Einen akuten Tryptasewert eingeben, der während der Symptome oder innerhalb von 4 h danach gewonnen wurde, sowie einen Baseline-Tryptasewert.",
       tryptase_invalid: "Bitte gültige Zahlenwerte eingeben.",
       tryptase_threshold: "Schwellenwert",
       tryptase_acute: "Akute Tryptase",
       tryptase_baseline: "Baseline-Tryptase",
       tryptase_formula:
-        "Relevanter akuter Anstieg, wenn akute Tryptase ≥ (1.2 × Baseline) + 2 ng/mL.",
+        "Ein akuter Anstieg der Tryptase gegenüber der Baseline von mindestens 2 ng/mL + (1,2 × Baseline-Tryptase) während der Symptome oder innerhalb von 4 h danach ist hinweisend auf eine IHR.",
       tryptase_positive:
-        "Das Ergebnis spricht für das Vorliegen einer unmittelbaren Hypersensitivitätsreaktion (IHR).",
+        "Das Ergebnis ist hinweisend auf eine IHR.",
       tryptase_negative:
-        "Das Ergebnis stützt keinen signifikanten akuten Tryptaseanstieg.",
+        "Das Ergebnis zeigt keinen akuten Anstieg gegenüber der Baseline von mindestens 2 ng/mL + (1,2 × Baseline-Tryptase).",
       tryptase_note:
-        "Die Resultate sollten immer im klinischen Kontext interpretiert werden. Ein normaler Tryptasewert schliesst eine echte unmittelbare Hypersensitivitätsreaktion nicht aus.",
+        "Bei milder oder moderater IHR bleiben die Tryptasewerte typischerweise normal; ein fehlender Anstieg schließt die Möglichkeit einer echten IHR nicht aus.",
 
-      acute_title: "Akutmanagement",
+            acute_title: "Akutmanagement",
       acute_subtitle:
         "ESUR-Akutalgorithmus. Lokales Notfallprotokoll beachten und Medikamentenkonzentration vor Gabe prüfen.",
       acute_immediate_title: "Sofortbeurteilung und allgemeine Maßnahmen",
@@ -611,197 +607,242 @@ arrest: [
       acute_severity_moderate: "Moderate Reaktionen",
       acute_severity_severe: "Schwere Reaktionen",
       acute_pattern_mild_general: "Milde Reaktionen",
-      acute_pattern_moderate_urticaria: "Generalisierte Urtikaria / diffuses Erythem",
-      acute_pattern_moderate_angioedema: "Faziales Ödem / Angioödem",
+      acute_pattern_moderate_urticaria: "Diffuse Urtikaria / diffuses Erythem",
+      acute_pattern_moderate_angioedema: "Faziales Ödem ohne Stridor",
       acute_pattern_moderate_bronchospasm: "Milder Bronchospasmus",
-      acute_pattern_severe_anaphylaxis: "Anaphylaxie",
+      acute_pattern_severe_anaphylaxis: "Anaphylaktische Reaktion oder Stridor",
       acute_section_clinical: "Klinisches Muster / Warnhinweis",
       acute_section_management: "Management",
       acute_section_escalation: "Eskalation / Rapid Response",
       acute_warning_label: "Warnhinweis",
       acute_arrest_title: "Herz- oder Atemstillstand",
       acute_immediate_actions: [
-        "Anamnese und körperliche Untersuchung durch Radiologin/Radiologen.",
-        "A — Airway/Atemweg: Giemen, Stridor.",
-        "B — Breathing/Atmung: Auskultation von Lunge/Rachen, SaO₂.",
-        "C — Circulation/Kreislauf: Puls, Blutdruck, Pulsationen.",
-        "D — Disability/Neurologie: Ansprechbarkeit.",
-        "E — Environment/Exposition: Inspektion der gesamten Haut.",
-        "Kontrastmittelinfusion stoppen und i.v.-Leitung mit kristalloider Infusion weiterführen.",
-        "Serumtryptase innerhalb von 1–4 h bei allen moderaten bis schweren Reaktionen bestimmen."
+        "Den Patienten engmaschig überwachen und die Progression der Reaktion beurteilen.",
+        "Engmaschig auf Schleimhautödem von Nase, Mund, Rachen oder Larynx achten.",
+        "Bei Symptomen Herzfrequenz, arteriellen Blutdruck und Bewusstsein prüfen.",
+        "Den Patienten gemäß der ABCDE-Methode prüfen und stabilisieren.",
+        "Kontrastmittelinfusion stoppen und die i.v.-Leitung durch Kristalloid ersetzen.",
+        "Dyspnoe oder Stridor: den Patienten aufsetzen lassen.",
+        "Bestimmung der Serumtryptase erwägen, idealerweise 1–2 h nach Beginn der Reaktion.",
+        "Akute allergische Reaktionen und das auslösende Kontrastmittel im Allergieregister der elektronischen Patientenakte dokumentieren."
       ],
       acute_content: {
         mild_general: {
 clinical:
-  "Nasale Kongestion, Niesen, Konjunktivitis, Rhinorrhö, kutanes Ödem, juckender Hals, milde vereinzelte Urtikaria, z. B. <10.",
+  "Milde Merkmale: nasale Kongestion; Niesen, Konjunktivitis, Rhinorrhö; begrenzte oder vereinzelte Urtikaria und Pruritus; kutanes Ödem; begrenzter juckender oder kratzender Hals. Maßgeblich ist das stärkste Symptom.",
 management: [
-  "Patientin/Patient beruhigen.",
-  "IV-Zugang belassen.",
-  "500 mL NaCl 0,9% i.v. als Infusion.",
-  "Regelmäßige Beobachtung bis zum Abklingen der Symptome, mindestens 30 Minuten.",
-  "Bei prolongiertem Erbrechen: Ondansetron 4 mg i.v.",
-  "Bei persistierender Hautreaktion oder Juckreiz: nicht sedierendes H1-Antihistaminikum, z. B. Desloratadin 5 mg p.o. 1× täglich oder Cetirizin 10 mg p.o. 1× täglich."
+  "Milde Reaktionen können allein mit Beruhigung auskommen.",
+  "Vitalzeichen beobachten, bis die Symptome abklingen.",
+  "Den i.v.-Zugang während der Beobachtung nicht entfernen.",
+  "Nach einer milden Reaktion überwachen, bis jedes Symptom verschwunden ist (mindestens 30 Minuten, üblicherweise unter 60 Minuten).",
+  "Bei milder allergischer Reaktion ein nicht sedierendes Antihistaminikum erwägen, z. B. Desloratadin 5 mg oral oder Cetirizin 10 mg oral, einmal täglich.",
+  "Bei protrahiertem Erbrechen: Ondansetron 4 mg i.v."
 ],
 escalation: [
-  "Bei Bedarf Rapid-Response-Team hinzuziehen."
+  "Engmaschig überwachen und auf eine Progredienz der Reaktion achten."
 ]
         },
         moderate_urticaria: {
-clinical: "Generalisierte Urtikaria / diffuses Erythem.",
-warning: "Achtung Hypotonie.",
+clinical: "Diffuse Urtikaria / diffuses Erythem.",
 management: [
-  "1000 mL NaCl 0,9% i.v. in 1 h.",
-  "H1-Antihistaminikum i.v., z. B. Clemastin 2 mg.",
-  "Bei Bedarf H1-Antihistaminikum i.v. nach 5 Minuten wiederholen.",
-  "Bei Hypotonie (SBP <90): Beine aktiv hochlagern."
+  "Chlorphenamin 20 mg oder Clemastin 2 mg i.v. geben.",
+  "Verlegung in einen Bereich mit Überwachung der Vitalfunktionen erwägen."
 ],
 escalation: [
-  "Bei Hypotonie (SBP <90): wie Anaphylaxie behandeln.",
-  "Bei Bedarf Rapid-Response-Team hinzuziehen."
+  "Bei begleitender Hypotonie wie eine Anaphylaxie behandeln."
 ]
         },
         moderate_angioedema: {
-clinical: "Faziales Ödem / Angioödem.",
-warning: "Achtung Larynxödem.",
+clinical: "Faziales Ödem ohne Stridor.",
 management: [
-  "O₂ über Maske 10–15 L/min.",
-  "1000 mL NaCl 0,9% i.v. in 1 h.",
-  "H1-Antihistaminikum i.v., z. B. Clemastin 2 mg.",
-  "Bei Bedarf H1-Antihistaminikum i.v. nach 5 Minuten wiederholen."
+  "Sauerstoff 10 bis 15 L/min über eine Nicht-Rückatmungsmaske geben.",
+  "Chlorphenamin 20 mg oder Clemastin 2 mg i.v. geben.",
+  "Verlegung in einen Bereich mit Überwachung der Vitalfunktionen erwägen."
 ],
 escalation: [
-  "Bei schwerem Verlauf oder Stridor/Larynxödem: sitzende Position.",
-  "Bei schwerem Verlauf oder Stridor/Larynxödem: wie Anaphylaxie behandeln.",
-  "Bei schwerem Verlauf oder Stridor/Larynxödem: Rapid-Response-Team hinzuziehen."
+  "Wenn das Ödem schwer ist, in Atemwegsnähe liegt oder Stridor auftritt, wie eine Anaphylaxie behandeln."
 ]
         },
         moderate_bronchospasm: {
 clinical: "Milder Bronchospasmus.",
-warning: "Achtung respiratorische Bedrohung.",
 management: [
-  "O₂ über Maske 10–15 L/min.",
-  "SABA-Dosieraerosol: 2–3 tiefe Inhalationen à 100 µg oder Vernebelung in 3 mL NaCl bis zur Besserung, gemäß ESUR/Quelltext.",
-  "Bei Bedarf SABA-Vernebelung bis zur Besserung wiederholen."
+  "Kurzwirksamer β2-Agonist: 2–4 Inhalationen zu je 100 µg Salbutamol (abhängig vom Schweregrad), mit der Option zur Wiederholung alle 20 Minuten, oder per Vernebelung (2,5–5 µg verdünnt in 3 mL Kochsalzlösung) bis zur klinischen Besserung.",
+  "Verlegung in einen Bereich mit Überwachung der Vitalfunktionen erwägen."
 ],
 escalation: [
-  "Bei zunehmender Schwere: Adrenalin 1 mg/mL, 0,5 mg i.m.",
-  "Bei zunehmender Schwere: bei Bedarf Adrenalin 1 mg/mL, 0,5 mg i.m. nach 5 Minuten wiederholen, herzfrequenzgesteuert.",
-  "Bei protrahiertem Verlauf >5 h: Kortikosteroid langsam i.v. erwägen, z. B. Prednisolon 50 mg.",
-  "Bei Bedarf Rapid-Response-Team hinzuziehen."
+  "Bei Verschlechterung Adrenalin 0,5 mg i.m. geben und die Hinzuziehung des Rapid-Response-Teams erwägen.",
+  "Wenn der Bronchospasmus an Schwere zunimmt, Wiederholung von Adrenalin 0,5 mg i.m. erwägen, gesteuert anhand der Herzfrequenz."
 ]
         },
         severe_anaphylaxis: {
-clinical: "Anaphylaxie.",
+clinical: "Anaphylaktische Reaktion oder Stridor.",
 management: [
-  "Rapid-Response-Team hinzuziehen.",
-  "O₂ über Maske 10–15 L/min.",
-  "500 mL NaCl 0,9% i.v. in 10 Minuten.",
-  "Bei Bedarf NaCl 0,9% i.v. wiederholen.",
-  "Adrenalin 1 mg/mL, 0,5 mg i.m.",
-  "Bei Bedarf Adrenalin 1 mg/mL, 0,5 mg i.m. nach 5 Minuten wiederholen, herzfrequenzgesteuert.",
-  "H1-Antihistaminikum i.v., z. B. Clemastin 2 mg.",
-  "Bei Bedarf SABA-Dosieraerosol 2–10 tiefe Inhalationen à 100 µg oder Vernebelung in 3 mL NaCl bis zu 1 Stunde, gemäß ESUR/Quelltext.",
-  "Kortikosteroid langsam i.v. erwägen, z. B. Prednisolon 50 mg.",
-  "Bei Bedarf Intubation und ICU/Intensivstation."
+  "Das Rapid-Response-Team rufen.",
+  "Sauerstoff 10 bis 15 L/min mit Nicht-Rückatmungsmaske geben.",
+  "0,5 mg Adrenalin i.m. in den lateralen Oberschenkel geben, nach Bedarf wiederholen, gesteuert anhand der Herzfrequenz.",
+  "Flüssigkeitsbolus von 500 mL Kristalloid i.v. in 10 min geben, nach Bedarf wiederholen.",
+  "Kurzwirksamer β2-Agonist: 2–10 Inhalationen zu je 100 µg Salbutamol (abhängig vom Schweregrad), mit der Option zur Wiederholung alle 20 Minuten, oder per Vernebelung (2,5–5 µg verdünnt in 3 mL Kochsalzlösung) bis zu 1 Stunde.",
+  "Chlorphenamin 20 mg oder Clemastin 2 mg i.v. geben, nach Bedarf wiederholen.",
+  "Zusatz eines Kortikosteroids erwägen (zum Beispiel Prednisolon 50 mg i.v.)."
 ],
 arrest: [
-  "REANIMATIONSTEAM RUFEN.",
-  "Kardiopulmonale Reanimation starten.",
-  "Adrenalin 0,1 mg/mL i.v. nur durch das Reanimationsteam."
+  "CPR-Team (Reanimationsteam) rufen.",
+  "CPR starten."
 ]
         }
       },
 
-      nihr_title: "Spätreaktions-Check",
+      nihr_title: "NIHR — nicht unmittelbare Hypersensitivitätsreaktionen",
       nihr_subtitle:
-        "Für verzögerte Hautreaktionen nach Kontrastmittelgabe inklusive SCAR-Warnzeichen.",
-      red_flags: "Warnzeichen",
-      blistering: "Blasenbildung",
+        "Für eine frühere nicht unmittelbare Hypersensitivitätsreaktion auf ein iodhaltiges Kontrastmittel oder ein gadoliniumbasiertes Kontrastmittel, wenn eine erneute Gabe erwogen wird.",
+      nihr_severity_title: "Schweregrad der früheren NIHR",
+      nihr_severity_mild: "Mild",
+      nihr_severity_moderate: "Moderat",
+      nihr_severity_severe: "Schwer",
+      nihr_severity_hint:
+        "Mild: Hautläsionen klingen ohne Behandlung ab. Moderat: Hautläsionen klingen unter ambulanter Behandlung ab. Schwer: eine stationäre Aufnahme zur Behandlung ist erforderlich.",
+      nihr_culprit_class_title: "Klasse des früher auslösenden Kontrastmittels",
+      nihr_cmtype_icm: "ICM",
+      nihr_cmtype_gbca: "GBCA",
+      nihr_cmtype_unknown: "Kontrastmittelklasse unbekannt",
+      nihr_culprit_known_title: "Genaues auslösendes Kontrastmittel bekannt?",
+      nihr_culprit_known: "Auslösendes KM bekannt",
+      nihr_culprit_unknown: "Auslösendes KM unbekannt",
+      nihr_danger_signs_title: "Warnzeichen",
+      erosions: "Erosive und/oder hämorrhagische Läsionen",
+      blistering: "Blasenbildung und Hautstörung",
       mucosal_involvement: "Schleimhautbeteiligung",
-      erosions: "Erosive Läsionen",
-      hemorrhagic_lesions: "Hämorrhagische Läsionen",
-      skin_disruption: "Hautunterbrechung",
-      fever: "Hohes Fieber",
-      organ_values: "Auffällige Leber- oder Nierenwerte",
-      lymphadenopathy: "Lymphadenopathie",
-      assessment: "Beurteilung",
-      nihr_default: "Keine Warnzeichen ausgewählt.",
-      nihr_positive_title: "Mögliche schwere kutane Nebenwirkung (SCAR)",
-      nihr_positive_text_icm: [
-        "Eine dringliche Beurteilung durch eine allergologische oder dermatologische Fachperson wird empfohlen.",
-        "Wenn möglich, sollte ein alternatives Bildgebungsverfahren erwogen werden.",
-        "Nach einer schweren nicht-unmittelbaren Hypersensitivitätsreaktion auf ein jodhaltiges Kontrastmittel sollten alle jodhaltigen Kontrastmittel vermieden werden."
-      ],
-      nihr_positive_text_gbca: [
-        "Eine dringliche Beurteilung durch eine allergologische oder dermatologische Fachperson wird empfohlen.",
-        "Wenn möglich, sollte ein alternatives Bildgebungsverfahren erwogen werden.",
-        "Nach einer schweren nicht-unmittelbaren Hypersensitivitätsreaktion auf ein gadoliniumhaltiges Kontrastmittel sollten alle gadoliniumhaltigen Kontrastmittel vermieden werden."
-      ],
+      extracutaneous_involvement: "Extrakutane Organbeteiligung (hohes Fieber, auffällige Leber-/Nierenwerte, Lymphadenopathie)",
+      nihr_recommendation_title: "NIHR-Empfehlung",
+      nihr_safety_note_title: "Sicherheitshinweis",
+      nihr_safety_note: "",
+      nihr_recommended_actions: "Empfohlene Maßnahmen",
+      nihr_class_specific_rule: "Klassenspezifische Regel",
+      nihr_status_scar: "Schwere nicht unmittelbare Hypersensitivitätsreaktion mit Warnzeichen (SCAR)",
+      nihr_status_moderate: "Moderate NIHR ohne Warnzeichen",
+      nihr_status_mild: "Milde NIHR ohne Warnzeichen",
+      nihr_scope_guard:
+        "Diese Kombination ist in ESUR Part 2 Table 2 nicht als eigener Managementpfad dargestellt. Schweregrad der NIHR und dokumentierte Warnzeichen erneut prüfen.",
+      nihr_mild_interview: "Die Patientin oder den Patienten zur früheren Hypersensitivitätsreaktion befragen.",
+      nihr_mild_refer:
+        "Optional die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt), wenn die lokale Kapazität für Arzneimittelallergologie ausreicht.",
+      nihr_moderate_refer:
+        "Die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt).",
+      nihr_optimize_ehr: "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+      nihr_apply_advice:
+        "Die Empfehlung der Fachperson für Arzneimittelallergien für ein sicheres iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel umsetzen.",
+      nihr_choose_different:
+        "Wenn diese Empfehlung nicht vorliegt, ein anderes iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel wählen, sofern das auslösende Kontrastmittel bekannt ist.",
+      nihr_observe:
+        "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+      nihr_written:
+        "Der Patientin oder dem Patienten schriftliche Hinweise für eine mögliche erneute nicht unmittelbare Hypersensitivitätsreaktion mitgeben.",
+      nihr_recurrence:
+        "Wenn eine nicht unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+      nihr_preventive_alt:
+        "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+      nihr_preventive_never_deny:
+        "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind.",
+      nihr_footnote_crossreact:
+        "Kreuzreaktivität von Kontrastmitteln und ein erhöhtes Risiko für eine nicht unmittelbare Hypersensitivitätsreaktion bei Verwendung iso-osmolarer dimerer iodhaltiger Kontrastmittel erwägen.",
+      nihr_scar_refer:
+        "Die Patientin oder den Patienten sofort an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt).",
+      nihr_scar_choose_imaging: "Eine alternative Bildgebungsmodalität wählen.",
+      nihr_scar_ehr: "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+      nihr_scar_do_not_give:
+        "Die Kontrastmittelgruppe, auf die die schwere Hautreaktion aufgetreten ist, nicht geben.",
+      nihr_scar_icm_rule:
+        "Nach einer schweren nicht unmittelbaren Hypersensitivitätsreaktion auf ein iodhaltiges Kontrastmittel alle iodhaltigen Kontrastmittel vermeiden.",
+      nihr_scar_gbca_rule:
+        "Nach einer schweren nicht unmittelbaren Hypersensitivitätsreaktion auf ein gadoliniumbasiertes Kontrastmittel alle gadoliniumbasierten Kontrastmittel vermeiden.",
+      nihr_scar_unknown_rule:
+        "Nach einer schweren Reaktion auf ein unbekanntes Kontrastmittel das Vorgehen nach multidisziplinärer Konsultation individualisieren.",
 
-      icm_hint:
-        "ICM-Gruppenbeispiele\nMarkenbeispiele; Verfügbarkeit und Markenrechte können je nach Land variieren.",
+            icm_hint:
+        "Die ESUR-Gruppierung basiert auf dem jeweiligen Kontrastmittelwirkstoff. Markennamen werden ausschließlich zur Produktidentifikation angezeigt.\nGruppierung gemäß ESUR Part 2 Fig. 2 / Fig. 3 und Table 1.",
       gbca_hint:
-        "GBCA-Gruppenbeispiele\nMarkenbeispiele; Verfügbarkeit und Markenrechte können je nach Land variieren.",
+        "Die ESUR-Gruppierung basiert auf dem jeweiligen Kontrastmittelwirkstoff. Markennamen werden ausschließlich zur Produktidentifikation angezeigt.\nGruppierung gemäß ESUR Part 2 Fig. 2 / Fig. 3 und Table 1.",
 
       flow_titles: {
         elective_mild: "Elektive Bildgebung — frühere milde unmittelbare Hypersensitivitätsreaktion",
         elective_moderate: "Elektive Bildgebung — frühere moderate unmittelbare Hypersensitivitätsreaktion",
         elective_severe: "Elektive Bildgebung — frühere schwere unmittelbare Hypersensitivitätsreaktion",
-        elective_unclear: "Elektive Bildgebung — Schweregrad der früheren Reaktion unklar",
         emergency_mild: "Notfallbildgebung — frühere milde unmittelbare Hypersensitivitätsreaktion",
         emergency_moderate: "Notfallbildgebung — frühere moderate unmittelbare Hypersensitivitätsreaktion",
-        emergency_severe: "Notfallbildgebung — frühere schwere unmittelbare Hypersensitivitätsreaktion",
-        emergency_unclear: "Notfallbildgebung — Schweregrad der früheren Reaktion unklar"
+        emergency_severe: "Notfallbildgebung — frühere schwere unmittelbare Hypersensitivitätsreaktion"
       },
 
       flow_bullets: {
         elective_mild: [
-          "Die frühere Reaktion sollte überprüft werden.",
-          "Die Allergiedokumentation sollte optimiert werden.",
-          "Empfehlungen einer allergologischen Fachperson können berücksichtigt oder eine Überweisung kann erwogen werden.",
-          "Wenn das auslösende Kontrastmittel bekannt ist, kann die Verwendung eines alternativen Kontrastmittels erwogen werden.",
-          "Wenn eine Kontrastmittelgabe erforderlich ist, sollte eine Beobachtung für ≥30 Minuten mit intravenösem Zugang sichergestellt werden.",
-          "Auf mögliche wiederkehrende Reaktionen sollte klinisch geachtet werden."
+          "Die Patientin oder den Patienten zur früheren Hypersensitivitätsreaktion befragen.",
+          "Optional die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt), wenn die lokale Kapazität für Arzneimittelallergologie ausreicht.",
+          "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+          "Die Empfehlung der Fachperson für Arzneimittelallergien für ein sicheres iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel umsetzen; oder, wenn diese nicht vorliegt, ein anderes iodhaltiges oder gadoliniumbasiertes Kontrastmittel wählen, sofern das auslösende Kontrastmittel bekannt ist.",
+          "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+          "Auf eine wiederkehrende unmittelbare Hypersensitivitätsreaktion vorbereitet und wachsam sein.",
+          "Wenn eine unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+          "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+          "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind."
         ],
         elective_moderate: [
-          "Ein Aufschub der Untersuchung sollte erwogen werden, wenn dies klinisch möglich ist.",
-          "Eine Überweisung zur formellen allergologischen Abklärung wird dringend empfohlen.",
-          "Wenn eine kontrastverstärkte Bildgebung weiterhin erforderlich ist, sollte die Verwendung eines alternativen Kontrastmittels erwogen werden.",
-          "Eine Beobachtung für ≥30 Minuten mit intravenösem Zugang sollte sichergestellt werden."
+          "Die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt).",
+          "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+          "Die Bildgebung aufschieben, um die Ergebnisse der Allergieanalyse abzuwarten.",
+          "Die Empfehlung der Fachperson für Arzneimittelallergien für ein sicheres iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel umsetzen.",
+          "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+          "Auf eine wiederkehrende unmittelbare Hypersensitivitätsreaktion vorbereitet und wachsam sein.",
+          "Wenn eine unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+          "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+          "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind."
         ],
         elective_severe: [
-          "Ein Aufschub der Untersuchung sollte erwogen werden, wenn dies klinisch möglich ist.",
-          "Eine Überweisung zur formellen allergologischen Abklärung wird dringend empfohlen.",
-          "Wenn eine kontrastverstärkte Bildgebung weiterhin erforderlich ist, sollte die Verwendung eines alternativen Kontrastmittels erwogen werden.",
-          "Die Verfügbarkeit eines Mitglieds des Rapid-Response- oder Reanimationsteams sollte sichergestellt werden.",
-          "Eine Beobachtung für ≥30 Minuten mit intravenösem Zugang sollte sichergestellt werden."
-        ],
-        elective_unclear: [
-          "Die frühere Reaktion sollte überprüft werden.",
-          "Die Allergiedokumentation sollte optimiert werden.",
-          "Wenn eine Kontrastmittelgabe weiterhin erforderlich ist, sollten klinische Beurteilung und lokale Protokolle das weitere Vorgehen leiten."
+          "Die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt).",
+          "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+          "Ein geschultes Mitglied des Rapid-Response-Teams (oder Reanimationsteams) in der Nähe haben.",
+          "Die Bildgebung aufschieben, um die Ergebnisse der Allergieanalyse abzuwarten.",
+          "Die Empfehlung der Fachperson für Arzneimittelallergien für ein sicheres iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel umsetzen.",
+          "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+          "Auf eine wiederkehrende unmittelbare Hypersensitivitätsreaktion vorbereitet und wachsam sein.",
+          "Wenn eine unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+          "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+          "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind."
         ],
         emergency_mild: [
-          "Wenn eine Kontrastmittelgabe erforderlich ist, sollte das potenzielle Risiko eines Wiederauftretens berücksichtigt werden.",
-          "Die Verwendung eines alternativen Kontrastmittels kann erwogen werden, wenn das auslösende Kontrastmittel bekannt ist.",
-          "Die Verfügbarkeit von Personal mit Schulung im Management akuter Hypersensitivitätsreaktionen sollte sichergestellt werden.",
-          "Eine Beobachtung für ≥30 Minuten mit intravenösem Zugang sollte sichergestellt werden."
+          "Die Patientin oder den Patienten zur früheren Hypersensitivitätsreaktion befragen.",
+          "Optional die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt), wenn die lokale Kapazität für Arzneimittelallergologie ausreicht.",
+          "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+          "Die Empfehlung der Fachperson für Arzneimittelallergien für ein sicheres iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel umsetzen; oder, wenn diese nicht vorliegt, ein anderes iodhaltiges oder gadoliniumbasiertes Kontrastmittel wählen, sofern das auslösende Kontrastmittel bekannt ist.",
+          "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+          "Auf eine wiederkehrende unmittelbare Hypersensitivitätsreaktion vorbereitet und wachsam sein.",
+          "Wenn eine unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+          "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+          "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind."
         ],
         emergency_moderate: [
-          "Wenn eine kontrastverstärkte Bildgebung als notwendig erachtet wird, sollte die Verwendung eines alternativen Kontrastmittels erwogen werden.",
-          "Die Verfügbarkeit von Personal mit Schulung im Management akuter Hypersensitivitätsreaktionen sollte sichergestellt werden.",
-          "Eine Beobachtung für ≥30 Minuten mit intravenösem Zugang sollte sichergestellt werden."
+          "Die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt).",
+          "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+          "Eine geschulte Ärztin oder einen geschulten Arzt aus Bildgebung oder Notaufnahme in der Nähe haben.",
+          "Ein anderes iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel wählen, sofern das auslösende Kontrastmittel bekannt ist.",
+          "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+          "Auf eine wiederkehrende unmittelbare Hypersensitivitätsreaktion vorbereitet und wachsam sein.",
+          "Wenn eine unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+          "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+          "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind."
         ],
         emergency_severe: [
-          "Wenn eine kontrastverstärkte Bildgebung als unvermeidbar erachtet wird, kann eine Prämedikation gemäss EAACI-Guidance erwogen werden.",
-          "Die Verwendung eines alternativen Kontrastmittels sollte erwogen werden.",
-          "Die Verfügbarkeit eines Mitglieds des Rapid-Response- oder Reanimationsteams sollte sichergestellt werden.",
-          "Eine Beobachtung für ≥30 Minuten mit intravenösem Zugang sollte sichergestellt werden."
-        ],
-        emergency_unclear: [
-          "Wenn eine Kontrastmittelgabe als notwendig erachtet wird, sollte das potenzielle Risiko eines Wiederauftretens berücksichtigt werden.",
-          "Die Verfügbarkeit von Personal mit Schulung im Management akuter Hypersensitivitätsreaktionen sollte sichergestellt werden.",
-          "Klinische Beurteilung und lokale Protokolle sollten das weitere Vorgehen leiten."
+          "Die Patientin oder den Patienten an eine Fachperson für Arzneimittelallergien überweisen (falls noch nicht erfolgt).",
+          "Die Allergieregistrierung in der elektronischen Patientenakte optimieren.",
+          "Ein geschultes Mitglied des Rapid-Response-Teams (oder Reanimationsteams) in der Nähe haben.",
+          "Die Gabe einer Prämedikation erwägen (EAACI-Leitlinien).",
+          "Notfall-Prämedikationsprotokoll: 50 mg Prednisolon i.v. (oder Äquivalent) ≥ 30 min vor der Kontrastmittelgabe.",
+          "Notfall-Prämedikationsprotokoll: 2 mg Clemastin i.v. (oder Äquivalent) ≥ 30 min vor der Kontrastmittelgabe.",
+          "Kontext aus Part 2: Eine routinemäßige Prämedikation wird nicht empfohlen. Eine Prämedikation ist in Notfallsituationen optional, wenn ein nicht identifiziertes auslösendes Kontrastmittel zu einer schweren Hypersensitivitätsreaktion geführt hat.",
+          "Ein anderes iodhaltiges Kontrastmittel oder gadoliniumbasiertes Kontrastmittel wählen, sofern das auslösende Kontrastmittel bekannt ist.",
+          "Wenn das Kontrastmittel verabreicht wird, die Patientin oder den Patienten mindestens 30 Minuten mit liegendem i.v.-Zugang beobachten.",
+          "Auf eine wiederkehrende unmittelbare Hypersensitivitätsreaktion vorbereitet und wachsam sein.",
+          "Wenn eine unmittelbare Hypersensitivitätsreaktion wieder auftritt, ist die Überweisung an eine Fachperson für Arzneimittelallergien verpflichtend.",
+          "Eine alternative Bildgebungsmodalität erwägen oder eine Untersuchung ohne Kontrastmittel erwägen, wenn die diagnostische Aussagekraft für die korrekte Patientenführung ausreicht.",
+          "Eine klinisch gut indizierte kontrastverstärkte Untersuchung nicht verweigern, wenn keine alternativen Bildgebungsstrategien verfügbar sind."
         ]
       },
 
@@ -811,135 +852,53 @@ arrest: [
       icm_rules: {
         A: {
           title: "Gruppe A ausgewählt",
-          text: "Ein alternatives ICM aus Gruppe B oder D kann erwogen werden.",
-          note: "Eine hohe Kreuzreaktivität wurde zwischen Gruppe A und Gruppe C beschrieben. Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Vorschlag aus praktischer Erfahrung: Alternatives ICM aus Gruppe B oder D (ohne klassische Carbamoyl-Seitenkette).",
+          note: "Hohe Kreuzreaktivität zwischen Gruppe A und Gruppe C."
         },
         B: {
           title: "Gruppe B ausgewählt",
-          text: "Ein alternatives ICM aus Gruppe A, C oder D kann erwogen werden.",
-          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Vorschlag aus praktischer Erfahrung: Alternatives ICM aus Gruppe A, C oder D.",
+          note: ""
         },
         C: {
           title: "Gruppe C ausgewählt",
-          text: "Ein alternatives ICM aus Gruppe B kann erwogen werden.",
-          note: "Eine hohe Kreuzreaktivität wurde zwischen Gruppe C und Gruppe A beschrieben. Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Vorschlag aus praktischer Erfahrung: Alternatives ICM aus Gruppe B (ohne klassische oder methylmodifizierte Carbamoyl-Seitenkette).",
+          note: "Hohe Kreuzreaktivität zwischen Gruppe C und Gruppe A."
         },
         D: {
           title: "Gruppe D ausgewählt",
-          text: "Ein alternatives ICM aus Gruppe A oder B kann erwogen werden.",
-          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Vorschlag aus praktischer Erfahrung: Alternatives ICM aus Gruppe A oder B (ohne methylmodifizierte Carbamoyl-Seitenkette).",
+          note: ""
         },
         unknown: {
           title: "ICM unbekannt",
-          text: "Ein alternatives ICM aus Gruppe B oder D kann erwogen werden.",
-          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung und berücksichtigt die höhere Wahrscheinlichkeit, dass das beteiligte ICM zu Gruppe A gehört."
+          text: "Aufgrund der höheren Wahrscheinlichkeit, dass das beteiligte ICM aus Gruppe A stammt: das alternative ICM aus Gruppe B oder D wählen.",
+          note: "Hohe Kreuzreaktivität zwischen Gruppe C und Gruppe A. Dies ist ein Vorschlag aus praktischer Erfahrung auf Basis der optionalen, nicht validierten Klassifikation und keine robuste evidenzbasierte Empfehlung."
         }
       },
 
       gbca_rules: {
         A: {
           title: "Gruppe A ausgewählt",
-          text: "Ein alternatives GBCA aus Gruppe B kann erwogen werden.",
-          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Vorschlag aus praktischer Erfahrung: Alternatives GBCA aus Gruppe B.",
+          note: ""
         },
         B: {
           title: "Gruppe B ausgewählt",
-          text: "Ein alternatives GBCA aus Gruppe A kann erwogen werden.",
-          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Vorschlag aus praktischer Erfahrung: Alternatives GBCA aus Gruppe A.",
+          note: ""
         },
         C: {
           title: "Gruppe C ausgewählt",
-          text: "Für einen empirischen Wechsel besteht eine unzureichende Datenlage.",
-          note: "Fachärztlicher Input ist vorzuziehen."
+          text: "Unzureichende Datenlage für eine empirische Wechsel-Empfehlung.",
+          note: ""
         },
         unknown: {
           title: "GBCA unbekannt",
-          text: "Es kann kein Schema mit Sicherheit empfohlen werden. Die Verwendung eines anderen als des routinemässig eingesetzten GBCA kann erwogen werden.",
-          note: "Dieser Vorschlag beruht nur auf praktischer Erfahrung."
+          text: "Ein Schema kann nicht mit Sicherheit empfohlen werden. Aufgrund der Beteiligungswahrscheinlichkeit wird die Verwendung eines anderen als des routinemässig eingesetzten GBCA vorgeschlagen.",
+          note: "Dies beruht auf praktischer Erfahrung und ist keine robuste evidenzbasierte Empfehlung."
         }
       },
-
-      // Thyroid
-      thyroid_title: "Schilddrüse",
-      thyroid_subtitle: "Entscheidungshilfe für iodhaltige Kontrastmittel bei schilddrüsenbezogenen Risikokonstellationen.",
-      thyroid_step1: "Schritt 1 — Klinische Situation",
-      thyroid_step2: "Schritt 2 — Schilddrüsenstatus",
-      thyroid_step3: "Schritt 3 — Medikation",
-      thyroid_step4: "Schritt 4 — Geplante Radioiod-Anwendung",
-      thyroid_status_normal: "Normale Schilddrüsenfunktion",
-      thyroid_status_manifest: "Manifeste Hyperthyreose",
-      thyroid_status_subclinical: "Subklinisch / niedriges TSH / unklarer Risikostatus",
-      thyroid_status_autonomy: "Bekannte Autonomie / multinodöse Struma",
-      thyroid_status_graves: "Unbehandelter Morbus Basedow",
-      thyroid_med_none: "Keine Schilddrüsenmedikation",
-      thyroid_med_levothyroxine: "Levothyroxin",
-      thyroid_med_thyreostatics: "Thyreostatika",
-      thyroid_rit_no: "Nein / nicht relevant",
-      thyroid_rit_yes: "Bald geplant",
-      thyroid_placeholder: "Die Schilddrüsen-Entscheidungshilfe erscheint hier, sobald die JavaScript-Logik verbunden ist.",
-      thyroid_safety_note:
-        "Dieses Modul sollte zwischen ESUR-Kernempfehlungen und lokalen bzw. endokrinologisch geführten Prophylaxe-Pfaden unterscheiden.",
-      thyroid_level_ok: "Aktuell geringe schilddrüsenbezogene Sorge",
-      thyroid_level_warn: "Relevante schilddrüsenbezogene Vorsicht",
-      thyroid_level_danger: "Hohe schilddrüsenbezogene Relevanz",
-      thyroid_level_ok_detail: "Iodhaltiges Kontrastmittel kann im Allgemeinen erwogen werden.",
-      thyroid_level_warn_detail: "Iodhaltiges Kontrastmittel kann weiterhin möglich sein, aber Abklärung, Timing oder fachärztlicher Input sollten erwogen werden.",
-      thyroid_level_danger_detail: "Iodhaltiges Kontrastmittel sollte im Allgemeinen vermieden werden, ausser wenn es klinisch unvermeidbar ist.",
-      thyroid_reasoning: "Begründung",
-      thyroid_next_steps: "Empfohlener nächster Schritt",
-      thyroid_local_note: "Lokaler / fachärztlicher Hinweis",
-      thyroid_rit_note:
-        "Eine bald geplante Radioioddiagnostik oder Radioiodtherapie nach iodhaltigem Kontrastmittel ist ein separates Problem. Das Timing sollte explizit mit Nuklearmedizin / Endokrinologie besprochen werden.",
-      thyroid_local_prophylaxis_note:
-        "Perchlorat- / Thiamazol-basierte Prophylaxe-Pfade sind keine universellen ESUR-Bedside-Regeln. Sie sollten als lokale oder endokrinologisch geführte Protokolle behandelt werden.",
-
-      // Calculators
-      calculators_title: "Rechner",
-      calculators_subtitle: "Didaktische Rechentools für Dosisabschätzung und Nebennieren-Washout.",
-      calculators_tools_title: "Rechner-Tools",
-      dose_tab: "Dosis",
-      washout_tab: "Washout",
-
-      // Dose
-      dose_input_title: "Dosis-Eingabe",
-      dose_region_head: "Kopf",
-      dose_region_thorax: "Thorax",
-      dose_region_abdomen_pelvis: "Abdomen / Becken",
-      dose_dlp_placeholder: "DLP",
-      dose_placeholder: "Die Dosisabschätzung erscheint hier, sobald die JavaScript-Logik verbunden ist.",
-      dose_invalid: "Bitte einen gültigen DLP-Wert eingeben.",
-      dose_estimated_msv: "Geschätzte effektive Dosis",
-      dose_region_label: "Region",
-      dose_comparison_background: "Ungefähre natürliche Hintergrundstrahlung",
-      dose_comparison_cxr: "Ungefähre Thorax-Röntgenbilder",
-      dose_comparison_flights: "Ungefähre Langstreckenflüge",
-      dose_disclaimer:
-        "Dies ist eine didaktische Schätzung auf Grundlage eines regionsspezifischen Konversionsfaktors. Es handelt sich nicht um eine patientenspezifische Dosis- oder Krebsrisikoberechnung.",
-      dose_safety_note:
-        "Geschätzte mSv-Werte und Alltagsvergleiche sollten als didaktische Näherungen gekennzeichnet werden, nicht als patientenspezifisches Risiko.",
-
-      // Washout
-      washout_input_title: "Washout-Eingabe",
-      washout_unenhanced_placeholder: "Nativ-HU",
-      washout_enhanced_placeholder: "KM-HU",
-      washout_delayed_placeholder: "Verzögert-HU",
-      washout_delay_placeholder: "Delay (Minuten, optional)",
-      washout_placeholder: "Die Washout-Berechnung erscheint hier, sobald die JavaScript-Logik verbunden ist.",
-      washout_invalid: "Bitte gültige numerische HU-Werte eingeben.",
-      washout_no_enhancement: "Kein plausibles Enhancement-Muster (KM-HU ≤ Nativ-HU). Eine klassische Nebennieren-Washout-Berechnung ist nicht sinnvoll anwendbar. ROI-Platzierung, Phase und HU-Werte prüfen.",
-      washout_invalid_formula: "Mit diesen Werten ist keine sinnvolle Washout-Berechnung möglich. Bitte die HU-Eingaben prüfen.",
-      washout_absolute: "Absoluter Washout",
-      washout_relative: "Relativer Washout",
-      washout_classic: "Klassische Interpretation",
-      washout_delay_label: "Delay",
-      washout_classic_positive:
-        "Nach klassischen radiologischen Schwellen sprechen die Werte für ein adenomatypisches Washout-Verhalten (absolut >60% und/oder relativ >40%).",
-      washout_classic_negative:
-        "Nach klassischen radiologischen Schwellen zeigen die Werte kein typisches adenomatöses Washout-Verhalten.",
-      washout_caution:
-        "Washout immer im Kontext interpretieren: Nativ-HU, Homogenität der Läsion, Messqualität, onkologisches Setting und aktuelle Guideline-Vorsicht bleiben relevant.",
-      washout_safety_note:
-        "Washout-Werte sollten zusammen mit Nativ-HU, Homogenität der Läsion und dem weiteren klinischen Kontext interpretiert werden.",
 
       // Practice Changes tab — static UI
       changes_title: "Practice Changes 2025",
@@ -969,31 +928,6 @@ arrest: [
     }
   };
 
-  const doseFactors = {
-    head: 0.0021,
-    thorax: 0.014,
-    abdomen_pelvis: 0.015
-  };
-
-  const doseRegionLabels = {
-    en: {
-      head: "Head",
-      thorax: "Thorax",
-      abdomen_pelvis: "Abdomen / Pelvis"
-    },
-    de: {
-      head: "Kopf",
-      thorax: "Thorax",
-      abdomen_pelvis: "Abdomen / Becken"
-    }
-  };
-
-  const doseComparisons = {
-    chestXray: 0.1,
-    longHaulFlight: 0.03,
-    annualBackground: 3.0
-  };
-
   const changesLibrary = {
     en: [
       {
@@ -1002,13 +936,13 @@ arrest: [
         icon: "document",
         title: "Publication model and structure",
         summary:
-          "2025 moves from a booklet-style version update to an electronic, modular guidance framework with yearly updates.",
+          "The 2018 Version 10 quick guide groups topics under three main sections. The 2025 contents list topic headings; its preface announces that the guidelines will also be published electronically on the ESUR webpage and updated annually.",
         keywords: [
           "publication",
           "structure",
           "electronic",
           "yearly update",
-          "modular",
+          "topic sections",
           "permanent work in progress"
         ],
         compare: {
@@ -1016,49 +950,49 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "ESUR 10.0 was presented as a classical guideline booklet with the large sections General adverse reactions, Renal adverse reactions (PC-AKI), and Miscellaneous."
+                "Version 10.0 (2018) was presented as a booklet. Its quick guide groups topics under General adverse reactions, Renal adverse reactions (PC-AKI), and Miscellaneous. The official German 2018 edition also mentions electronic versions of these guidelines on the ESUR website."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "The 2025 document is organized as topic-based modules such as hypersensitivity, CA-AKI, dialysis, extravasation, waiting times, laboratory interference, systemic diseases, HSG, and CO₂.",
-                "It is also described as an electronic, annually updated document and a permanent work in progress."
+                "The 2025 contents list topic sections including hypersensitivity reactions, prevention of CA-AKI, dialysis, extravasation, waiting times, laboratory interference, and systemic diseases. Under Miscellaneous recommendations and topics, the contents also list CO₂ and HSG.",
+                "The 2025 preface announces that, from now on, the guidelines will also be published in electronic form on the ESUR webpage and updated annually. It describes the guidelines as a permanent work in progress."
               ]
             },
             {
-              label: "Practical impact",
+              label: "Scope of comparison",
               paragraphs: [
-                "The newer structure is easier to map to concrete clinical questions and should not be read as a simple static reprint of the 2018 booklet."
+                "The two editions group their contents differently. This structural comparison does not establish whether an individual clinical recommendation changed."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 summary guideline"
+            "Source: ESUR Guidelines 10.0 (2018 EN), Preface p. 2 / PDF p. 3; Quick Guide p. 3 / PDF p. 4; Contents pp. 4–5 / PDF pp. 5–6",
+            "Source: ESUR Guidelines 10.0 (2018 DE), Einleitung and Kurzanleitung, unnumbered / PDF p. 3; Inhalt, unnumbered / PDF pp. 4–5",
+            "Source: ESUR CMSC Guidelines 2025, Preface p. 3 / PDF p. 3; Contents pp. 4–5 / PDF pp. 4–5"
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR 2025 action points",
+              label: "Source notes",
               bullets: [
-                "When citing current ESUR contrast safety guidance, use the 2025 electronic guidance rather than treating it as a conventional booklet update.",
-                "Expect topic-based modules and yearly electronic updates when checking whether a practice point has changed."
+                "The 2025 preface says that the guidelines summarize key recommendations and encourages readers to consult the original ESUR CMSC guideline publications for a complete understanding of each topic.",
+                "The 2025 preface announces that, from now on, the guidelines will also be published in electronic form on the ESUR webpage and updated annually."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "This is a structural change in how the guidance is maintained and accessed, even where the underlying clinical rule has not dramatically changed."
+                "The 2025 preface names, among others, updated sections on contrast agent hypersensitivity and extravasation. Its contents alone do not show how an individual clinical recommendation changed."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 summary guideline",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR CMSC Guidelines 2025, Preface and Note, p. 3 / PDF p. 3; Contents pp. 4–5 / PDF pp. 4–5"
           ]
         }
       },
@@ -1069,7 +1003,7 @@ arrest: [
         icon: "warningDrop",
         title: "Hypersensitivity",
         summary:
-          "This is the strongest clinical redesign in the 2025 guidance: clearer classification, stronger allergy work-up, and more structured re-exposure pathways.",
+          "For adults, the 2025 guidance defines IHR and NIHR and details acute management, documentation, allergy assessment, and pathways for preventing recurrent reactions.",
         keywords: [
           "hypersensitivity",
           "immediate",
@@ -1086,32 +1020,32 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "The 2018 guideline already addressed acute, late, and very late adverse reactions, but the structure was less centered on modern allergy work-up and formal re-exposure pathways.",
-                "Classification and management were less explicitly separated into immediate and non-immediate hypersensitivity reactions."
+                "The 2018 guideline addressed acute and late adverse reactions and already included allergy testing, documentation, and measures to reduce repeat reactions. Very late adverse reactions were covered separately.",
+                "The 2018 guideline separated acute and late reactions. The 2025 guidance explicitly defines IHR and NIHR and sets out separate prevention pathways."
               ]
             },
             {
               label: "2025",
               bullets: [
-                "Distinguishes immediate and non-immediate hypersensitivity reactions more clearly.",
-                "Explicitly uses both ACR and Ring & Messmer classification frameworks.",
-                "Expands acute management, including structured observation, IV access, ABCDE-style thinking, and clearer positioning / supportive measures.",
-                "Strengthens tryptase use, documentation, and prevention of recurrent reactions.",
-                "Separates recurrent-reaction management by severity and by elective versus emergency situations."
+                "Explicitly defines immediate (IHR) and non-immediate (NIHR) hypersensitivity reactions.",
+                "Endorses both ACR and Ring & Messmer classification; Ring & Messmer was already included in the 2018 acute classification.",
+                "Specifies ABCDE assessment, observation after treatment, keeping IV access during observation, and symptom-specific positioning and supportive measures.",
+                "Specifies tryptase sampling, detailed reaction documentation, and pathways for preventing recurrent reactions.",
+                "Sets out pathways by severity; for previous moderate or severe IHR, it distinguishes elective from emergency examinations."
               ]
             },
             {
               label: "Practical impact",
               paragraphs: [
-                "Compared with 2018, the 2025 framework is more allergy-oriented and more structured for future contrast decisions, especially after moderate or severe reactions.",
-                "Documentation of the exact agent and the reaction details becomes much more important because later testing and re-exposure planning depend on it."
+                "The 2025 guidance sets out specialist assessment and severity-specific planning for future contrast examinations, particularly after moderate or severe reactions.",
+                "Agent-specific documentation was already required in 2018. The 2025 guidance specifies additional reaction details for allergy assessment and later contrast-agent selection."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 hypersensitivity guidance"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), A.1 Acute adverse reactions, A.2 Late adverse reactions and A.3 Very late adverse reactions, printed pp. 6–16 / PDF pp. 7–17.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Hypersensitivity reactions to contrast agents (in adults), printed/PDF pp. 6–14; van der Molen et al., Part 1, European Radiology 2025;35:6798–6810 (PDF pp. 1–13); Part 2, European Radiology 2025;35:6811–6825 (PDF pp. 1–15)."
           ]
         },
         action: {
@@ -1119,24 +1053,24 @@ arrest: [
             {
               label: "ESUR 2025 action points",
               bullets: [
-                "ESUR 2025 recommends formal allergy assessment after moderate or severe reactions and after clinically relevant non-immediate reactions.",
-                "During future contrast administration, observation for at least 30 min with IV access in place is described.",
-                "If the culprit agent is known and no allergy-based recommendation is available, use of a different contrast agent may be considered.",
-                "For severe NIHR / SCAR, avoidance of the involved contrast agent class is described.",
-                "Tryptase sampling is described within 4 h, with a baseline sample after ≥24 h."
+                "Refer patients with moderate or severe HSR, recurrent HSR of any severity, or HSR to multiple iodine-based or gadolinium-based contrast agents to a drug allergy specialist; referral after mild HSR is optional when specialist capacity permits.",
+                "In the listed IHR pathways and the mild or moderate NIHR pathways without danger signs, observe the patient for at least 30 min with the IV line in place when contrast medium is administered.",
+                "If specialist advice is unavailable, choose a different agent when the culprit is known after mild IHR or mild or moderate NIHR without danger signs. In emergencies after moderate or severe IHR, choose a different agent if the culprit is known. For elective examinations after moderate or severe IHR, postpone imaging for allergy-analysis results and apply specialist advice.",
+                "After severe NIHR with danger signs (SCAR), urgently refer to a drug allergy specialist, choose alternative imaging, and avoid all agents in the involved class (iodine-based or gadolinium-based); after a severe reaction to an unknown contrast agent, individualize after multidisciplinary consultation.",
+                "Measure serum tryptase within 1–4 h from the start of all moderate-to-severe IHR; a second measurement after ≥24 h serves as a baseline."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "This part of the guideline is no longer just about labeling a prior reaction. It is now built around structured risk documentation, specialist work-up, and better-controlled re-exposure decisions."
+                "The 2025 guidance links detailed reaction documentation, specialist assessment, and severity-specific planning when another contrast examination is considered."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 hypersensitivity guidance",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Hypersensitivity reactions to contrast agents (in adults), printed/PDF pp. 6–14; van der Molen et al., Part 1, European Radiology 2025;35:6798–6810 (PDF pp. 1–13); Part 2, European Radiology 2025;35:6811–6825 (PDF pp. 1–15).",
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), A.1 Acute adverse reactions, A.2 Late adverse reactions and A.3 Very late adverse reactions, printed pp. 6–16 / PDF pp. 7–17."
           ]
         }
       },
@@ -1147,7 +1081,7 @@ arrest: [
         icon: "kidney",
         title: "Renal terminology: PC-AKI → CA-AKI",
         summary:
-          "The renal section is renamed and aligned with newer terminology, but the core preventive framework is not completely rebuilt.",
+          "In the 2025 iodine-based renal prevention section, the CMSC uses CA-AKI in place of PC-AKI, following the ACR/NKF Consensus 2020.",
         keywords: [
           "pc-aki",
           "ca-aki",
@@ -1172,36 +1106,36 @@ arrest: [
             {
               label: "Practical impact",
               paragraphs: [
-                "This mainly affects terminology, communication, and alignment with newer literature. It should not be mistaken for the strongest practical change in the renal section."
+                "The PC-AKI-to-CA-AKI change identifies the terminology used by the ESUR CMSC from 2025 onward."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 CA-AKI guidance"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), B. Renal adverse reactions (post-contrast acute kidney injury, PC-AKI), definition, printed p. 17 / PDF p. 18.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Prevention of contrast-associated acute kidney injury (CA-AKI) when administering iodine-based contrast media — terminology note and definitions, printed/PDF p. 15."
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR 2025 action points",
+              label: "Terminology note",
               bullets: [
-                "Use the term CA-AKI in current communication and documentation when referring to the updated ESUR framework.",
-                "Do not overstate this wording change as a major new bedside rule."
+                "From 2025 onward, the ESUR CMSC uses CA-AKI in place of PC-AKI, following the ACR/NKF Consensus 2020.",
+                "The terminology note does not itself state a separate clinical intervention."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "The terminology change aligns ESUR with newer nephrology / radiology consensus language, while much of the underlying risk framework remains familiar."
+                "The 2025 guidance explicitly attributes the terminology change to the ACR/NKF Consensus 2020; renal risk and prevention measures are described separately."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 CA-AKI guidance",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Prevention of contrast-associated acute kidney injury (CA-AKI) when administering iodine-based contrast media — terminology note and definitions, printed/PDF p. 15.",
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), B. Renal adverse reactions (post-contrast acute kidney injury, PC-AKI), definition, printed p. 17 / PDF p. 18."
           ]
         }
       },
@@ -1246,8 +1180,8 @@ arrest: [
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 waiting-time guidance"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), B.6 same-day iodine- and gadolinium-based administration and B.7–B.8 repeat administrations, printed pp. 24–25 / PDF pp. 25–26.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Safe time intervals between contrast agent injections, printed/PDF pp. 21–22."
           ]
         },
         action: {
@@ -1314,8 +1248,8 @@ arrest: [
             }
           ],
           refs: [
-            "Source: ESUR 2025 waiting-time guidance",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Safe time intervals between contrast agent injections, printed/PDF pp. 21–22.",
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), B.6 same-day iodine- and gadolinium-based administration and B.7–B.8 repeat administrations, printed pp. 24–25 / PDF pp. 25–26."
           ]
         }
       },
@@ -1326,7 +1260,7 @@ arrest: [
         icon: "lab",
         title: "Analytical interference with laboratory tests",
         summary:
-          "2025 makes laboratory interference a distinct practice block with clearer eGFR-based timing for blood and urine collection.",
+          "Version 10.0 already included blood- and urine-sampling advice. The 2025 booklet sets out recommended delays after intravascular contrast agent administration separately for blood and urine across three eGFR groups.",
         keywords: [
           "laboratory",
           "blood",
@@ -1341,26 +1275,27 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "The 2018 guideline discussed interaction with other drugs and clinical tests, but the advice was more general: collect blood and urine before contrast whenever possible and delay post-contrast testing, especially in renal impairment."
+                "For non-emergency biochemical assays, Version 10.0 recommended collecting blood and urine preferably before contrast agent administration. With normal renal function, blood could be collected after 4 h if necessary. With reduced renal function (eGFR <45 mL/min/1.73 m²), blood collection should be delayed for as long as possible. The English version states that urine collection should not be done within 24 h; the official German version specifically refers to “Sammelurin”."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "The 2025 guidance presents laboratory interference as its own section and gives clearer timing recommendations after intravascular iodine- or gadolinium-based contrast administration."
+                "The 2025 booklet has a separate section on analytical interference of intravascular contrast agents with laboratory tests. It provides expert-consensus guidance, including for iodine- and gadolinium-based compounds, and lists recommended blood- and urine-collection delays by eGFR group."
               ]
             },
             {
               label: "Practical impact",
               paragraphs: [
-                "This turns an older cautionary topic into a more usable timing framework for everyday blood and urine collection after contrast studies."
+                "Compared with the 2018 guidance, the 2025 booklet specifies three eGFR groups for each sample type, with both minimum and optimal recommended delays for blood collection and minimum recommended delays for urine collection."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 laboratory-interference guidance"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018), EN, section C.6 “Non-emergency biochemical assays”, printed p. 30 / PDF p. 31.",
+            "Source: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018), section C.6 “Laborchemische Proben in der Routinediagnostik”, printed p. 41 / PDF p. 21 (two-up).",
+            "Source: ESUR CMSC Contrast Agent Guidelines 2025 booklet, “Analytical interference of intravascular contrast agents with clinical laboratory tests”, printed/PDF p. 23."
           ]
         },
         action: {
@@ -1368,23 +1303,24 @@ arrest: [
             {
               label: "ESUR 2025 action points",
               bullets: [
-                "For blood collection after intravascular contrast: eGFR >60: minimum 4 h, optimal 12 h.",
-                "For blood collection after intravascular contrast: eGFR 30–60: minimum 16 h, optimal 48 h.",
-                "For blood collection after intravascular contrast: eGFR <30: minimum 60 h, optimal 168 h.",
-                "For urine collection after intravascular contrast: eGFR >60: minimum 24 h; eGFR 30–60: minimum 48 h; eGFR <30: minimum 7 days."
+                "Recommended delay for blood collection after intravascular contrast agent administration: eGFR >60 mL/min/1.73 m² — at least 4 h; optimally 12 h.",
+                "Recommended delay for blood collection after intravascular contrast agent administration: eGFR 30–60 mL/min/1.73 m² — at least 16 h; optimally 48 h.",
+                "Recommended delay for blood collection after intravascular contrast agent administration: eGFR <30 mL/min/1.73 m² — at least 2.5 days (60 h); optimally 7 days (168 h).",
+                "Recommended delay for urine collection after intravascular contrast agent administration: eGFR >60 mL/min/1.73 m² — at least 24 h; eGFR 30–60 mL/min/1.73 m² — at least 48 h; eGFR <30 mL/min/1.73 m² — at least 7 days (168 h)."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "The 2025 document gives a much more explicit practice framework than the older “delay if possible” approach."
+                "The 2018 guideline already contained specific blood- and urine-collection intervals. The 2025 booklet distinguishes three eGFR groups and provides recommended minimum and optimal delays for blood collection, but only minimum delays for urine collection."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 laboratory-interference guidance",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018), EN, section C.6 “Non-emergency biochemical assays”, printed p. 30 / PDF p. 31.",
+            "Source: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018), section C.6 “Laborchemische Proben in der Routinediagnostik”, printed p. 41 / PDF p. 21 (two-up).",
+            "Source: ESUR CMSC Contrast Agent Guidelines 2025 booklet, “Analytical interference of intravascular contrast agents with clinical laboratory tests”, printed/PDF p. 23."
           ]
         }
       },
@@ -1395,13 +1331,13 @@ arrest: [
         icon: "extravasation",
         title: "Extravasation",
         summary:
-          "2025 is much more operational here, with severity framing, clearer prevention, structured detection, and escalation criteria.",
+          "The 2025 extravasation guidance adds explicit mild, moderate and severe definitions, more detailed recognition and reporting steps, and specified monitoring and surgical-escalation criteria. The 2018 guidelines already addressed risk factors, prevention, imaging and surgical advice.",
         keywords: [
           "extravasation",
           "contrast leak",
           "severity",
           "mild moderate severe",
-          "150 mL",
+          ">150 mL",
           "surgical opinion"
         ],
         compare: {
@@ -1409,29 +1345,30 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "Extravasation was already addressed in 2018, but with a simpler management frame and less detailed separation of risk factors, recognition steps, and escalation pathways."
+                "The 2018 English and official German guidelines already separate technique-related from patient-related risk factors. They describe risk reduction, potentially helpful imaging documentation, conservative treatment in most cases, and surgical advice when serious injury is suspected."
               ]
             },
             {
               label: "2025",
               bullets: [
-                "Uses a clearer mild / moderate / severe framing.",
-                "Separates technique-related and patient-related risk factors.",
-                "Expands prevention, detection, documentation, follow-up, and escalation.",
-                "Specifically addresses radiographic documentation in moderate / severe cases and surgical input for severe injury concerns."
+                "Defines mild, moderate and severe extravasation using clinical findings and instructs assessment of severity.",
+                "Retains separate technique-related and patient-related risk factors and specifies further risk-reduction measures, including preferred use of an appropriately sized upper-arm vein, suitable cannula size, appropriate flow and pressure, and contrast-volume minimisation based on indication and patient size.",
+                "Specifies recognition during and after injection, recording in the radiology report and local incident system, a patient information leaflet, and a follow-up appointment if necessary.",
+                "For moderate or severe cases, two orthogonal radiographic views or cross-sectional imaging can help assess extent and compartmentalisation. If severe injury is suspected, urgently seek advice from a surgeon; surgical opinion is also recommended for extravasated volumes >150 mL."
               ]
             },
             {
               label: "Practical impact",
               paragraphs: [
-                "The 2025 approach is less dependent on local habit and more like an operational pathway."
+                "Compared with 2018, the 2025 section specifies three severity grades, more recognition and reporting steps, a 2–4-hourly monitoring interval for mild cases, and additional conditions for surgical advice."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 extravasation guidance"
+            "ESUR Guidelines 10.0 (2018), § C.1, printed p. 26 (PDF p. 27).",
+            "Official German ESUR Guidelines 10.0 (2018), § C.1, printed p. 36 (PDF p. 19).",
+            "ESUR CMSC Guidelines 2025, Management and prevention of contrast agent extravasation, printed pp. 20–21 (PDF pp. 20–21)."
           ]
         },
         action: {
@@ -1439,23 +1376,24 @@ arrest: [
             {
               label: "ESUR 2025 action points",
               bullets: [
-                "Use a structured mild / moderate / severe framework rather than treating all extravasations as one category.",
-                "Consider technique-related and patient-related risk factors separately.",
-                "For moderate / severe cases, radiographic documentation is described.",
-                "If severe injury is suspected, surgical assessment is described; a surgical opinion is also described for extravasation volumes >150 mL."
+                "The 2025 booklet directs classification as mild, moderate or severe. Moderate cases require close monitoring; physician assessment is advised to check for neurovascular compromise.",
+                "The 2025 section specifies further prevention details for venous access, cannula size, flow, pressure and contrast volume. Meticulous cannulation and a saline test injection were already described in 2018.",
+                "For mild cases, the 2025 booklet specifies limb elevation, ice packs and monitoring every 2–4 hours. Discharge is stated if improving; if there is no improvement, surgical opinion is required.",
+                "In moderate or severe cases, two orthogonal radiographic views or cross-sectional imaging can help assess extent and compartmentalisation. The complication is to be recorded in the radiology report and local incident system; a patient information leaflet should be given, and a follow-up appointment arranged if necessary.",
+                "If severe injury is suspected, urgently seek advice from a surgeon. Surgical opinion is also recommended when the extravasated volume exceeds 150 mL."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "Compared with 2018, this section is far more explicit about prevention, recognition, documentation, and escalation."
+                "The added 2025 detail concerns severity definitions, recognition, reporting, mild-case monitoring and specific indications for surgical advice; several risk-reduction and management measures were already present in 2018."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 extravasation guidance",
-            "Source: ESUR 10.0 guideline"
+            "ESUR CMSC Guidelines 2025, Management and prevention of contrast agent extravasation, printed pp. 20–21 (PDF pp. 20–21).",
+            "For the 2018 comparison: ESUR Guidelines 10.0, § C.1, printed p. 26 (PDF p. 27)."
           ]
         }
       },
@@ -1466,42 +1404,43 @@ arrest: [
         icon: "dialysis",
         title: "Dialysis-related refinement",
         summary:
-          "2025 refines the dialysis section, especially for GBCA, and differentiates more clearly between macrocyclic and linear agents.",
+          "The 2025 dialysis section explicitly distinguishes macrocyclic and linear GBCA within separate haemodialysis and CAPD sections.",
         keywords: [
           "dialysis",
           "haemodialysis",
           "macrocyclic",
           "linear",
           "GBCA",
-          "CAPD",
-          "rest diuresis"
+          "CAPD"
         ],
         compare: {
           sections: [
             {
               label: "2018",
               paragraphs: [
-                "The 2018 guideline was more general: no special timing with dialysis for iodine-based contrast, and dialysis correlation / extra haemodialysis was recommended more broadly for GBCA."
+                "ESUR 10.0 already separated haemodialysis from CAPD and iodine-based contrast from GBCA. In haemodialysis, timing coordination and an extra session were unnecessary for iodine-based contrast; for GBCA, timing coordination and an extra haemodialysis session as soon as possible after administration were recommended.",
+                "In CAPD, haemodialysis to remove iodine-based contrast was unnecessary; after GBCA, the need for haemodialysis was to be discussed with the referring physician."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "The newer guidance is more explicit: after macrocyclic GBCA, immediate dialysis is not required, whereas after linear agents immediate dialysis is described and repetition on the following two days is advised.",
-                "It also highlights the relevance of remnant renal function and CAPD-specific trade-offs."
+                "For patients on haemodialysis, an immediate dialysis session is not needed after macrocyclic GBCA; after linear agents (e.g., liver-specific agents), it is indicated and needs to be repeated on the following two days.",
+                "For patients on CAPD, an immediate dialysis session is not needed after macrocyclic GBCA; with linear GBCA, the NSF risk should be weighed against the risk of placing a temporary haemodialysis catheter in consultation with the referring physician."
               ]
             },
             {
               label: "Practical impact",
               paragraphs: [
-                "The dialysis section is no longer just “dialyse soon after GBCA.” It is more agent-specific and more nuanced."
+                "Compared with 2018, the 2025 GBCA guidance adds an explicit macrocyclic-versus-linear distinction. The immediate-dialysis instructions differ by dialysis type and GBCA class."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 dialysis guidance"
+            "Source: ESUR Guidelines on Contrast Agents 10.0 (2018 EN), § B.5 Dialysis and contrast medium administration, printed p. 23 / PDF p. 24.",
+            "Source: ESUR Leitlinien für Kontrastmittel 10.0 (official DE), § B.5 Dialyse und Kontrastmittelgabe, printed pp. 33–34 / PDF pp. 17–18.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Safe use of contrast agent administration in patients on dialysis, printed/PDF p. 19."
           ]
         },
         action: {
@@ -1509,23 +1448,22 @@ arrest: [
             {
               label: "ESUR 2025 action points",
               bullets: [
-                "After macrocyclic GBCA, immediate dialysis is not described as necessary.",
-                "After linear GBCA, immediate dialysis is described and repetition on the following two days is advised.",
-                "In CAPD and similar settings, the guideline describes weighing the NSF risk of linear agents against the risk of temporary haemodialysis access.",
-                "For iodine-based contrast in end-stage renal failure, the role of remnant diuresis is highlighted more clearly."
+                "For iodine-based contrast in patients on haemodialysis, coordinating injection with the haemodialysis session or sessions is unnecessary, and extra haemodialysis sessions to remove the contrast medium are not recommended. In CAPD, additional haemodialysis to remove iodine-based contrast is unnecessary.",
+                "After macrocyclic GBCA, an immediate dialysis session is not needed in haemodialysis or CAPD.",
+                "After linear GBCA in patients on haemodialysis, an immediate dialysis session is indicated and needs to be repeated on the following two days.",
+                "For CAPD and linear GBCA, the NSF risk should be weighed against the risk of placing a temporary haemodialysis catheter in consultation with the referring physician."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "The 2025 section is more specific and avoids lumping all GBCA into one dialysis rule."
+                "The 2025 GBCA instructions differ by dialysis type and GBCA class."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 dialysis guidance",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Safe use of contrast agent administration in patients on dialysis — Patients on haemodialysis; Patients on continuous ambulatory peritoneal dialysis, printed/PDF p. 19."
           ]
         }
       },
@@ -1534,9 +1472,9 @@ arrest: [
         id: "new_clinical_scenarios",
         level: "medium",
         icon: "layers",
-        title: "New clinical scenarios: myasthenia gravis, HSG, CO₂",
+        title: "Dedicated ESUR 2025 sections: myasthenia gravis, HSG and CO₂ angiography",
         summary:
-          "2025 explicitly adds or foregrounds topics that were absent or not separately framed in the 2018 booklet.",
+          "The 2018 EN and DE booklets do not address myasthenia gravis or HSG; both name carbon dioxide only in the terminology definition. The 2025 booklet contains dedicated subsections for all three topics.",
         keywords: [
           "myasthenia gravis",
           "HSG",
@@ -1550,49 +1488,50 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "The 2018 booklet did not have dedicated practice chapters for myasthenia gravis, hysterosalpingography, or CO₂ as an alternative intravascular contrast option."
+                "Neither 2018 edition addresses myasthenia gravis or HSG. Both mention carbon dioxide only as an example of an X-ray contrast medium in the terminology section; neither contains a CO₂ angiography subsection."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "The 2025 guidance explicitly includes myasthenia gravis within systemic diseases and adds dedicated sections for HSG and for CO₂ as an alternative to iodine-based contrast media in vascular procedures."
+                "Myasthenia gravis appears under “Safe use of contrast agents in patients with systemic diseases”. HSG and CO₂ angiography appear as separate subsections under “Miscellaneous recommendations and topics”."
               ]
             },
             {
               label: "Practical impact",
               paragraphs: [
-                "These areas are easier to find and use in the 2025 guidance, rather than requiring extrapolation from broader sections."
+                "This comparison establishes a change in the booklet’s coverage and section structure."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 2025 summary guideline",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), Contents C.1–C.11, printed pp. 4–5 / PDF pp. 5–6; Terminology: Contrast agents and contrast media, printed p. 5 / PDF p. 6.",
+            "Source: Official German ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), Inhalt C.1–C.11, PDF pp. 4–5; Terminologie: Kontrastmittel und Röntgenkontrastmittel, printed pp. 10–11 / PDF p. 6.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Contents, printed/PDF p. 5; Safe use of contrast agents in patients with myasthenia gravis, p. 29; CO₂ and HSG subsections, p. 31."
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR 2025 action points",
+              label: "ESUR 2025 statements",
               bullets: [
-                "Use the 2025 guidance when questions arise about myasthenia gravis and contrast use, because this topic is now explicitly addressed.",
-                "Use the 2025 dedicated section for hysterosalpingography rather than extrapolating from general contrast rules.",
-                "Use the 2025 CO₂ section when considering CO₂ as an alternative to iodine-based contrast in vascular procedures."
+                "For myasthenia gravis, the 2025 booklet states that intravenous low- or iso-osmolar iodine-based contrast media can be associated with symptom exacerbation within the first 24 hours after administration, probably in fewer than 5% of patients receiving these agents intravenously; gadolinium-based contrast agents are described as safe for myasthenia gravis patients.",
+                "The 2025 HSG subsection notes limited external validity because some contrast media used in the past are no longer on the market. Compared with water-based contrast media, oil-based contrast media are associated with approximately 10% more pregnancies and live births and significantly better image quality; intravasation occurs with equal frequency. Oil-based contrast media can remain in the abdominal cavity for a prolonged period and have a significantly greater inflammatory effect on the peritoneum; the clinical consequences are unknown, and caution is advised. In every woman receiving oil-based contrast media, thyroid function should be tested before HSG and monitored for 6 months afterwards; routine additional neonatal thyroid function tests after HSG are not indicated.",
+                "The 2025 booklet describes the evidence for CO₂ angiography as an alternative to iodine-based contrast media as limited. CO₂ angiography seems to be a safe alternative in vascular procedures and may reduce CA-AKI risk, especially in PAD procedures, while specific contraindications and safety measures and the higher incidence of non-serious adverse events need to be considered. More large-scale RCTs are needed to confirm these findings and further investigate CA-AKI risk factors in EVAR and interventional procedures for PAD."
               ],
               variant: "action"
             },
             {
               label: "Why this matters",
               paragraphs: [
-                "These are genuine additions or newly explicit topic areas, not just cosmetic rearrangements."
+                "These are dedicated subsections in the 2025 booklet; carbon dioxide was already named in the 2018 terminology sections."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 summary guideline",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Safe use of contrast agents in patients with myasthenia gravis, printed/PDF p. 29.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, Safety of CO₂ as an alternative to iodine-based contrast media in vascular procedures; Safe use of contrast agents in hysterosalpingography (HSG), printed/PDF p. 31."
           ]
         }
       },
@@ -1601,9 +1540,9 @@ arrest: [
         id: "other_reorganized_topics",
         level: "medium",
         icon: "stack",
-        title: "Other reorganized or continued topics",
+        title: "Selected 2018 topics in the 2025 booklet",
         summary:
-          "Several subjects are retained, regrouped, or expanded in 2025 without always becoming headline changes.",
+          "The 2025 booklet contains some 2018 topics with differences in wording or placement, uses a different classification for others, and does not reproduce some 2018 topics. Each topic therefore has to be compared separately.",
         keywords: [
           "pregnancy",
           "lactation",
@@ -1619,53 +1558,64 @@ arrest: [
         compare: {
           sections: [
             {
-              label: "2018",
-              paragraphs: [
-                "Pregnancy / lactation, paediatric use, metformin, gadolinium retention, warming / fasting, and several older miscellaneous topics already existed in the 2018 booklet.",
-                "Some topics such as late reactions, very late reactions, sickle cell disease, and effects on blood / endothelium were more separately visible in the older structure."
+              label: "Present in both booklets",
+              bullets: [
+                "Pregnancy and lactation, paediatric use, metformin, gadolinium retention, warming and fasting are addressed in both booklets. Their wording and/or placement is not identical.",
+                "In 2025, metformin appears under systemic diseases. Warming and fasting remain separate topics under “Miscellaneous”; the 2025 fasting text also includes ultrasound contrast agents.",
+                "The 2025 paediatric section does not reproduce the 2018 bullets stating that non-ionic iodine-based contrast media should be used and that high-risk gadolinium-based agents should be avoided."
               ]
             },
             {
-              label: "2025",
-              paragraphs: [
-                "Many of these topics remain, but are regrouped differently. Pregnancy / lactation and paediatric use continue, metformin is embedded within systemic diseases, gadolinium retention remains, and nonvascular iodine administration is described in more detail.",
-                "At the same time, some 2018 topics are less separately foregrounded in the 2025 summary structure."
+              label: "Classification or scope changed",
+              bullets: [
+                "The 2018 “late adverse reactions” section defined late reactions as occurring 1 hour to 1 week after intravascular iodine-based contrast medium. In 2025, non-immediate/delayed hypersensitivity reactions are handled within the adult HSR section; these are not the same document classification.",
+                "The 2018 “very late adverse reactions” umbrella is not retained as such in 2025. Iodine-induced hyperthyroidism is addressed under systemic diseases, while NSF remains present as a dedicated body section.",
+                "For extravascular iodine-based contrast administration, the 2018 booklet gave a general precaution when systemic absorption or leakage was possible. The 2025 booklet contains a more detailed HSR-specific paragraph on nonvascular administration and management of hypersensitivity reactions."
               ]
             },
             {
-              label: "Practical impact",
+              label: "Not found in the 2025 booklet",
+              bullets: [
+                "The 2018 sickle cell disease section was not found in the complete 2025 booklet.",
+                "The 2018 recommendations on effects of contrast media on blood and endothelium, including thrombosis, were not found in the complete 2025 booklet."
+              ]
+            },
+            {
+              label: "Scope limit",
               paragraphs: [
-                "Absence from the 2025 table of contents should not automatically be interpreted as “removed.” In several cases the content is retained but reorganized."
+                "“Not found in the 2025 booklet” describes only this booklet comparison and does not mean that ESUR has withdrawn the topic from all guidance. A missing table-of-contents entry alone is not evidence of absence from the body; NSF is present in the 2025 body without its own contents line."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Source: ESUR 10.0 guideline",
-            "Source: ESUR 2025 summary guideline"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN): A.1.3–A.1.5, printed p. 11 / PDF p. 12; A.2, printed p. 12 / PDF p. 13; A.3, printed p. 13 onward / PDF p. 14 onward; B.4, printed p. 22 / PDF p. 23; C.3–C.3.2, printed pp. 27–28 / PDF pp. 28–29; C.5, printed p. 29 / PDF p. 30; C.7, printed pp. 31–32 / PDF pp. 32–33; C.10, printed p. 35 / PDF p. 36.",
+            "Source: Official German ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE): A.1.3–A.1.5 body text, printed pp. 18–19 / PDF p. 10 (the A.1.3 heading in the DE source is mismatched); A.2, printed pp. 20–21 / PDF p. 11; A.3, printed pp. 22–23 / PDF p. 12 onward; B.4, printed p. 33 / PDF p. 17; C.3–C.3.2, printed pp. 37–38 / PDF pp. 19–20; C.5, printed pp. 39–40 / PDF pp. 20–21; C.7, printed pp. 42–43 / PDF p. 22; C.10, printed p. 46 / PDF p. 24.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025: nonvascular iodine administration, printed/PDF p. 10; NSF, pp. 24–26; pregnancy/lactation, pp. 26–27; paediatric use, p. 27; metformin and iodine-induced hyperthyroidism, pp. 27–28; gadolinium retention, pp. 29–30; fasting and warming, pp. 31–32; guidelines currently being updated, p. 33."
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR 2025 action points",
+              label: "Source-concordant comparison",
               bullets: [
-                "Do not assume that a topic is gone just because it is less separately visible in the 2025 summary structure.",
-                "Use the systemic-diseases block in 2025 for regrouped items such as metformin and other disease-related topics.",
-                "Use the 2025 text if you need the expanded wording on nonvascular iodine-based contrast administration."
+                "Present in both booklets, with wording and/or placement differences: pregnancy and lactation, paediatric use, metformin, gadolinium retention, warming and fasting.",
+                "Classification or scope changed: late and very late adverse reactions, and the nonvascular/extravascular iodine-based contrast passages.",
+                "Not found in the complete 2025 booklet: the 2018 sickle cell disease section and the 2018 blood/endothelium/thrombosis recommendations."
               ],
               variant: "action"
             },
             {
-              label: "Why this matters",
+              label: "Interpretation limit",
               paragraphs: [
-                "Not every difference between 2018 and 2025 is a new rule. Some are changes in framing, grouping, or level of emphasis."
+                "The comparison describes the authorized 2018 and 2025 booklet texts. It does not establish that a topic absent from the 2025 booklet has been withdrawn from all ESUR guidance."
               ]
             }
           ],
           refs: [
-            "Source: ESUR 2025 summary guideline",
-            "Source: ESUR 10.0 guideline"
+            "Source: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), sections A.1.3–A.3, B.4, C.3–C.3.2, C.5, C.7 and C.10; printed pp. 11–35 / corresponding PDF pp. 12–36.",
+            "Source: Official German ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), corresponding sections A.1.3–A.3, B.4, C.3–C.3.2, C.5, C.7 and C.10; PDF pp. 10–24.",
+            "Source: ESUR Contrast Media Safety Committee Guidelines 2025, relevant body sections on pp. 10 and 24–33."
           ]
         }
       }
@@ -1678,13 +1628,13 @@ arrest: [
         icon: "document",
         title: "Publikationsmodell und Struktur",
         summary:
-          "2025 verschiebt sich die Guidance von einer Booklet-artigen Versionslogik zu einem elektronischen, modularen und jährlich aktualisierten Rahmen.",
+          "Die Kurzanleitung der Version 10 von 2018 gliedert die Themen in drei Hauptabschnitte. Das Inhaltsverzeichnis 2025 enthält thematische Überschriften; die Einleitung kündigt an, dass die Leitlinien auch in elektronischer Form auf der ESUR-Website erscheinen und jährlich aktualisiert werden sollen.",
         keywords: [
           "publikation",
           "struktur",
           "elektronisch",
           "jährliche aktualisierung",
-          "modular",
+          "thematische abschnitte",
           "permanent work in progress"
         ],
         compare: {
@@ -1692,49 +1642,49 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "ESUR 10.0 war als klassisches Leitlinien-Booklet aufgebaut, mit den grossen Bereichen General adverse reactions, Renal adverse reactions (PC-AKI) und Miscellaneous."
+                "Die Version 10.0 (2018) wurde als Broschüre vorgestellt. Ihre Kurzanleitung gliedert die Themen in Allgemeine unerwünschte Wirkungen, Renale unerwünschte Wirkungen (PC-AKI) und Verschiedenes. Die offizielle deutsche Ausgabe von 2018 erwähnt bereits elektronische Versionen dieser Leitlinien auf der ESUR-Website."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "Die 2025er Guidance ist themenbasiert modular aufgebaut, etwa zu Hypersensitivität, CA-AKI, Dialyse, Extravasation, Wartezeiten, Laborinterferenz, systemischen Erkrankungen, HSG und CO₂.",
-                "Sie wird zudem als elektronisches, jährlich aktualisiertes Dokument und als permanent work in progress beschrieben."
+                "Das Inhaltsverzeichnis 2025 nennt thematische Abschnitte unter anderem zu Hypersensitivitätsreaktionen, Prävention von CA-AKI, Dialyse, Extravasation, Wartezeiten, Laborinterferenz und systemischen Erkrankungen. Unter der Überschrift „Miscellaneous recommendations and topics“ stehen außerdem CO₂ und HSG.",
+                "Die Einleitung 2025 kündigt an, dass die Leitlinien von nun an auch in elektronischer Form auf der ESUR-Website erscheinen und jährlich aktualisiert werden sollen. Sie beschreibt die Leitlinien als permanent work in progress."
               ]
             },
             {
-              label: "Praktische Bedeutung",
+              label: "Gegenstand des Vergleichs",
               paragraphs: [
-                "Die neuere Struktur lässt sich direkter auf konkrete klinische Fragen abbilden und sollte nicht als einfacher statischer Nachdruck des 2018er Booklets gelesen werden."
+                "Die beiden Ausgaben gliedern ihre Inhalte unterschiedlich. Aus diesem Strukturvergleich lässt sich nicht ableiten, ob sich eine einzelne klinische Empfehlung geändert hat."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Summary Guideline"
+            "Quelle: ESUR-Leitlinien 10.0 (2018 EN), Preface S. 2 / PDF S. 3; Quick Guide S. 3 / PDF S. 4; Contents S. 4–5 / PDF S. 5–6",
+            "Quelle: ESUR-Leitlinien 10.0 (2018 DE), Einleitung und Kurzanleitung, unnummeriert / PDF S. 3; Inhalt, unnummeriert / PDF S. 4–5",
+            "Quelle: ESUR CMSC Guidelines 2025, Preface S. 3 / PDF S. 3; Contents S. 4–5 / PDF S. 4–5"
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR-2025-Kernaussagen",
+              label: "Hinweise zu den Quellen",
               bullets: [
-                "Wenn du aktuelle ESUR-Kontrastmittel-Guidance zitierst oder vermittelst, sollte die elektronische 2025er Guidance als Referenz dienen und nicht nur ein klassisches Booklet-Update.",
-                "Es sollte erwartet werden, dass topic-basierte Module und jährliche elektronische Aktualisierungen relevant sind, wenn ein Praxispunkt neu überprüft wird."
+                "Laut Einleitung fasst die Ausgabe 2025 zentrale Empfehlungen zusammen und regt an, für ein vollständiges Verständnis des jeweiligen Themas die ursprünglichen ESUR-CMSC-Leitlinienpublikationen heranzuziehen.",
+                "Die Einleitung 2025 kündigt an, dass die Leitlinien von nun an auch in elektronischer Form auf der ESUR-Website erscheinen und jährlich aktualisiert werden sollen."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Das ist eine strukturelle Änderung in der Pflege und Zugänglichkeit der Guidance, auch dort, wo sich die zugrunde liegende klinische Regel nicht dramatisch verändert hat."
+                "Die Einleitung 2025 nennt unter anderem aktualisierte Abschnitte zu Kontrastmittel-Hypersensitivität und Extravasation. Das Inhaltsverzeichnis allein zeigt nicht, wie sich eine einzelne klinische Empfehlung geändert hat."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Summary Guideline",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR CMSC Guidelines 2025, Preface und Note, S. 3 / PDF S. 3; Contents S. 4–5 / PDF S. 4–5"
           ]
         }
       },
@@ -1745,7 +1695,7 @@ arrest: [
         icon: "warningDrop",
         title: "Hypersensitivität",
         summary:
-          "Das ist der stärkste klinische Umbau der 2025er Guidance: klarere Klassifikation, stärkerer allergologischer Fokus und strukturiertere Re-Exposure-Pfade.",
+          "Für Erwachsene definiert die 2025er Guidance IHR und NIHR und beschreibt Akutmanagement, Dokumentation, allergologische Abklärung und Wege zur Prävention erneuter Reaktionen.",
         keywords: [
           "hypersensitivität",
           "immediate",
@@ -1762,32 +1712,32 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "Die 2018er Guideline behandelte akute, späte und sehr späte Reaktionen bereits, war aber weniger um moderne allergologische Abklärung und formalisierte Re-Exposure-Pfade herum aufgebaut.",
-                "Klassifikation und Management waren weniger explizit in immediate und non-immediate hypersensitivity reactions getrennt."
+                "Die Leitlinie von 2018 behandelte akute und späte unerwünschte Wirkungen und enthielt bereits Allergietests, Dokumentation und Maßnahmen gegen erneute Reaktionen. Sehr späte unerwünschte Wirkungen wurden gesondert behandelt.",
+                "Die Leitlinie von 2018 trennte akute und späte Reaktionen. Die Guidance von 2025 definiert IHR und NIHR ausdrücklich und beschreibt getrennte Präventionswege."
               ]
             },
             {
               label: "2025",
               bullets: [
-                "Klare Trennung zwischen immediate und non-immediate hypersensitivity reactions.",
-                "Explizite Nutzung sowohl der ACR- als auch der Ring-&-Messmer-Klassifikation.",
-                "Deutlich ausgebautes Akutmanagement mit strukturierter Beobachtung, liegendem IV-Zugang, ABCDE-Denke sowie präziserer Lagerung / Supportivmassnahmen.",
-                "Stärkerer Fokus auf Tryptase, Dokumentation und Prävention erneuter Reaktionen.",
-                "Getrennte Re-Exposure-Logik nach Schweregrad sowie nach elektiver versus notfallmässiger Situation."
+                "Ausdrückliche Definition von immediate hypersensitivity reactions (IHR) und non-immediate hypersensitivity reactions (NIHR).",
+                "Das ESUR CMSC 2025 befürwortet sowohl die ACR- als auch die Ring-&-Messmer-Klassifikation; Ring & Messmer war bereits in der Akuteinteilung von 2018 enthalten.",
+                "Das Akutmanagement beschreibt ABCDE-Beurteilung, Beobachtung nach Behandlung, Belassen des IV-Zugangs während der Beobachtung sowie symptomabhängige Lagerung und Supportivmaßnahmen.",
+                "Konkretisierte Tryptase-Probenahme, detaillierte Reaktionsdokumentation und Wege zur Prävention erneuter Reaktionen.",
+                "Wege nach Schweregrad; bei früherer moderater oder schwerer IHR getrennte Wege für elektive und notfallmäßige Untersuchungen."
               ]
             },
             {
               label: "Praktische Bedeutung",
               paragraphs: [
-                "Im Vergleich zu 2018 ist die 2025er Guidance deutlich allergologischer und strukturierter, vor allem nach moderaten oder schweren Reaktionen.",
-                "Die exakte Dokumentation des auslösenden Kontrastmittels und der Reaktionsdetails wird viel wichtiger, weil spätere Tests und Re-Exposure-Entscheidungen davon abhängen."
+                "Die Guidance von 2025 beschreibt die allergologische Abklärung und die Planung künftiger Kontrastmitteluntersuchungen nach Schweregrad, insbesondere nach moderaten oder schweren Reaktionen.",
+                "Die Dokumentation des konkreten Kontrastmittels war schon 2018 vorgesehen. Die Guidance von 2025 präzisiert weitere Reaktionsdetails für die allergologische Abklärung und spätere Kontrastmittelauswahl."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Hypersensitivitäts-Guidance"
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), A.1 Akute unerwünschte Wirkungen, A.2 Späte unerwünschte Wirkungen und A.3 Sehr späte unerwünschte Wirkungen, Drucks. 12–26 / PDF-S. 7–14.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Hypersensitivity reactions to contrast agents (in adults)“, Druck-/PDF-S. 6–14; van der Molen et al., Part 1, European Radiology 2025;35:6798–6810 (PDF-S. 1–13); Part 2, European Radiology 2025;35:6811–6825 (PDF-S. 1–15)."
           ]
         },
         action: {
@@ -1795,24 +1745,24 @@ arrest: [
             {
               label: "ESUR-2025-Kernaussagen",
               bullets: [
-                "Nach moderaten oder schweren Reaktionen sowie nach klinisch relevanten NIHR beschreibt ESUR 2025 eine formelle allergologische Abklärung.",
-                "Bei zukünftiger Kontrastmittelgabe wird eine Beobachtung von mindestens 30 min mit liegendem IV-Zugang beschrieben.",
-                "Wenn das auslösende Mittel bekannt ist und keine allergologisch basierte Empfehlung vorliegt, kann die Verwendung eines anderen Kontrastmittels erwogen werden.",
-                "Bei schweren NIHR / SCAR wird die Vermeidung der betroffenen Kontrastmittelklasse beschrieben.",
-                "Eine Tryptase-Bestimmung innerhalb von 4 h sowie eine Baseline-Bestimmung nach ≥24 h werden beschrieben."
+                "Patienten mit moderater oder schwerer HSR, wiederkehrender HSR jeder Schwere oder HSR auf mehrere iodhaltige oder gadoliniumhaltige Kontrastmittel an einen Spezialisten für Arzneimittelallergien überweisen; nach milder HSR ist die Überweisung bei ausreichender Kapazität optional.",
+                "Bei erneuter Kontrastmittelgabe in den beschriebenen IHR-Pfaden und den Pfaden für milde oder moderate NIHR ohne Gefahrenzeichen mindestens 30 min mit liegendem IV-Zugang beobachten.",
+                "Wenn keine allergologische Empfehlung vorliegt, nach milder IHR oder milder oder moderater NIHR ohne Gefahrenzeichen bei bekanntem Auslöser ein anderes Mittel wählen. Im Notfall nach moderater oder schwerer IHR bei bekanntem Auslöser ebenfalls ein anderes Mittel wählen. Elektive Untersuchungen nach moderater oder schwerer IHR bis zum Ergebnis der Allergieanalyse verschieben und die allergologische Empfehlung anwenden.",
+                "Nach schwerer NIHR mit Gefahrenzeichen (SCAR) dringend an einen Spezialisten für Arzneimittelallergien überweisen, eine alternative Bildgebung wählen und alle Mittel der betroffenen Klasse (iodhaltig oder gadoliniumhaltig) vermeiden; nach schwerer Reaktion auf ein unbekanntes Kontrastmittel das Vorgehen nach multidisziplinärer Beratung individualisieren.",
+                "Bei allen moderaten bis schweren IHR Serumtryptase innerhalb von 1–4 h ab Reaktionsbeginn bestimmen; eine zweite Messung nach ≥24 h dient als Baseline."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Dieser Guideline-Teil dreht sich nicht mehr nur um das Etikett einer früheren Reaktion. Er ist jetzt auf strukturierte Risikodokumentation, Fachabklärung und kontrolliertere Re-Exposure-Entscheidungen ausgerichtet."
+                "Die Guidance von 2025 verbindet eine detaillierte Reaktionsdokumentation mit allergologischer Abklärung und einer Planung nach Schweregrad, wenn eine weitere Kontrastmitteluntersuchung erwogen wird."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Hypersensitivitäts-Guidance",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Hypersensitivity reactions to contrast agents (in adults)“, Druck-/PDF-S. 6–14; van der Molen et al., Part 1, European Radiology 2025;35:6798–6810 (PDF-S. 1–13); Part 2, European Radiology 2025;35:6811–6825 (PDF-S. 1–15).",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), A.1 Akute unerwünschte Wirkungen, A.2 Späte unerwünschte Wirkungen und A.3 Sehr späte unerwünschte Wirkungen, Drucks. 12–26 / PDF-S. 7–14."
           ]
         }
       },
@@ -1823,7 +1773,7 @@ arrest: [
         icon: "kidney",
         title: "Renale Terminologie: PC-AKI → CA-AKI",
         summary:
-          "Der renale Abschnitt wird umbenannt und an neuere Terminologie angepasst, ohne dass das präventive Grundgerüst komplett neu gebaut wird.",
+          "Im Abschnitt zur renalen Prävention bei iodhaltigen Kontrastmitteln verwendet das ESUR CMSC ab 2025 CA-AKI statt PC-AKI gemäß dem ACR/NKF Consensus 2020.",
         keywords: [
           "pc-aki",
           "ca-aki",
@@ -1836,7 +1786,7 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "Die 2018er Guideline verwendete im renalen Kapitel den Begriff PC-AKI (post-contrast acute kidney injury)."
+                "Die offizielle deutsche ESUR-Fassung von 2018 verwendet das Kürzel PC-AKI und bezeichnet es als „Kontrastmittel-assoziierte akute Nierenschädigung“. Die englische Fassung löst PC-AKI als „post-contrast acute kidney injury“ auf."
               ]
             },
             {
@@ -1848,36 +1798,36 @@ arrest: [
             {
               label: "Praktische Bedeutung",
               paragraphs: [
-                "Das betrifft vor allem Terminologie, Kommunikation und den Anschluss an die neuere Literatur. Es sollte nicht als grösste praktische Änderung des renalen Abschnitts fehlinterpretiert werden."
+                "Der Wechsel von PC-AKI zu CA-AKI bezeichnet die vom ESUR CMSC ab 2025 verwendete Terminologie."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 CA-AKI-Guidance"
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), B. Renale unerwünschte Wirkungen (Kontrastmittel-assoziierte akute Nierenschädigung, PC-AKI), Definition, Drucks. 27 / PDF-S. 14.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Prevention of contrast-associated acute kidney injury (CA-AKI) when administering iodine-based contrast media“ — Terminologiehinweis und Definitionen, Druck-/PDF-S. 15."
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR-2025-Kernaussagen",
+              label: "Hinweis zur Terminologie",
               bullets: [
-                "In aktueller Kommunikation und Dokumentation sollte im aktualisierten ESUR-Rahmen der Begriff CA-AKI verwendet werden.",
-                "Diese sprachliche Änderung sollte nicht als grosser neuer klinischer Bedside-Algorithmus überbewertet werden."
+                "Ab 2025 verwendet das ESUR CMSC gemäß dem ACR/NKF Consensus 2020 CA-AKI anstelle von PC-AKI.",
+                "Der Terminologiehinweis formuliert für sich genommen keine gesonderte klinische Maßnahme."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Die Terminologie wird an neuere nephrologische / radiologische Konsenssprache angepasst, während grosse Teile des zugrunde liegenden Risikorahmens vertraut bleiben."
+                "Die Guidance von 2025 begründet den Terminologiewechsel ausdrücklich mit dem ACR/NKF Consensus 2020; renale Risiko- und Präventionsmaßnahmen werden gesondert beschrieben."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 CA-AKI-Guidance",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Prevention of contrast-associated acute kidney injury (CA-AKI) when administering iodine-based contrast media“ — Terminologiehinweis und Definitionen, Druck-/PDF-S. 15.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), B. Renale unerwünschte Wirkungen (Kontrastmittel-assoziierte akute Nierenschädigung, PC-AKI), Definition, Drucks. 27 / PDF-S. 14."
           ]
         }
       },
@@ -1980,8 +1930,8 @@ arrest: [
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Wartezeiten-Guidance"
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), B.6 gleichzeitige Iod-/Gadolinium-Gabe und B.7–B.8 wiederholte Gaben, Drucks. 34–35 / PDF-S. 18.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Safe time intervals between contrast agent injections“, Druck-/PDF-S. 21–22."
           ]
         },
         action: {
@@ -2048,8 +1998,8 @@ arrest: [
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Wartezeiten-Guidance",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Safe time intervals between contrast agent injections“, Druck-/PDF-S. 21–22.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), B.6 gleichzeitige Iod-/Gadolinium-Gabe und B.7–B.8 wiederholte Gaben, Drucks. 34–35 / PDF-S. 18."
           ]
         }
       },
@@ -2060,7 +2010,7 @@ arrest: [
         icon: "lab",
         title: "Analytische Interferenz mit Labortests",
         summary:
-          "2025 wird Laborinterferenz zu einem eigenen Praxisblock mit klareren eGFR-basierten Zeitangaben für Blut- und Urinsammlung.",
+          "Version 10.0 enthielt bereits Empfehlungen zur Blut- und Urinprobenahme. Das Booklet 2025 nennt für die Probenahme nach intravaskulärer Kontrastmittelgabe getrennte empfohlene Wartezeiten für Blut und Urin in drei eGFR-Gruppen.",
         keywords: [
           "labor",
           "blut",
@@ -2075,26 +2025,27 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "Die 2018er Guideline behandelte Wechselwirkungen mit anderen Medikamenten und klinischen Tests, aber deutlich allgemeiner: Blut und Urin nach Möglichkeit vor Kontrastmittelgabe abnehmen und Nachkontrollen insbesondere bei Niereninsuffizienz hinauszögern."
+                "Für laborchemische Proben in der Routinediagnostik empfahl Version 10.0, Urin- und Blutproben vorzugsweise vor der Kontrastmittelgabe abzunehmen. Bei normaler Nierenfunktion konnte eine Blutentnahme bei Bedarf 4 h nach der Gabe erfolgen. Bei reduzierter Nierenfunktion (eGFR <45 ml/min/1,73 m²) sollten Blutentnahmen so lange wie möglich hinausgezögert werden. Die offizielle deutsche Fassung sagt, dass „Sammelurin“ für 24 h unterbleiben sollte; die englische Fassung spricht von „urine collection“."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "Die 2025er Guidance führt Laborinterferenz als eigenen Abschnitt und gibt klarere Zeitangaben nach intravaskulärer Gabe iodhaltiger oder gadoliniumhaltiger Kontrastmittel."
+                "Das Booklet 2025 enthält einen eigenen Abschnitt zur analytischen Interferenz intravaskulärer Kontrastmittel mit Labortests. Es gibt Empfehlungen auf Grundlage eines Expertenkonsenses, unter anderem für iod- und gadoliniumhaltige Kontrastmittel, und nennt empfohlene Wartezeiten für Blut- und Urinproben nach eGFR-Gruppe."
               ]
             },
             {
               label: "Praktische Bedeutung",
               paragraphs: [
-                "Aus einem älteren Vorsichtsthema wird ein deutlich praktikableres Timing-Schema für Blut- und Urinabnahmen nach Kontrastmitteluntersuchungen."
+                "Im Vergleich zu 2018 nennt das Booklet 2025 drei eGFR-Gruppen für jede Probenart: Für Blutentnahmen werden empfohlene Mindest- und Optimalwartezeiten angegeben, für Urinproben nur empfohlene Mindestwartezeiten."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Laborinterferenz-Guidance"
+            "Quelle: ESUR Guidelines on Contrast Agents, Version 10.0 (2018), EN, Abschnitt C.6 „Non-emergency biochemical assays“, gedruckte S. 30 / PDF-S. 31.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018), Abschnitt C.6 „Laborchemische Proben in der Routinediagnostik“, gedruckte S. 41 / PDF-S. 21 (Doppelseite).",
+            "Quelle: ESUR CMSC Contrast Agent Guidelines 2025 Booklet, „Analytical interference of intravascular contrast agents with clinical laboratory tests“, gedruckte/PDF-S. 23."
           ]
         },
         action: {
@@ -2102,23 +2053,24 @@ arrest: [
             {
               label: "ESUR-2025-Kernaussagen",
               bullets: [
-                "Für Blutentnahmen nach intravaskulärem Kontrastmittel: eGFR >60: Minimum 4 h, optimal 12 h.",
-                "Für Blutentnahmen nach intravaskulärem Kontrastmittel: eGFR 30–60: Minimum 16 h, optimal 48 h.",
-                "Für Blutentnahmen nach intravaskulärem Kontrastmittel: eGFR <30: Minimum 60 h, optimal 168 h.",
-                "Für Urinentnahmen nach intravaskulärem Kontrastmittel: eGFR >60: Minimum 24 h; eGFR 30–60: Minimum 48 h; eGFR <30: Minimum 7 Tage."
+                "Empfohlene Wartezeit für Blutentnahmen nach intravaskulärer Kontrastmittelgabe: eGFR >60 ml/min/1,73 m² — mindestens 4 h; optimal 12 h.",
+                "Empfohlene Wartezeit für Blutentnahmen nach intravaskulärer Kontrastmittelgabe: eGFR 30–60 ml/min/1,73 m² — mindestens 16 h; optimal 48 h.",
+                "Empfohlene Wartezeit für Blutentnahmen nach intravaskulärer Kontrastmittelgabe: eGFR <30 ml/min/1,73 m² — mindestens 2,5 Tage (60 h); optimal 7 Tage (168 h).",
+                "Empfohlene Wartezeit für Urinproben nach intravaskulärer Kontrastmittelgabe: eGFR >60 ml/min/1,73 m² — mindestens 24 h; eGFR 30–60 ml/min/1,73 m² — mindestens 48 h; eGFR <30 ml/min/1,73 m² — mindestens 7 Tage (168 h)."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Die 2025er Guidance ist hier viel klarer und praxisnäher als der ältere Ansatz „wenn möglich verzögern“."
+                "Die Guideline von 2018 enthielt bereits konkrete Zeitangaben zur Blut- und Urinprobenahme. Das Booklet 2025 unterscheidet drei eGFR-Gruppen und gibt für Blutentnahmen empfohlene Mindest- und Optimalwartezeiten an, für Urinproben jedoch nur empfohlene Mindestwartezeiten."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Laborinterferenz-Guidance",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Guidelines on Contrast Agents, Version 10.0 (2018), EN, Abschnitt C.6 „Non-emergency biochemical assays“, gedruckte S. 30 / PDF-S. 31.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018), Abschnitt C.6 „Laborchemische Proben in der Routinediagnostik“, gedruckte S. 41 / PDF-S. 21 (Doppelseite).",
+            "Quelle: ESUR CMSC Contrast Agent Guidelines 2025 Booklet, „Analytical interference of intravascular contrast agents with clinical laboratory tests“, gedruckte/PDF-S. 23."
           ]
         }
       },
@@ -2129,13 +2081,13 @@ arrest: [
         icon: "extravasation",
         title: "Extravasation",
         summary:
-          "2025 wird dieser Bereich viel operativer: Severity-Framing, klarere Prävention, strukturierte Erkennung und definiertere Eskalationskriterien.",
+          "Die Extravasationshinweise von 2025 ergänzen ausdrückliche Definitionen für leichte, moderate und schwere Fälle, genauere Schritte zur Erkennung und Meldung sowie konkrete Angaben zur Überwachung und chirurgischen Abklärung. Risikofaktoren, Prävention, Bildgebung und chirurgische Vorstellung waren bereits 2018 behandelt.",
         keywords: [
           "extravasation",
           "kontrastmittelaustritt",
           "schweregrad",
           "mild moderat schwer",
-          "150 mL",
+          ">150 mL",
           "chirurgische beurteilung"
         ],
         compare: {
@@ -2143,29 +2095,29 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "Extravasation wurde bereits 2018 behandelt, aber mit einfacherem Management-Rahmen und weniger detaillierter Trennung von Risikofaktoren, Erkennungsschritten und Eskalationswegen."
+                "Die englische und die offizielle deutsche Leitlinie von 2018 trennen bereits technische von patientenbezogenen Risikofaktoren. Sie beschreiben Risikoreduktion, eine möglicherweise hilfreiche bildgebende Dokumentation, meist ausreichende konservative Behandlung und die chirurgische Vorstellung bei Verdacht auf schwere Schäden."
               ]
             },
             {
               label: "2025",
               bullets: [
-                "Klarere Einteilung in mild / moderat / schwer.",
-                "Trennung zwischen technikbezogenen und patientenbezogenen Risikofaktoren.",
-                "Deutlich mehr Details zu Prävention, Erkennung, Dokumentation, Follow-up und Eskalation.",
-                "Explizite radiographische Dokumentation bei moderaten / schweren Fällen sowie chirurgischer Input bei Verdacht auf schwere Verletzung."
+                "Definiert leichte, moderate und schwere Extravasationen anhand klinischer Befunde und sieht die Beurteilung des Schweregrades vor.",
+                "Behält die Trennung technischer und patientenbezogener Risikofaktoren bei und konkretisiert weitere Massnahmen zur Risikoreduktion: Eine geeignete Oberarmvene wird bevorzugt; ausserdem nennt der Abschnitt eine geeignete Kanülengrösse, passende Flussraten und Drücke sowie die Minimierung des Kontrastmittelvolumens anhand von Indikation und Patientengrösse.",
+                "Konkretisiert die Erkennung während und nach der Injektion, die Dokumentation im radiologischen Bericht und im lokalen Meldesystem, ein Patienteninformationsblatt sowie einen Nachsorgetermin, falls erforderlich.",
+                "Bei moderaten oder schweren Fällen können zwei orthogonale Röntgenaufnahmen oder eine Schnittbildgebung helfen, Ausdehnung und Kompartimentierung zu beurteilen. Bei Verdacht auf schwere Schäden ist dringend chirurgischer Rat einzuholen; bei einem extravasierten Volumen >150 mL wird eine chirurgische Beurteilung ebenfalls empfohlen."
               ]
             },
             {
               label: "Praktische Bedeutung",
               paragraphs: [
-                "Der 2025er Ansatz ist weniger von lokaler Gewohnheit abhängig und stärker wie ein operativer Pathway aufgebaut."
+                "Gegenüber 2018 nennt der Abschnitt von 2025 drei Schweregrade, genauere Schritte zur Erkennung und Meldung, eine Überwachung leichter Fälle alle 2–4 Stunden und zusätzliche Anlässe für chirurgischen Rat."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Extravasations-Guidance"
+            "Offizielle deutsche ESUR-Leitlinie 10.0 (2018), § C.1, Druckseite 36 (PDF-Seite 19).",
+            "ESUR CMSC Guidelines 2025, Management and prevention of contrast agent extravasation, Druckseiten 20–21 (PDF-Seiten 20–21)."
           ]
         },
         action: {
@@ -2173,23 +2125,24 @@ arrest: [
             {
               label: "ESUR-2025-Kernaussagen",
               bullets: [
-                "Es sollte ein strukturiertes mild / moderat / schwer-Schema verwendet werden, statt alle Extravasationen als eine Kategorie zu behandeln.",
-                "Technikbezogene und patientenbezogene Risikofaktoren sollten getrennt betrachtet werden.",
-                "Für moderate / schwere Fälle wird radiographische Dokumentation beschrieben.",
-                "Bei Verdacht auf schwere Verletzung wird chirurgische Beurteilung beschrieben; zusätzlich wird eine chirurgische Beurteilung bei >150 mL beschrieben."
+                "Das Booklet von 2025 sieht die Einordnung als leicht, moderat oder schwer vor. Moderate Fälle erfordern engmaschige Überwachung; zur Prüfung einer neurovaskulären Beeinträchtigung wird eine ärztliche Beurteilung empfohlen.",
+                "Der Abschnitt von 2025 konkretisiert die Prävention bei Venenzugang, Kanülengrösse, Fluss, Druck und Kontrastmittelvolumen. Sorgfältige Kanülierung und eine Testinjektion mit Kochsalzlösung waren bereits 2018 beschrieben.",
+                "Für leichte Fälle nennt das Booklet von 2025 Hochlagern der Extremität, Eispackungen und Überwachung alle 2–4 Stunden. Bei Besserung ist die Entlassung vorgesehen; bleibt die Besserung aus, ist chirurgischer Rat erforderlich.",
+                "Bei moderaten oder schweren Fällen können zwei orthogonale Röntgenaufnahmen oder eine Schnittbildgebung helfen, Ausdehnung und Kompartimentierung zu beurteilen. Die Komplikation ist im radiologischen Bericht und im lokalen Meldesystem zu dokumentieren; ein Patienteninformationsblatt sollte ausgehändigt und ein Nachsorgetermin vereinbart werden, falls erforderlich.",
+                "Bei Verdacht auf schwere Schäden dringend chirurgischen Rat einholen. Auch bei einem extravasierten Volumen von mehr als 150 mL wird eine chirurgische Beurteilung empfohlen."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Im Vergleich zu 2018 ist dieser Abschnitt deutlich expliziter in Prävention, Erkennung, Dokumentation und Eskalation."
+                "Die zusätzlichen Angaben von 2025 betreffen Schweregraddefinitionen, Erkennung, Meldung, Überwachung leichter Fälle und konkrete Anlässe für chirurgischen Rat; mehrere Massnahmen zur Risikoreduktion und Behandlung standen bereits in der Leitlinie von 2018."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Extravasations-Guidance",
-            "Quelle: ESUR 10.0 Guideline"
+            "ESUR CMSC Guidelines 2025, Management and prevention of contrast agent extravasation, Druckseiten 20–21 (PDF-Seiten 20–21).",
+            "Für den Vergleich mit 2018: offizielle deutsche ESUR-Leitlinie 10.0, § C.1, Druckseite 36 (PDF-Seite 19)."
           ]
         }
       },
@@ -2200,42 +2153,43 @@ arrest: [
         icon: "dialysis",
         title: "Dialyse-bezogene Präzisierung",
         summary:
-          "2025 wird der Dialyse-Abschnitt insbesondere für GBCA klarer und unterscheidet deutlicher zwischen makrozyklischen und linearen Mitteln.",
+          "Der Dialyseabschnitt von 2025 unterscheidet innerhalb getrennter Abschnitte für Hämodialyse und CAPD ausdrücklich zwischen makrozyklischen und linearen GBCA.",
         keywords: [
           "dialyse",
           "hämodialyse",
           "makrozyklisch",
           "linear",
           "GBCA",
-          "CAPD",
-          "restdiurese"
+          "CAPD"
         ],
         compare: {
           sections: [
             {
               label: "2018",
               paragraphs: [
-                "Die 2018er Guideline war allgemeiner: für iodhaltige Kontrastmittel keine spezielle zeitliche Abstimmung mit Dialyse, und für GBCA eher breitere Empfehlungen zur Korrelation mit Dialyse bzw. zusätzlicher Hämodialyse."
+                "ESUR 10.0 unterschied bereits Hämodialyse und CAPD sowie iodhaltige Röntgenkontrastmittel und GBCA. Bei Hämodialyse waren für iodhaltige Röntgenkontrastmittel die Abstimmung mit der Hämodialysesitzung nicht erforderlich und eine zusätzliche Hämodialyse zur Elimination nicht notwendig; bei gadoliniumhaltigen Kontrastmitteln wurde empfohlen, die Gabe mit dem Hämodialysezeitpunkt abzustimmen, und nach der Gabe sollte so früh wie möglich eine Hämodialyse durchgeführt werden.",
+                "Bei CAPD war eine Hämodialyse zur Elimination iodhaltiger Röntgenkontrastmittel nicht notwendig; nach gadoliniumhaltigen Kontrastmitteln sollte die Notwendigkeit einer Hämodialyse mit dem überweisenden Arzt besprochen werden."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "Die neuere Guidance ist konkreter: nach makrozyklischen GBCA ist keine sofortige Dialyse nötig, nach linearen Mitteln wird eine sofortige Dialyse beschrieben und eine Wiederholung an den folgenden zwei Tagen empfohlen.",
-                "Zudem werden Restfunktion der Niere und CAPD-spezifische Abwägungen klarer betont."
+                "Bei Patientinnen und Patienten unter Hämodialyse ist nach makrozyklischen GBCA keine sofortige Dialysesitzung erforderlich; nach linearen Mitteln (z. B. leberspezifischen Mitteln) ist sie angezeigt und muss an den folgenden zwei Tagen wiederholt werden.",
+                "Bei Patientinnen und Patienten unter CAPD ist nach makrozyklischen GBCA keine sofortige Dialysesitzung erforderlich; bei linearen GBCA sollte das NSF-Risiko gegen das Risiko der Anlage eines temporären Hämodialysekatheters abgewogen werden, in Rücksprache mit dem überweisenden Arzt."
               ]
             },
             {
               label: "Praktische Bedeutung",
               paragraphs: [
-                "Der Dialyse-Abschnitt ist nicht mehr einfach „nach GBCA möglichst rasch dialysieren“. Er ist mittel- und situationsspezifischer geworden."
+                "Gegenüber 2018 ergänzt die GBCA-Guidance 2025 eine ausdrückliche Unterscheidung zwischen makrozyklischen und linearen Mitteln. Die Vorgaben zur sofortigen Dialyse unterscheiden sich nach Dialyseart und GBCA-Klasse."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Dialyse-Guidance"
+            "Quelle: ESUR Guidelines on Contrast Agents 10.0 (2018 EN), § B.5 Dialysis and contrast medium administration, Druckseite 23 / PDF-Seite 24.",
+            "Quelle: ESUR Leitlinien für Kontrastmittel 10.0 (offizielle DE-Fassung), § B.5 Dialyse und Kontrastmittelgabe, Druckseiten 33–34 / PDF-Seiten 17–18.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, Safe use of contrast agent administration in patients on dialysis, Druck-/PDF-Seite 19."
           ]
         },
         action: {
@@ -2243,23 +2197,22 @@ arrest: [
             {
               label: "ESUR-2025-Kernaussagen",
               bullets: [
-                "Nach makrozyklischen GBCA wird eine sofortige Dialyse nicht als notwendig beschrieben.",
-                "Nach linearen GBCA wird eine sofortige Dialyse beschrieben, mit Wiederholung an den folgenden zwei Tagen.",
-                "Bei CAPD und ähnlichen Situationen beschreibt die Guideline eine Abwägung zwischen NSF-Risiko linearer Mittel und dem Risiko eines temporären Hämodialysezugangs.",
-                "Für iodhaltige Kontrastmittel bei terminalem Nierenversagen wird die Bedeutung der Restdiurese klarer hervorgehoben."
+                "Bei iodhaltigen Röntgenkontrastmitteln ist für Hämodialysepatienten keine zeitliche Abstimmung der Injektion mit der Hämodialysesitzung oder den Hämodialysesitzungen erforderlich; zusätzliche Hämodialysesitzungen zur Entfernung des Kontrastmittels werden nicht empfohlen. Bei CAPD ist eine zusätzliche Hämodialyse zur Elimination iodhaltigen Röntgenkontrastmittels nicht notwendig.",
+                "Nach makrozyklischen GBCA ist bei Hämodialyse oder CAPD keine sofortige Dialysesitzung erforderlich.",
+                "Nach linearen GBCA ist bei Patientinnen und Patienten unter Hämodialyse eine sofortige Dialysesitzung angezeigt und muss an den folgenden zwei Tagen wiederholt werden.",
+                "Bei CAPD und linearen GBCA sollte das NSF-Risiko in Rücksprache mit dem überweisenden Arzt gegen das Risiko der Anlage eines temporären Hämodialysekatheters abgewogen werden."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Die 2025er Guidance ist hier deutlich spezifischer und behandelt nicht mehr alle GBCA unter derselben Dialyse-Regel."
+                "Die GBCA-Anweisungen von 2025 unterscheiden sich nach Dialyseart und GBCA-Klasse."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Dialyse-Guidance",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, Safe use of contrast agent administration in patients on dialysis — Patients on haemodialysis; Patients on continuous ambulatory peritoneal dialysis, Druck-/PDF-Seite 19."
           ]
         }
       },
@@ -2268,9 +2221,9 @@ arrest: [
         id: "new_clinical_scenarios",
         level: "medium",
         icon: "layers",
-        title: "Neue klinische Szenarien: Myasthenia gravis, HSG, CO₂",
+        title: "Eigene ESUR-2025-Abschnitte: Myasthenia gravis, HSG und CO₂-Angiographie",
         summary:
-          "2025 werden Themen explizit ergänzt oder hervorgehoben, die im 2018er Booklet fehlten oder nicht separat gerahmt waren.",
+          "Die englische und die offizielle deutsche Ausgabe von 2018 behandeln Myasthenia gravis und HSG nicht; beide nennen Kohlendioxid nur in der Terminologie. Das Booklet 2025 enthält zu allen drei Themen eigene Unterabschnitte.",
         keywords: [
           "myasthenia gravis",
           "HSG",
@@ -2284,49 +2237,50 @@ arrest: [
             {
               label: "2018",
               paragraphs: [
-                "Das 2018er Booklet hatte keine eigenen Praxis-Kapitel zu Myasthenia gravis, Hysterosalpingographie oder CO₂ als alternative intravaskuläre Kontrastoption."
+                "Keine der beiden Ausgaben von 2018 behandelt Myasthenia gravis oder HSG. Beide nennen Kohlendioxid nur als Beispiel eines Röntgenkontrastmittels in der Terminologie; ein Unterabschnitt zur CO₂-Angiographie fehlt."
               ]
             },
             {
               label: "2025",
               paragraphs: [
-                "Die 2025er Guidance enthält Myasthenia gravis explizit im Block zu systemischen Erkrankungen und ergänzt eigene Abschnitte zu HSG sowie zu CO₂ als Alternative zu iodhaltigen Kontrastmitteln bei vaskulären Eingriffen."
+                "Myasthenia gravis steht unter „Safe use of contrast agents in patients with systemic diseases“. HSG und CO₂-Angiographie stehen als getrennte Unterabschnitte unter „Miscellaneous recommendations and topics“."
               ]
             },
             {
               label: "Praktische Bedeutung",
               paragraphs: [
-                "Diese Themen sind in der 2025er Guidance leichter auffindbar und nutzbar, anstatt aus breiteren Abschnitten abgeleitet werden zu müssen."
+                "Dieser Vergleich belegt eine Änderung der im Booklet behandelten Themen und ihrer Gliederung."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Summary Guideline",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), Inhaltsverzeichnis C.1–C.11, Drucks. 4–5 / PDF-S. 5–6; „Terminology: Contrast agents and contrast media“, Drucks. 5 / PDF-S. 6.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), Inhalt C.1–C.11, PDF-S. 4–5; „Terminologie: Kontrastmittel und Röntgenkontrastmittel“, Drucks. 10–11 / PDF-S. 6.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, Inhaltsverzeichnis, Druck-/PDF-S. 5; „Safe use of contrast agents in patients with myasthenia gravis“, S. 29; CO₂- und HSG-Unterabschnitte, S. 31."
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR-2025-Kernaussagen",
+              label: "Aussagen der ESUR 2025",
               bullets: [
-                "Bei Fragen zu Myasthenia gravis und Kontrastmittel sollte die 2025er Guidance verwendet werden, weil dieses Thema jetzt explizit adressiert wird.",
-                "Für HSG sollte der dedizierte 2025er Abschnitt verwendet werden, statt nur von allgemeinen Kontrastmittelregeln auszugehen.",
-                "Wenn CO₂ als Alternative zu iodhaltigem Kontrastmittel bei vaskulären Eingriffen erwogen wird, sollte der 2025er CO₂-Abschnitt herangezogen werden."
+                "Bei Myasthenia gravis können laut Booklet 2025 intravenös verabreichte niedrig- oder iso-osmolare iodhaltige Röntgenkontrastmittel innerhalb der ersten 24 Stunden nach der Gabe mit einer Verschlechterung der Symptome verbunden sein, wahrscheinlich bei weniger als 5 % der Patientinnen und Patienten, die diese Mittel intravenös erhalten; gadoliniumhaltige Kontrastmittel werden für Patientinnen und Patienten mit Myasthenia gravis als sicher beschrieben.",
+                "Der HSG-Unterabschnitt von 2025 weist darauf hin, dass die externe Validität begrenzt ist, weil einige früher verwendete Kontrastmittel nicht mehr auf dem Markt sind. Im Vergleich zu wasserbasierten Kontrastmitteln treten nach HSG mit ölbasierten Kontrastmitteln etwa 10 % mehr Schwangerschaften und Lebendgeburten auf und die Bildqualität ist signifikant besser; Intravasationen treten gleich häufig auf. Ölbasierte Kontrastmittel können längere Zeit in der Bauchhöhle verbleiben und haben einen signifikant stärkeren entzündlichen Effekt auf das Peritoneum; die klinischen Folgen sind unbekannt und bei der Anwendung ist Vorsicht geboten. Bei jeder Frau, die ein ölbasiertes Kontrastmittel erhält, soll die Schilddrüsenfunktion vor der HSG geprüft und danach 6 Monate lang überwacht werden; routinemässige zusätzliche Schilddrüsenfunktionstests beim Neugeborenen nach HSG sind nicht indiziert.",
+                "Das Booklet 2025 bezeichnet die Evidenz zur CO₂-Angiographie als Alternative zu iodhaltigen Röntgenkontrastmitteln als begrenzt. CO₂ scheint bei vaskulären Eingriffen eine sichere Alternative zu sein und könnte das CA-AKI-Risiko insbesondere bei PAD-Eingriffen senken; dabei sind spezifische Kontraindikationen und Sicherheitsmassnahmen sowie die höhere Häufigkeit nicht schwerwiegender unerwünschter Ereignisse zu berücksichtigen. Weitere grosse RCTs sind erforderlich, um diese Ergebnisse zu bestätigen und CA-AKI-Risikofaktoren bei EVAR und interventionellen Eingriffen wegen PAD weiter zu untersuchen."
               ],
               variant: "action"
             },
             {
               label: "Warum das wichtig ist",
               paragraphs: [
-                "Das sind echte Ergänzungen bzw. neu explizit gemachte Themenbereiche und nicht nur kosmetische Umstellungen."
+                "Dies sind eigene Unterabschnitte im Booklet 2025; Kohlendioxid wurde bereits 2018 in der Terminologie genannt."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Summary Guideline",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Safe use of contrast agents in patients with myasthenia gravis“, Druck-/PDF-S. 29.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, „Safety of CO₂ as an alternative to iodine-based contrast media in vascular procedures“ und „Safe use of contrast agents in hysterosalpingography (HSG)“, Druck-/PDF-S. 31."
           ]
         }
       },
@@ -2335,9 +2289,9 @@ arrest: [
         id: "other_reorganized_topics",
         level: "medium",
         icon: "stack",
-        title: "Weitere reorganisierte oder fortgeführte Themen",
+        title: "Ausgewählte Themen von 2018 im Booklet 2025",
         summary:
-          "Mehrere Inhalte bleiben erhalten, werden umgruppiert oder ausgebaut, ohne dass sie immer als grosse Headline-Änderungen erscheinen.",
+          "Einige Themen aus 2018 sind auch im Booklet 2025 enthalten, teils mit anderem Wortlaut oder an anderer Stelle. Andere werden anders klassifiziert, und einige Themen aus 2018 werden im Booklet 2025 nicht wiedergegeben. Deshalb ist jedes Thema einzeln zu vergleichen.",
         keywords: [
           "schwangerschaft",
           "laktation",
@@ -2353,53 +2307,64 @@ arrest: [
         compare: {
           sections: [
             {
-              label: "2018",
-              paragraphs: [
-                "Schwangerschaft / Laktation, pädiatrische Anwendung, Metformin, Gadolinium-Retention, Warming / Fasting und mehrere ältere Miscellaneous-Themen waren bereits im 2018er Booklet enthalten.",
-                "Einige Themen wie late reactions, very late reactions, sickle cell disease und effects on blood / endothelium waren im älteren Aufbau stärker separat sichtbar."
+              label: "In beiden Booklets enthalten",
+              bullets: [
+                "Schwangerschaft und Stillzeit, Pädiatrie, Metformin, Gadoliniumretention, Erwärmen und Nüchternheit werden in beiden Booklets behandelt. Wortlaut und/oder Einordnung sind nicht identisch.",
+                "2025 steht Metformin unter systemischen Erkrankungen. Erwärmen und Nüchternheit bleiben getrennte Themen unter „Miscellaneous“; der 2025-Text zur Nüchternheit nennt zusätzlich Ultraschall-Kontrastmittel.",
+                "Der Pädiatrie-Abschnitt 2025 gibt die 2018er Aussagen, dass bei iodhaltigen Röntgenkontrastmitteln nicht-ionische Mittel verwendet und bei gadoliniumhaltigen Kontrastmitteln Hochrisikomittel vermieden werden sollen, nicht wieder."
               ]
             },
             {
-              label: "2025",
-              paragraphs: [
-                "Viele dieser Inhalte bleiben erhalten, werden aber anders gruppiert. Schwangerschaft / Laktation und Pädiatrie bleiben, Metformin ist in systemische Erkrankungen eingebettet, Gadolinium-Retention bleibt, und die nichtvaskuläre Gabe iodhaltiger Kontrastmittel wird breiter beschrieben.",
-                "Gleichzeitig werden manche 2018 prominenter sichtbaren Themen im 2025er Summary-Aufbau weniger separat hervorgehoben."
+              label: "Geänderte Klassifikation oder Aussageebene",
+              bullets: [
+                "Der 2018er Abschnitt zu „späten unerwünschten Wirkungen“ definierte diese als Reaktionen 1 Stunde bis 1 Woche nach intravaskulärer Gabe iodhaltiger Röntgenkontrastmittel. 2025 werden nicht unmittelbare/verzögerte HSR im Erwachsenen-HSR-Abschnitt behandelt; dies ist nicht dieselbe Dokumentklassifikation.",
+                "Die 2018er Oberkategorie „sehr späte unerwünschte Wirkungen“ wird 2025 nicht als solche fortgeführt. Jodinduzierte Hyperthyreose steht unter systemischen Erkrankungen; NSF ist weiterhin als eigener Abschnitt im Fließtext vorhanden.",
+                "Bei extravaskulärer Gabe iodhaltiger Röntgenkontrastmittel enthielt das Booklet 2018 eine allgemeine Vorsichtsregel, wenn eine systemische Aufnahme oder Leckage möglich war. Das Booklet 2025 enthält einen detaillierteren HSR-spezifischen Absatz zur nichtvaskulären Gabe und zum Management von Überempfindlichkeitsreaktionen."
               ]
             },
             {
-              label: "Praktische Bedeutung",
+              label: "Im Booklet 2025 nicht gefunden",
+              bullets: [
+                "Der 2018er Abschnitt zur Sichelzellanämie wurde im vollständigen Booklet 2025 nicht gefunden.",
+                "Die 2018er Empfehlungen zu Wirkungen von Kontrastmitteln auf Blut und Endothel einschließlich Thrombose wurden im vollständigen Booklet 2025 nicht gefunden."
+              ]
+            },
+            {
+              label: "Begrenzung",
               paragraphs: [
-                "Dass ein Thema im 2025er Inhaltsverzeichnis weniger prominent erscheint, bedeutet nicht automatisch, dass es inhaltlich entfernt wurde. In mehreren Fällen wurde es fortgeführt, aber umgruppiert."
+                "„Im Booklet 2025 nicht gefunden“ beschreibt nur diesen Booklet-Vergleich und bedeutet nicht, dass ESUR das Thema aus sämtlichen Leitlinien zurückgezogen hat. Ein fehlender Eintrag im Inhaltsverzeichnis belegt für sich allein keine Abwesenheit im Fließtext; NSF ist im 2025er Fließtext vorhanden, obwohl es keine eigene Inhaltsverzeichniszeile hat."
               ],
               variant: "impact"
             }
           ],
           refs: [
-            "Quelle: ESUR 10.0 Guideline",
-            "Quelle: ESUR 2025 Summary Guideline"
+            "Quelle: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN): A.1.3–A.1.5, Drucks. 11 / PDF-S. 12; A.2, Drucks. 12 / PDF-S. 13; A.3, ab Drucks. 13 / ab PDF-S. 14; B.4, Drucks. 22 / PDF-S. 23; C.3–C.3.2, Drucks. 27–28 / PDF-S. 28–29; C.5, Drucks. 29 / PDF-S. 30; C.7, Drucks. 31–32 / PDF-S. 32–33; C.10, Drucks. 35 / PDF-S. 36.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE): Fließtext A.1.3–A.1.5, Drucks. 18–19 / PDF-S. 10 (die Überschrift A.1.3 ist in der DE-Quelle abweichend); A.2, Drucks. 20–21 / PDF-S. 11; A.3, ab Drucks. 22–23 / ab PDF-S. 12; B.4, Drucks. 33 / PDF-S. 17; C.3–C.3.2, Drucks. 37–38 / PDF-S. 19–20; C.5, Drucks. 39–40 / PDF-S. 20–21; C.7, Drucks. 42–43 / PDF-S. 22; C.10, Drucks. 46 / PDF-S. 24.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025: nichtvaskuläre iodhaltige Kontrastmittelgabe, Druck-/PDF-S. 10; NSF, S. 24–26; Schwangerschaft/Stillzeit, S. 26–27; Pädiatrie, S. 27; Metformin und jodinduzierte Hyperthyreose, S. 27–28; Gadoliniumretention, S. 29–30; Nüchternheit und Erwärmen, S. 31–32; aktuell in Überarbeitung befindliche Guidelines, S. 33."
           ]
         },
         action: {
           sections: [
             {
-              label: "ESUR-2025-Kernaussagen",
+              label: "Quellenkonformer Vergleich",
               bullets: [
-                "Es sollte nicht automatisch angenommen werden, dass ein Thema verschwunden ist, nur weil es im 2025er Summary-Aufbau weniger separat sichtbar ist.",
-                "Für umgruppierte Inhalte wie Metformin und weitere krankheitsbezogene Themen sollte in 2025 der Block zu systemischen Erkrankungen genutzt werden.",
-                "Wenn die breitere Formulierung zur nichtvaskulären Gabe iodhaltiger Kontrastmittel gebraucht wird, sollte der 2025er Text verwendet werden."
+                "In beiden Booklets enthalten, mit Unterschieden in Wortlaut und/oder Einordnung: Schwangerschaft und Stillzeit, Pädiatrie, Metformin, Gadoliniumretention, Erwärmen und Nüchternheit.",
+                "Geänderte Klassifikation oder Aussageebene: späte und sehr späte unerwünschte Wirkungen sowie die Passagen zur nichtvaskulären/extravaskulären Gabe iodhaltiger Röntgenkontrastmittel.",
+                "Im vollständigen Booklet 2025 nicht gefunden: der 2018er Abschnitt zur Sichelzellanämie sowie die 2018er Empfehlungen zu Blut/Endothel/Thrombose."
               ],
               variant: "action"
             },
             {
-              label: "Warum das wichtig ist",
+              label: "Interpretationsgrenze",
               paragraphs: [
-                "Nicht jede Differenz zwischen 2018 und 2025 ist eine neue Regel. Teilweise geht es um Framing, Gruppierung oder unterschiedliche Betonung."
+                "Der Vergleich beschreibt die autorisierten Booklet-Texte von 2018 und 2025. Er belegt nicht, dass ein im Booklet 2025 fehlendes Thema aus sämtlichen ESUR-Leitlinien zurückgezogen wurde."
               ]
             }
           ],
           refs: [
-            "Quelle: ESUR 2025 Summary Guideline",
-            "Quelle: ESUR 10.0 Guideline"
+            "Quelle: ESUR Guidelines on Contrast Agents, Version 10.0 (2018 EN), Abschnitte A.1.3–A.3, B.4, C.3–C.3.2, C.5, C.7 und C.10; Drucks. 11–35 / entsprechende PDF-S. 12–36.",
+            "Quelle: Offizielle deutsche ESUR Leitlinien für Kontrastmittel, Version 10.0 (2018 DE), entsprechende Abschnitte A.1.3–A.3, B.4, C.3–C.3.2, C.5, C.7 und C.10; PDF-S. 10–24.",
+            "Quelle: ESUR Contrast Media Safety Committee Guidelines 2025, einschlägige Abschnitte auf S. 10 und 24–33."
           ]
         }
       }
@@ -2408,8 +2373,6 @@ arrest: [
 
   const views = {
     hsr: document.getElementById("view-hsr"),
-    thyroid: document.getElementById("view-thyroid"),
-    calculators: document.getElementById("view-calculators"),
     changes: document.getElementById("view-changes")
   };
 
@@ -2421,10 +2384,6 @@ arrest: [
     nihr: document.getElementById("hsr-tab-nihr")
   };
 
-  const calcTabs = {
-    dose: document.getElementById("calc-tab-dose"),
-    washout: document.getElementById("calc-tab-washout")
-  };
 
   const flowOutput = document.getElementById("flowOutput");
   const flowSafety = document.getElementById("flowSafety");
@@ -2433,9 +2392,6 @@ arrest: [
   const switchOutput = document.getElementById("switchOutput");
   const tryptaseOutput = document.getElementById("tryptaseOutput");
   const nihrOutput = document.getElementById("nihrOutput");
-  const thyroidOutput = document.getElementById("thyroidOutput");
-  const doseOutput = document.getElementById("doseOutput");
-  const washoutOutput = document.getElementById("washoutOutput");
 
   const icmCard = document.getElementById("icmCard");
   const gbcaCard = document.getElementById("gbcaCard");
@@ -2598,7 +2554,7 @@ arrest: [
 
     setMultilineText("icmHint", t("icm_hint"));
     setMultilineText("gbcaHint", t("gbca_hint"));
-    setText("switchNonvalidated", t("switch_nonvalidated"));
+    fillSwitchPrinciples();
 
     setGroupLabel("icm", "A", t("icm_group_a_label"));
     setGroupLabel("icm", "B", t("icm_group_b_label"));
@@ -2671,17 +2627,6 @@ arrest: [
     state.hsrTab = name;
   }
 
-  function showCalcTab(name) {
-    Object.keys(calcTabs).forEach((key) => {
-      if (calcTabs[key]) calcTabs[key].hidden = key !== name;
-    });
-
-    document.querySelectorAll("[data-calc-tab]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.calcTab === name);
-    });
-
-    state.calcTab = name;
-  }
 
   function defaultAcutePattern(severity) {
     if (severity === "moderate") return "moderate_urticaria";
@@ -2711,6 +2656,16 @@ arrest: [
   }
 
   function renderFlow() {
+    const outputCard = flowOutput ? flowOutput.closest(".card") : null;
+    const hasCaseSelection = Boolean(state.situation && state.reaction);
+
+    if (outputCard) outputCard.hidden = !hasCaseSelection;
+    if (!hasCaseSelection) {
+      if (flowOutput) flowOutput.innerHTML = "";
+      if (flowSafety) flowSafety.textContent = t("flow_safety");
+      return;
+    }
+
     const key = `${state.situation}_${state.reaction}`;
     const title = t("flow_titles")[key];
     const bullets = t("flow_bullets")[key];
@@ -2796,6 +2751,23 @@ ${renderAcuteList(content.arrest)}
     `;
   }
 
+  function fillSwitchPrinciples() {
+    const items = [
+      t("switch_status_optional"),
+      t("switch_cmsc"),
+      t("switch_cr_structure"),
+      t("switch_cr_frequency"),
+      t("switch_best_option")
+    ];
+    const html =
+      `<ul>${items.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>` +
+      `<div class="hint">${escapeHtml(t("switch_brand_governance"))}</div>`;
+    const top = document.getElementById("switchNonvalidated");
+    const safety = document.getElementById("switchSafety");
+    if (top) top.innerHTML = html;
+    if (safety) safety.innerHTML = html;
+  }
+
   function renderSwitch() {
     if (!switchOutput) return;
 
@@ -2846,10 +2818,18 @@ ${renderAcuteList(content.arrest)}
   function calcTryptase() {
     if (!tryptaseOutput) return;
 
-    const baseline = Number(document.getElementById("baseline")?.value);
-    const acute = Number(document.getElementById("acute")?.value);
+    const baselineRaw = document.getElementById("baseline")?.value?.trim() ?? "";
+    const acuteRaw = document.getElementById("acute")?.value?.trim() ?? "";
 
-    if (!isFinite(baseline) || !isFinite(acute) || baseline < 0 || acute < 0) {
+    if (baselineRaw === "" || acuteRaw === "") {
+      tryptaseOutput.innerHTML = `<div class="hint">${escapeHtml(t("tryptase_invalid"))}</div>`;
+      return;
+    }
+
+    const baseline = Number(baselineRaw);
+    const acute = Number(acuteRaw);
+
+    if (!Number.isFinite(baseline) || !Number.isFinite(acute) || baseline < 0 || acute < 0) {
       tryptaseOutput.innerHTML = `<div class="hint">${escapeHtml(t("tryptase_invalid"))}</div>`;
       return;
     }
@@ -2872,259 +2852,105 @@ ${renderAcuteList(content.arrest)}
   function renderNihr() {
     if (!nihrOutput) return;
 
-    const anyChecked = Array.from(document.querySelectorAll(".nihr-check")).some((el) => el.checked);
+    const outputCard = nihrOutput.closest(".card");
+    const hasCaseSelection = Boolean(
+      state.nihrSeverity && state.nihrCmtype && state.nihrCulpritKnown
+    );
 
-    if (!anyChecked) {
-      nihrOutput.innerHTML = `<div class="hint">${escapeHtml(t("nihr_default"))}</div>`;
+    if (outputCard) outputCard.hidden = !hasCaseSelection;
+    if (!hasCaseSelection) {
+      nihrOutput.innerHTML = "";
       return;
     }
 
-    const lines =
-      state.nihrCmtype === "gbca"
-        ? t("nihr_positive_text_gbca")
-        : t("nihr_positive_text_icm");
+    const hasDangerSigns = Array.from(document.querySelectorAll(".nihr-check")).some((el) => el.checked);
+    const severity = state.nihrSeverity;
+    const mildValid = severity === "mild" && !hasDangerSigns;
+    const moderateValid = severity === "moderate" && !hasDangerSigns;
+    const scarValid = severity === "severe" && hasDangerSigns;
 
-    nihrOutput.innerHTML = `
-      <div><strong>${escapeHtml(t("nihr_positive_title"))}</strong></div>
-      <ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
-    `;
-  }
+    const renderNihrList = (items) =>
+      `<ul>${(items || []).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>`;
 
-  function renderThyroid() {
-    if (!thyroidOutput) return;
+    const adviceItems = () => {
+      const items = [t("nihr_apply_advice")];
+      if (state.nihrCulpritKnown === "known") items.push(t("nihr_choose_different"));
+      return items;
+    };
 
-    const status = state.thyroidStatus;
-    const ritSoon = state.thyroidRit === "planned_soon";
-    const situation = state.thyroidSituation;
-    const medication = state.thyroidMedication;
+    const followUpItems = [
+      t("nihr_observe"),
+      t("nihr_written"),
+      t("nihr_recurrence"),
+      t("nihr_preventive_alt"),
+      t("nihr_preventive_never_deny"),
+      t("nihr_footnote_crossreact")
+    ];
 
-    let level = "ok";
-    let title = t("thyroid_level_ok");
-    let lead = t("thyroid_level_ok_detail");
-    let reasoning = [];
-    let nextSteps = [];
-    let localNote = t("thyroid_local_prophylaxis_note");
-
-    if (status === "manifest") {
-      level = "danger";
-      title = t("thyroid_level_danger");
-      lead = t("thyroid_level_danger_detail");
-      reasoning.push(
-        state.lang === "de"
-          ? "ESUR 2025 beschreibt manifeste Hyperthyreose als Konstellation, in der iodhaltiges Kontrastmittel nicht gegeben werden sollte."
-          : "ESUR 2025 describes manifest hyperthyroidism as a setting in which iodinated contrast should not be given."
-      );
-      nextSteps.push(
-        situation === "emergency"
-          ? (state.lang === "de"
-              ? "Nur bei zwingender klinischer Indikation erwägen und die Situation eng mit Endokrinologie / behandelndem Team abstimmen."
-              : "Only consider if clinically unavoidable and coordinate closely with Endocrinology / the treating team.")
-          : (state.lang === "de"
-              ? "Alternative Bildgebung prüfen und iodhaltiges Kontrastmittel möglichst vermeiden."
-              : "Consider alternative imaging and avoid iodinated contrast where possible.")
-      );
-    } else if (status === "graves") {
-      level = situation === "emergency" ? "danger" : "warn";
-      title = level === "danger" ? t("thyroid_level_danger") : t("thyroid_level_warn");
-      lead = level === "danger" ? t("thyroid_level_danger_detail") : t("thyroid_level_warn_detail");
-      reasoning.push(
-        state.lang === "de"
-          ? "Unbehandelter Morbus Basedow gehört zu den klaren Risikokonstellationen für iodinduzierte thyreotoxische Probleme."
-          : "Untreated Graves’ disease is one of the clear risk constellations for iodine-induced thyrotoxic problems."
-      );
-      nextSteps.push(
-        state.lang === "de"
-          ? "TSH / klinische Situation prüfen und endokrinologische Rücksprache erwägen."
-          : "Check TSH / clinical status and consider endocrinology input."
-      );
-    } else if (status === "autonomy") {
-      level = "warn";
-      title = t("thyroid_level_warn");
-      lead = t("thyroid_level_warn_detail");
-      reasoning.push(
-        state.lang === "de"
-          ? "Bekannte Autonomie oder multinodöse Struma gehört zu den ESUR-Risikogruppen."
-          : "Known autonomy or multinodular goitre belongs to the ESUR risk groups."
-      );
-      nextSteps.push(
-        state.lang === "de"
-          ? "Risikonutzen abwägen, TSH / endokrinologische Abklärung gezielt erwägen und lokale Protokolle beachten."
-          : "Weigh benefit versus risk, consider targeted TSH / endocrinology assessment, and follow local protocols."
-      );
-    } else if (status === "subclinical") {
-      level = "warn";
-      title = t("thyroid_level_warn");
-      lead = t("thyroid_level_warn_detail");
-      reasoning.push(
-        state.lang === "de"
-          ? "Ein niedriges TSH oder unklare Risikokonstellationen sind keine automatische absolute Kontraindikation, brauchen aber Kontext."
-          : "Low TSH or unclear thyroid-risk constellations are not automatic absolute contraindications, but they need context."
-      );
-      nextSteps.push(
-        state.lang === "de"
-          ? "Wenn zeitlich möglich, Ursache und Relevanz vor elektiver Kontrastgabe klären."
-          : "If time allows, clarify the cause and relevance before elective contrast administration."
-      );
-    } else {
-      level = "ok";
-      title = t("thyroid_level_ok");
-      lead = t("thyroid_level_ok_detail");
-      reasoning.push(
-        state.lang === "de"
-          ? "Normale Schilddrüsenfunktion gilt in ESUR nicht als spezielle Risikokonstellation."
-          : "Normal thyroid function is not considered a special ESUR thyroid-risk constellation."
-      );
-      nextSteps.push(
-        state.lang === "de"
-          ? "Iodhaltiges Kontrastmittel ist im Allgemeinen möglich."
-          : "Iodinated contrast is generally possible."
-      );
-    }
-
-    if (status === "normal" && medication === "levothyroxine") {
-      reasoning.push(
-        state.lang === "de"
-          ? "Eine reine Levothyroxin-Substitution bei sonst normaler Funktion ist für sich allein kein typischer Hochrisikofaktor."
-          : "Levothyroxine replacement alone with otherwise normal function is not by itself a typical high-risk factor."
-      );
-    }
-
-    if (medication === "thyreostatics" && (status === "manifest" || status === "graves" || status === "autonomy" || status === "subclinical")) {
-      reasoning.push(
-        state.lang === "de"
-          ? "Laufende Thyreostatika ändern den Kontext, heben eine relevante Risikokonstellation aber nicht automatisch auf."
-          : "Ongoing thyrostatic treatment changes the context, but does not automatically remove a relevant thyroid-risk constellation."
-      );
-    }
-
-    if (ritSoon) {
-      if (level === "ok") level = "warn";
-      if (title !== t("thyroid_level_danger")) title = t("thyroid_level_warn");
-      if (lead === t("thyroid_level_ok_detail")) lead = t("thyroid_level_warn_detail");
-      reasoning.push(t("thyroid_rit_note"));
-      nextSteps.push(
-        state.lang === "de"
-          ? "Vor KM-Gabe explizit mit Nuklearmedizin / Endokrinologie Timing und Konsequenzen für Radioiod-Anwendung abstimmen."
-          : "Before contrast administration, explicitly coordinate timing and implications for radioiodine use with Nuclear Medicine / Endocrinology."
-      );
-    }
-
-    const levelClass =
-      level === "danger"
-        ? "rgba(255,74,74,.12); border-color:rgba(255,74,74,.28);"
-        : level === "warn"
-          ? "rgba(255,255,255,.06); border-color:rgba(255,255,255,.18);"
-          : "rgba(75,140,255,.10); border-color:rgba(75,140,255,.24);";
-
-    thyroidOutput.innerHTML = `
-      <div style="background:${levelClass.split(';')[0].replace('background:','')}; border:1px solid ${levelClass.split('border-color:')[1].replace(';','')}; border-radius:14px; padding:11px 12px;">
-        <strong>${escapeHtml(title)}</strong><br />
-        <span>${escapeHtml(lead)}</span>
-      </div>
-      <div>
-        <strong>${escapeHtml(t("thyroid_reasoning"))}:</strong>
-        <ul>${reasoning.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-      </div>
-      <div>
-        <strong>${escapeHtml(t("thyroid_next_steps"))}:</strong>
-        <ul>${nextSteps.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-      </div>
-      <div class="hint">
-        <strong>${escapeHtml(t("thyroid_local_note"))}:</strong> ${escapeHtml(localNote)}
-      </div>
-    `;
-  }
-
-  function renderDose() {
-    if (!doseOutput) return;
-    if (!doseOutput.dataset.ready) {
-      doseOutput.innerHTML = `<div class="hint">${escapeHtml(t("dose_placeholder"))}</div>`;
-    }
-  }
-
-  function calcDose() {
-    if (!doseOutput) return;
-
-    const dlp = Number(document.getElementById("doseDlp")?.value);
-    const factor = doseFactors[state.doseRegion];
-
-    if (!isFinite(dlp) || dlp < 0) {
-      doseOutput.innerHTML = `<div class="hint">${escapeHtml(t("dose_invalid"))}</div>`;
+    if (mildValid) {
+      nihrOutput.innerHTML = `
+        <div><strong>${escapeHtml(t("nihr_status_mild"))}</strong></div>
+        <div>
+          <strong>${escapeHtml(t("nihr_recommended_actions"))}</strong>
+          ${renderNihrList([
+            t("nihr_mild_interview"),
+            t("nihr_mild_refer"),
+            t("nihr_optimize_ehr"),
+            ...adviceItems(),
+            ...followUpItems
+          ])}
+        </div>
+      `;
       return;
     }
 
-    const msv = dlp * factor;
-    const backgroundYears = msv / doseComparisons.annualBackground;
-    const chestXrays = doseComparisons.chestXray > 0 ? msv / doseComparisons.chestXray : 0;
-    const flights = doseComparisons.longHaulFlight > 0 ? msv / doseComparisons.longHaulFlight : 0;
-
-    doseOutput.innerHTML = `
-      <div><strong>${escapeHtml(t("dose_region_label"))}:</strong> ${escapeHtml(doseRegionLabels[state.lang][state.doseRegion])}</div>
-      <div><strong>${escapeHtml(t("dose_estimated_msv"))}:</strong> ${fmt(msv)} mSv</div>
-      <div><strong>${escapeHtml(t("dose_comparison_background"))}:</strong> ${fmt(backgroundYears)} ${state.lang === "de" ? "Jahre" : "years"}</div>
-      <div><strong>${escapeHtml(t("dose_comparison_cxr"))}:</strong> ${fmt(chestXrays, 0)}</div>
-      <div><strong>${escapeHtml(t("dose_comparison_flights"))}:</strong> ${fmt(flights, 0)}</div>
-      <div class="hint">${escapeHtml(t("dose_disclaimer"))}</div>
-    `;
-
-    doseOutput.dataset.ready = "1";
-  }
-
-  function renderWashout() {
-    if (!washoutOutput) return;
-    if (!washoutOutput.dataset.ready) {
-      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_placeholder"))}</div>`;
-    }
-  }
-
-  function calcWashout() {
-    if (!washoutOutput) return;
-
-    const unenhanced = Number(document.getElementById("washoutUnenhanced")?.value);
-    const enhanced = Number(document.getElementById("washoutEnhanced")?.value);
-    const delayed = Number(document.getElementById("washoutDelayed")?.value);
-    const delayMinRaw = document.getElementById("washoutDelayMin")?.value ?? "";
-    const delayMin = delayMinRaw === "" ? null : Number(delayMinRaw);
-
-    if (
-      !isFinite(unenhanced) ||
-      !isFinite(enhanced) ||
-      !isFinite(delayed) ||
-      (delayMinRaw !== "" && (!isFinite(delayMin) || delayMin < 0))
-    ) {
-      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_invalid"))}</div>`;
+    if (moderateValid) {
+      nihrOutput.innerHTML = `
+        <div><strong>${escapeHtml(t("nihr_status_moderate"))}</strong></div>
+        <div>
+          <strong>${escapeHtml(t("nihr_recommended_actions"))}</strong>
+          ${renderNihrList([
+            t("nihr_moderate_refer"),
+            t("nihr_optimize_ehr"),
+            ...adviceItems(),
+            ...followUpItems
+          ])}
+        </div>
+      `;
       return;
     }
 
-    if (enhanced <= unenhanced) {
-      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_no_enhancement"))}</div>`;
+    if (scarValid) {
+      const classRule =
+        state.nihrCmtype === "gbca"
+          ? t("nihr_scar_gbca_rule")
+          : state.nihrCmtype === "unknown"
+            ? t("nihr_scar_unknown_rule")
+            : t("nihr_scar_icm_rule");
+
+      nihrOutput.innerHTML = `
+        <div><strong>${escapeHtml(t("nihr_status_scar"))}</strong></div>
+        <div>
+          <strong>${escapeHtml(t("nihr_recommended_actions"))}</strong>
+          ${renderNihrList([
+            t("nihr_scar_refer"),
+            t("nihr_scar_choose_imaging"),
+            t("nihr_scar_ehr"),
+            t("nihr_scar_do_not_give")
+          ])}
+        </div>
+        <div>
+          <strong>${escapeHtml(t("nihr_class_specific_rule"))}</strong>
+          ${renderNihrList([classRule])}
+        </div>
+      `;
       return;
     }
 
-    const absDenominator = enhanced - unenhanced;
-    const relDenominator = enhanced;
-
-    if (absDenominator === 0 || relDenominator === 0) {
-      washoutOutput.innerHTML = `<div class="hint">${escapeHtml(t("washout_invalid_formula"))}</div>`;
-      return;
-    }
-
-    const absoluteWashout = ((enhanced - delayed) / absDenominator) * 100;
-    const relativeWashout = ((enhanced - delayed) / relDenominator) * 100;
-    const classicPositive = absoluteWashout > 60 || relativeWashout > 40;
-
-    washoutOutput.innerHTML = `
-      <div><strong>${escapeHtml(t("washout_absolute"))}:</strong> ${fmt(absoluteWashout)}%</div>
-      <div><strong>${escapeHtml(t("washout_relative"))}:</strong> ${fmt(relativeWashout)}%</div>
-      ${delayMin !== null ? `<div><strong>${escapeHtml(t("washout_delay_label"))}:</strong> ${fmt(delayMin, 0)} ${state.lang === "de" ? "Minuten" : "minutes"}</div>` : ""}
-      <div><strong>${escapeHtml(t("washout_classic"))}:</strong> ${escapeHtml(classicPositive ? t("washout_classic_positive") : t("washout_classic_negative"))}</div>
-      <div class="hint">${escapeHtml(t("washout_caution"))}</div>
-    `;
-
-    washoutOutput.dataset.ready = "1";
+    nihrOutput.innerHTML = `<div>${escapeHtml(t("nihr_scope_guard"))}</div>`;
   }
 
-  function getChanges() {
+    function getChanges() {
     return changesLibrary[state.lang];
   }
 
@@ -3340,9 +3166,6 @@ ${renderAcuteList(content.arrest)}
   renderSwitch();
   renderTryptase();
   renderNihr();
-  renderThyroid();
-  renderDose();
-  renderWashout();
   renderChanges();
 }
 
@@ -3355,24 +3178,7 @@ ${renderAcuteList(content.arrest)}
       renderTryptase();
     }
 
-    const dlpVal = document.getElementById("doseDlp")?.value ?? "";
-    if (dlpVal !== "") {
-      calcDose();
-    } else {
-      renderDose();
-    }
-
-    const uVal = document.getElementById("washoutUnenhanced")?.value ?? "";
-    const eVal = document.getElementById("washoutEnhanced")?.value ?? "";
-    const dVal = document.getElementById("washoutDelayed")?.value ?? "";
-    if (uVal !== "" && eVal !== "" && dVal !== "") {
-      calcWashout();
-    } else {
-      renderWashout();
-    }
-
     renderNihr();
-    renderThyroid();
     renderChanges();
   }
 
@@ -3385,23 +3191,19 @@ ${renderAcuteList(content.arrest)}
   function resetAll() {
     state.mainNav = "hsr";
     state.hsrTab = "guidance";
-    state.calcTab = "dose";
 
-    state.situation = "elective";
-    state.reaction = "moderate";
+    state.situation = null;
+    state.reaction = null;
     state.cmtype = "icm";
-    state.nihrCmtype = "icm";
+    state.nihrCmtype = null;
+    state.nihrSeverity = null;
+    state.nihrCulpritKnown = null;
     state.acuteSeverity = "mild";
     state.acutePattern = "mild_general";
     state.icm = null;
     state.gbca = null;
 
-    state.thyroidSituation = "elective";
-    state.thyroidStatus = "normal";
-    state.thyroidMedication = "none";
-    state.thyroidRit = "no";
 
-    state.doseRegion = "head";
 
     state.changesFilter = "all";
     state.changesMode = "compare";
@@ -3411,17 +3213,14 @@ ${renderAcuteList(content.arrest)}
     document.body.classList.remove("emergency");
 
     const defaults = {
-      situation: "elective",
-      reaction: "moderate",
+      situation: null,
+      reaction: null,
       cmtype: "icm",
-      nihrCmtype: "icm",
+      nihrCmtype: null,
+      nihrSeverity: null,
+      nihrCulpritKnown: null,
       acuteSeverity: "mild",
       acutePattern: "mild_general",
-      thyroidSituation: "elective",
-      thyroidStatus: "normal",
-      thyroidMedication: "none",
-      thyroidRit: "no",
-      doseRegion: "head"
     };
 
     Object.keys(defaults).forEach((seg) => {
@@ -3437,9 +3236,6 @@ ${renderAcuteList(content.arrest)}
       btn.classList.toggle("active", btn.dataset.hsrTab === "guidance");
     });
 
-    document.querySelectorAll("[data-calc-tab]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.calcTab === "dose");
-    });
 
     document.querySelectorAll(".bottomnav__btn").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.mainNav === "hsr");
@@ -3456,11 +3252,6 @@ ${renderAcuteList(content.arrest)}
     const idsToClear = [
       "baseline",
       "acute",
-      "doseDlp",
-      "washoutUnenhanced",
-      "washoutEnhanced",
-      "washoutDelayed",
-      "washoutDelayMin",
       "changesSearch"
     ];
 
@@ -3475,18 +3266,9 @@ ${renderAcuteList(content.arrest)}
       delete tryptaseOutput.dataset.ready;
       tryptaseOutput.innerHTML = "";
     }
-    if (doseOutput) {
-      delete doseOutput.dataset.ready;
-      doseOutput.innerHTML = "";
-    }
-    if (washoutOutput) {
-      delete washoutOutput.dataset.ready;
-      washoutOutput.innerHTML = "";
-    }
 
     showMainView("hsr");
     showHsrTab("guidance");
-    showCalcTab("dose");
     setBodyMode();
     renderAll();
   }
@@ -3526,26 +3308,16 @@ if (stickyDisclaimer) {
     });
   });
 
-  // Calculator subnav
-  document.querySelectorAll("[data-calc-tab]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      showCalcTab(btn.dataset.calcTab);
-    });
-  });
-
   // Generic segment buttons
   [
     "situation",
     "reaction",
     "cmtype",
     "nihrCmtype",
+    "nihrSeverity",
+    "nihrCulpritKnown",
     "acuteSeverity",
     "acutePattern",
-    "thyroidSituation",
-    "thyroidStatus",
-    "thyroidMedication",
-    "thyroidRit",
-    "doseRegion"
   ].forEach((seg) => {
     document.querySelectorAll(`.seg__btn[data-seg="${seg}"]`).forEach((btn) => {
       btn.addEventListener("click", () => setSegment(seg, btn.dataset.value));
@@ -3593,15 +3365,11 @@ if (stickyDisclaimer) {
     });
   }
 
-  // Calculator buttons
+  // Tryptase calculator
   const calcBtn = document.getElementById("calcTryptase");
   if (calcBtn) calcBtn.addEventListener("click", calcTryptase);
 
-  const calcDoseBtn = document.getElementById("calcDose");
-  if (calcDoseBtn) calcDoseBtn.addEventListener("click", calcDose);
 
-  const calcWashoutBtn = document.getElementById("calcWashout");
-  if (calcWashoutBtn) calcWashoutBtn.addEventListener("click", calcWashout);
 
   document.querySelectorAll(".nihr-check").forEach((el) => el.addEventListener("change", renderNihr));
 
@@ -3633,7 +3401,6 @@ if (stickyDisclaimer) {
 
   showMainView("hsr");
   showHsrTab("guidance");
-  showCalcTab("dose");
   setBodyMode();
   renderAll();
 });
