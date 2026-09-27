@@ -933,91 +933,6 @@ arrest: [
     }
   };
 
-  const abbreviationUi = {
-    en: {
-      label: "Abbreviations",
-      organizations: [
-        ["ESUR", "European Society of Urogenital Radiology"],
-        ["CMSC", "Contrast Media Safety Committee"]
-      ],
-      switch: [
-        ["ICM", "iodine-based contrast medium"],
-        ["GBCA", "gadolinium-based contrast agent"]
-      ],
-      previous: [
-        ["EAACI", "European Association of Allergy & Clinical Immunology"]
-      ],
-      acute: [
-        ["CPR", "cardiopulmonary resuscitation"]
-      ],
-      tryptase: [
-        ["IHR", "immediate hypersensitivity reaction"]
-      ],
-      nihr: [
-        ["ICM", "iodine-based contrast medium"],
-        ["GBCA", "gadolinium-based contrast agent"],
-        ["SCAR", "severe cutaneous adverse reaction"]
-      ],
-      changes: {
-        hypersensitivity: [
-          ["ACR", "American College of Radiology"],
-          ["SCAR", "severe cutaneous adverse reaction"]
-        ],
-        waiting_times: [
-          ["eGFR", "estimated glomerular filtration rate"]
-        ],
-        dialysis_refinement: [
-          ["NSF", "nephrogenic systemic fibrosis"]
-        ],
-        new_clinical_scenarios: [
-          ["HSG", "hysterosalpingography"],
-          ["PAD", "peripheral arterial disease"],
-          ["EVAR", "endovascular aneurysm repair"]
-        ]
-      }
-    },
-    de: {
-      label: "Abkürzungen",
-      organizations: [
-        ["ESUR", "European Society of Urogenital Radiology"],
-        ["CMSC", "Contrast Media Safety Committee"]
-      ],
-      switch: [
-        ["ICM", "iodhaltiges Kontrastmittel"],
-        ["GBCA", "gadoliniumbasiertes Kontrastmittel"]
-      ],
-      previous: [
-        ["EAACI", "European Association of Allergy & Clinical Immunology"]
-      ],
-      acute: [],
-      tryptase: [
-        ["IHR", "unmittelbare Hypersensitivitätsreaktion"]
-      ],
-      nihr: [
-        ["ICM", "iodhaltiges Kontrastmittel"],
-        ["GBCA", "gadoliniumbasiertes Kontrastmittel"],
-        ["SCAR", "schwere kutane unerwünschte Reaktion"]
-      ],
-      changes: {
-        hypersensitivity: [
-          ["ACR", "American College of Radiology"],
-          ["SCAR", "schwere kutane unerwünschte Reaktion"]
-        ],
-        waiting_times: [
-          ["eGFR", "errechnete glomeruläre Filtrationsrate"]
-        ],
-        dialysis_refinement: [
-          ["NSF", "nephrogene systemische Fibrose"]
-        ],
-        new_clinical_scenarios: [
-          ["HSG", "Hysterosalpingographie"],
-          ["PAD", "peripheral arterial disease"],
-          ["EVAR", "endovascular aneurysm repair"]
-        ]
-      }
-    }
-  };
-
   const changesLibrary = {
     en: [
       {
@@ -2503,126 +2418,6 @@ arrest: [
       .replace(/'/g, "&#039;");
   }
 
-  function abbreviationConfig() {
-    return abbreviationUi[state.lang] || abbreviationUi.en;
-  }
-
-  function renderAbbreviationDisclosure(items, extraClass = "") {
-    if (!items || !items.length) return "";
-    const config = abbreviationConfig();
-    const cls = extraClass ? ` abbr-disclosure--${escapeHtml(extraClass)}` : "";
-
-    return `
-      <details class="abbr-disclosure${cls}">
-        <summary class="abbr-disclosure__summary">${escapeHtml(config.label)}</summary>
-        <dl class="abbr-disclosure__list">
-          ${items.map(([abbr, expansion]) => `
-            <div class="abbr-disclosure__row">
-              <dt>${escapeHtml(abbr)}</dt>
-              <dd>${escapeHtml(expansion)}</dd>
-            </div>
-          `).join("")}
-        </dl>
-      </details>
-    `;
-  }
-
-  function isAsciiAlphaNumeric(char) {
-    return Boolean(char && /[A-Za-z0-9]/.test(char));
-  }
-
-  function containsAbbreviation(text, abbreviation) {
-    let index = text.indexOf(abbreviation);
-
-    while (index !== -1) {
-      const before = index > 0 ? text[index - 1] : "";
-      const afterIndex = index + abbreviation.length;
-      const after = afterIndex < text.length ? text[afterIndex] : "";
-
-      if (!isAsciiAlphaNumeric(before) && !isAsciiAlphaNumeric(after)) return true;
-      index = text.indexOf(abbreviation, index + abbreviation.length);
-    }
-
-    return false;
-  }
-
-  function renderedTextWithoutClosedDetails(target) {
-    if (!target || target.closest("[hidden]")) return "";
-
-    const clone = target.cloneNode(true);
-    clone.querySelectorAll(".abbr-slot").forEach((el) => el.remove());
-    clone.querySelectorAll("[hidden]").forEach((el) => el.remove());
-    clone.querySelectorAll("details:not([open])").forEach((details) => {
-      Array.from(details.children).forEach((child) => {
-        if (child.tagName !== "SUMMARY") child.remove();
-      });
-    });
-
-    return (clone.textContent || "").replace(/\s+/g, " ").trim();
-  }
-
-  function setContextualAbbreviationDisclosure(slotId, target, candidates, extraClass = "") {
-    const slot = document.getElementById(slotId);
-    if (!slot) return;
-
-    const visibleText = target && !target.closest("[hidden]")
-      ? renderedTextWithoutClosedDetails(target)
-      : "";
-    const items = (candidates || []).filter(([abbr]) => containsAbbreviation(visibleText, abbr));
-    const markup = renderAbbreviationDisclosure(items, extraClass);
-    const signature = JSON.stringify([state.lang, extraClass, items]);
-
-    // Keep the native details node (and its open state) when visible content is unchanged.
-    if (slot.dataset.abbrSignature === signature) return;
-    const wasOpen = Boolean(slot.querySelector("details[open]"));
-    slot.innerHTML = markup;
-    slot.dataset.abbrSignature = signature;
-    if (wasOpen && markup) slot.querySelector("details").open = true;
-  }
-
-  function updateContextualAbbreviations() {
-    const config = abbreviationConfig();
-
-    setContextualAbbreviationDisclosure(
-      "previousAbbreviations",
-      document.getElementById("hsr-tab-guidance"),
-      config.previous
-    );
-
-    setContextualAbbreviationDisclosure(
-      "acuteAbbreviations",
-      document.getElementById("hsr-tab-acute"),
-      state.lang === "en" ? config.acute : []
-    );
-
-    setContextualAbbreviationDisclosure(
-      "switchAbbreviations",
-      document.getElementById("hsr-tab-switch"),
-      config.switch
-    );
-
-    setContextualAbbreviationDisclosure(
-      "tryptaseAbbreviations",
-      document.getElementById("hsr-tab-tryptase"),
-      config.tryptase
-    );
-
-    setContextualAbbreviationDisclosure(
-      "nihrAbbreviations",
-      document.getElementById("hsr-tab-nihr"),
-      config.nihr
-    );
-
-    const changeCard = document.querySelector(".change-detail-card");
-    const changeCandidates = config.changes?.[state.selectedChangeId] || [];
-    setContextualAbbreviationDisclosure(
-      "changeAbbreviations",
-      changeCard,
-      changeCandidates,
-      "change"
-    );
-  }
-
   function fmt(value, digits = 2) {
     return Number(value).toFixed(digits);
   }
@@ -2738,16 +2533,6 @@ arrest: [
 
     const stickyDisclaimer = document.getElementById("stickyDisclaimer");
     if (stickyDisclaimer) {
-      let organizations = stickyDisclaimer.querySelector('[data-ui-abbr="organizations"]');
-      if (!organizations) {
-        organizations = document.createElement("span");
-        organizations.setAttribute("data-ui-abbr", "organizations");
-        stickyDisclaimer.appendChild(organizations);
-      }
-      organizations.textContent = abbreviationConfig().organizations
-        .map(([abbr, expansion]) => `${expansion} (${abbr})`)
-        .join(" · ");
-
       let extra = stickyDisclaimer.querySelector('[data-i18n="disclaimer_line3"]');
       if (!extra) {
         extra = document.createElement("span");
@@ -2820,18 +2605,9 @@ arrest: [
   );
 }
   
-  document.addEventListener("click", function (event) {
-  if (event.target.closest(".abbr-disclosure")) return;
-  window.requestAnimationFrame(() => {
-    setBodyMode();
-    updateContextualAbbreviations();
-  });
+  document.addEventListener("click", function () {
+  window.requestAnimationFrame(setBodyMode);
 });
-
-  document.addEventListener("toggle", function (event) {
-    if (event.target.matches(".abbr-disclosure")) return;
-    window.requestAnimationFrame(updateContextualAbbreviations);
-  }, true);
   function showMainView(name) {
     Object.keys(views).forEach((key) => {
       if (views[key]) views[key].hidden = key !== name;
@@ -3358,8 +3134,6 @@ ${renderAcuteList(content.arrest)}
           </div>
         </header>
 
-        <div class="abbr-slot abbr-slot--change" id="changeAbbreviations"></div>
-
         <div class="change-detail__mode" role="group" aria-label="${escapeHtml(t("changes_mode_label"))}">
           <button
             class="change-detail__mode-btn ${state.changesMode === "compare" ? "active" : ""}"
@@ -3425,7 +3199,6 @@ ${renderAcuteList(content.arrest)}
     changesList.innerHTML = renderChangeDetail(selected);
 
     attachChangeEvents();
-    updateContextualAbbreviations();
   }
 
   function renderAll() {
@@ -3438,7 +3211,6 @@ ${renderAcuteList(content.arrest)}
   renderTryptase();
   renderNihr();
   renderChanges();
-  updateContextualAbbreviations();
 }
 
   function refreshComputedModulesAfterLanguageChange() {
@@ -3452,7 +3224,6 @@ ${renderAcuteList(content.arrest)}
 
     renderNihr();
     renderChanges();
-    updateContextualAbbreviations();
   }
 
   function clearButtons(seg) {
@@ -3617,12 +3388,7 @@ if (stickyDisclaimer) {
 
   // Tryptase calculator
   const calcBtn = document.getElementById("calcTryptase");
-  if (calcBtn) {
-    calcBtn.addEventListener("click", () => {
-      calcTryptase();
-      updateContextualAbbreviations();
-    });
-  }
+  if (calcBtn) calcBtn.addEventListener("click", calcTryptase);
 
 
 
