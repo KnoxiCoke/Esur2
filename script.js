@@ -2565,12 +2565,19 @@ arrest: [
     const slot = document.getElementById(slotId);
     if (!slot) return;
 
-    slot.innerHTML = "";
-    if (!target || target.closest("[hidden]") || !candidates || !candidates.length) return;
+    const visibleText = target && !target.closest("[hidden]")
+      ? renderedTextWithoutClosedDetails(target)
+      : "";
+    const items = (candidates || []).filter(([abbr]) => containsAbbreviation(visibleText, abbr));
+    const markup = renderAbbreviationDisclosure(items, extraClass);
+    const signature = JSON.stringify([state.lang, extraClass, items]);
 
-    const visibleText = renderedTextWithoutClosedDetails(target);
-    const items = candidates.filter(([abbr]) => containsAbbreviation(visibleText, abbr));
-    slot.innerHTML = renderAbbreviationDisclosure(items, extraClass);
+    // Keep the native details node (and its open state) when visible content is unchanged.
+    if (slot.dataset.abbrSignature === signature) return;
+    const wasOpen = Boolean(slot.querySelector("details[open]"));
+    slot.innerHTML = markup;
+    slot.dataset.abbrSignature = signature;
+    if (wasOpen && markup) slot.querySelector("details").open = true;
   }
 
   function updateContextualAbbreviations() {
@@ -2813,14 +2820,16 @@ arrest: [
   );
 }
   
-  document.addEventListener("click", function () {
+  document.addEventListener("click", function (event) {
+  if (event.target.closest(".abbr-disclosure")) return;
   window.requestAnimationFrame(() => {
     setBodyMode();
     updateContextualAbbreviations();
   });
 });
 
-  document.addEventListener("toggle", function () {
+  document.addEventListener("toggle", function (event) {
+    if (event.target.matches(".abbr-disclosure")) return;
     window.requestAnimationFrame(updateContextualAbbreviations);
   }, true);
   function showMainView(name) {
