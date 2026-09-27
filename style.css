@@ -2113,3 +2113,607 @@ input {
     padding-right: 12px;
   }
 }
+
+
+/* =========================================================
+   UI PHASE 2B — UNIFIED HSR WORKSPACES
+   Presentation only: Acute, Switch, Tryptase and NIHR.
+   Medical strings, state and script.js are unchanged.
+   ========================================================= */
+
+/* Shared workspace frame */
+#hsr-tab-acute,
+#hsr-tab-switch,
+#hsr-tab-tryptase,
+#hsr-tab-nihr {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(310px, 390px) minmax(0, 1fr);
+  column-gap: 30px;
+  row-gap: 0;
+  margin-top: 4px;
+  padding: 20px 22px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(14, 24, 40, 0.72);
+}
+
+#hsr-tab-acute > .card,
+#hsr-tab-switch > .card,
+#hsr-tab-tryptase > .card,
+#hsr-tab-nihr > .card {
+  margin: 0;
+  box-shadow: none;
+}
+
+/* Shared left-column treatment */
+#hsr-tab-acute > .card:not(.card--output),
+#hsr-tab-switch > .card:not(.card--output),
+#hsr-tab-tryptase > .card:not(.card--output),
+#hsr-tab-nihr > .card:not(.card--output) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#hsr-tab-acute > .card:not(.card--output) + .card:not(.card--output),
+#hsr-tab-switch > .card:not(.card--output) + .card:not(.card--output),
+#hsr-tab-tryptase > .card:not(.card--output) + .card:not(.card--output),
+#hsr-tab-nihr > .card:not(.card--output) + .card:not(.card--output) {
+  border-top: 1px solid var(--border);
+}
+
+#hsr-tab-acute > .card:not(.card--output),
+#hsr-tab-switch > .card:not(.card--output),
+#hsr-tab-tryptase > .card:not(.card--output),
+#hsr-tab-nihr > .card:not(.card--output) {
+  padding: 16px 0;
+}
+
+#hsr-tab-acute > .card:not(.card--output) .card__title,
+#hsr-tab-switch > .card:not(.card--output) .card__title,
+#hsr-tab-tryptase > .card:not(.card--output) .card__title,
+#hsr-tab-nihr > .card:not(.card--output) .card__title {
+  margin-bottom: 8px;
+  color: #94a9bc;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+#hsr-tab-acute > .card:first-child,
+#hsr-tab-switch > .card:first-child,
+#hsr-tab-nihr > .card:first-child {
+  padding-top: 3px;
+}
+
+/* Shared controls */
+#hsr-tab-acute .seg,
+#hsr-tab-switch .seg,
+#hsr-tab-nihr .seg {
+  gap: 7px;
+}
+
+#hsr-tab-acute .seg__btn,
+#hsr-tab-switch .seg__btn,
+#hsr-tab-nihr .seg__btn {
+  padding: 10px 9px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #0d1828;
+  color: #c5d1dc;
+  box-shadow: none !important;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+#hsr-tab-acute .seg__btn.active,
+#hsr-tab-switch .seg__btn.active,
+#hsr-tab-nihr .seg__btn.active {
+  background: #19354e;
+  border-color: rgba(76, 196, 224, 0.55);
+  color: #f2f7fb;
+  box-shadow: inset 0 0 0 1px rgba(76, 196, 224, 0.12) !important;
+}
+
+/* Shared result pane */
+#hsr-tab-acute > .card--output,
+#hsr-tab-switch > .card--output,
+#hsr-tab-tryptase > .card--output,
+#hsr-tab-nihr > .card--output {
+  min-height: 360px;
+  padding: 20px;
+  border: 1px solid rgba(76, 196, 224, 0.25);
+  border-left: 3px solid rgba(76, 196, 224, 0.82);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(76, 196, 224, 0.055), rgba(76, 196, 224, 0.012) 46%),
+    rgba(10, 19, 32, 0.72);
+}
+
+#hsr-tab-acute > .card--output > .card__title,
+#hsr-tab-switch > .card--output > .card__title,
+#hsr-tab-tryptase > .card--output > .card__title,
+#hsr-tab-nihr > .card--output > .card__title {
+  margin-bottom: 12px;
+  color: #71d2e8;
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+#hsr-tab-acute .card--output .output,
+#hsr-tab-switch .card--output .output,
+#hsr-tab-tryptase .card--output .output,
+#hsr-tab-nihr .card--output .output {
+  display: block;
+}
+
+#hsr-tab-acute .card--output .output > div,
+#hsr-tab-switch .card--output .output > div,
+#hsr-tab-tryptase .card--output .output > div,
+#hsr-tab-nihr .card--output .output > div {
+  margin: 0;
+  padding: 0 0 13px;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 176, 214, 0.10);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#hsr-tab-acute .card--output .output > div + div,
+#hsr-tab-switch .card--output .output > div + div,
+#hsr-tab-tryptase .card--output .output > div + div,
+#hsr-tab-nihr .card--output .output > div + div {
+  margin-top: 13px !important;
+}
+
+#hsr-tab-acute .card--output .output > div:last-child,
+#hsr-tab-switch .card--output .output > div:last-child,
+#hsr-tab-tryptase .card--output .output > div:last-child,
+#hsr-tab-nihr .card--output .output > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+#hsr-tab-acute .card--output .output ul,
+#hsr-tab-nihr .card--output .output ul {
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  list-style: none;
+}
+
+#hsr-tab-acute .card--output .output li,
+#hsr-tab-nihr .card--output .output li {
+  position: relative;
+  margin: 0;
+  padding: 9px 0 9px 17px;
+  border-top: 1px solid rgba(148, 176, 214, 0.09);
+  line-height: 1.45;
+}
+
+#hsr-tab-acute .card--output .output li:first-child,
+#hsr-tab-nihr .card--output .output li:first-child {
+  border-top: 0;
+}
+
+#hsr-tab-acute .card--output .output li::before,
+#hsr-tab-nihr .card--output .output li::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 2px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgba(76, 196, 224, 0.68);
+}
+
+/* Acute management: context + selectors left, management result right */
+#hsr-tab-acute {
+  grid-template-areas:
+    "intro output"
+    "immediate output"
+    "severity output"
+    "pattern output";
+}
+
+#hsr-tab-acute > .card:nth-child(1) { grid-area: intro; }
+#hsr-tab-acute > .card:nth-child(2) { grid-area: immediate; }
+#hsr-tab-acute > .card:nth-child(3) { grid-area: severity; }
+#hsr-tab-acute > .card:nth-child(4) { grid-area: pattern; }
+#hsr-tab-acute > .card:nth-child(5) { grid-area: output; }
+
+#hsr-tab-acute > .card:nth-child(1) .card__title {
+  color: #c8d5df;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#hsr-tab-acute #acuteImmediateOutput {
+  color: #b9c8d5;
+  font-size: 12px;
+  line-height: 1.48;
+}
+
+#hsr-tab-acute #acuteImmediateOutput > div {
+  color: #dbe5ed;
+  margin-bottom: 6px;
+}
+
+#hsr-tab-acute #acuteImmediateOutput ul {
+  margin: 6px 0 0;
+  padding-left: 17px;
+}
+
+#hsr-tab-acute #acuteImmediateOutput li {
+  margin: 5px 0;
+}
+
+#hsr-tab-acute > .card:nth-child(3) .seg {
+  display: flex;
+  grid-template-columns: none;
+}
+
+#hsr-tab-acute > .card:nth-child(3) .seg__btn {
+  min-width: 0;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+#acutePatternOptions {
+  display: flex;
+  flex-wrap: wrap;
+  grid-template-columns: none;
+}
+
+#acutePatternOptions .seg__btn:not([hidden]) {
+  flex: 1 1 160px;
+  width: auto;
+  text-align: center;
+}
+
+/* Switch: selection left, alternative output right, safety subordinate */
+#hsr-tab-switch {
+  grid-template-areas:
+    "intro output"
+    "type output"
+    "agent output"
+    ". safety";
+}
+
+#hsr-tab-switch > .card:nth-child(1) { grid-area: intro; }
+#hsr-tab-switch > .card:nth-child(2) { grid-area: type; }
+#hsr-tab-switch > .card:nth-child(3),
+#hsr-tab-switch > .card:nth-child(4) { grid-area: agent; }
+#hsr-tab-switch > .card:nth-child(5) { grid-area: output; }
+#hsr-tab-switch > .card:nth-child(6) { grid-area: safety; }
+
+#hsr-tab-switch > .card:nth-child(2) .seg {
+  display: flex;
+  grid-template-columns: none;
+}
+
+#hsr-tab-switch > .card:nth-child(2) .seg__btn {
+  min-width: 0;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+#hsr-tab-switch #icmCard .seg,
+#hsr-tab-switch #gbcaCard .seg {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#hsr-tab-switch #icmCard .seg__btn,
+#hsr-tab-switch #gbcaCard .seg__btn {
+  min-width: 0;
+  text-align: left;
+}
+
+#hsr-tab-switch #icmCard .small,
+#hsr-tab-switch #gbcaCard .small {
+  color: #75899c;
+  font-size: 10.5px;
+  font-weight: 650;
+}
+
+#hsr-tab-switch > .card:nth-child(6) {
+  margin-top: 14px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--border);
+  color: #7f91a2;
+}
+
+#hsr-tab-switch > .card:nth-child(6) .card__title {
+  color: #8da0b2;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+
+#hsr-tab-switch > .card:nth-child(6) .output {
+  color: #7f91a2;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* Tryptase: guidance + entry left, result right */
+#hsr-tab-tryptase {
+  grid-template-areas:
+    "info output"
+    "values output";
+}
+
+#hsr-tab-tryptase > .card:nth-child(1) { grid-area: info; }
+#hsr-tab-tryptase > .card:nth-child(2) { grid-area: values; }
+#hsr-tab-tryptase > .card:nth-child(3) { grid-area: output; }
+
+#hsr-tab-tryptase > .card:nth-child(1) {
+  padding-top: 3px;
+}
+
+#hsr-tab-tryptase > .card:nth-child(1) .output {
+  color: #aebdca;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#hsr-tab-tryptase > .card:nth-child(1) .output ul {
+  margin: 4px 0 0;
+  padding-left: 17px;
+}
+
+#hsr-tab-tryptase > .card:nth-child(1) .output li {
+  margin: 6px 0;
+}
+
+#hsr-tab-tryptase > .card:nth-child(2) {
+  display: grid;
+  gap: 8px;
+}
+
+#hsr-tab-tryptase > .card:nth-child(2) .card__title {
+  margin-bottom: 1px;
+}
+
+#hsr-tab-tryptase input {
+  min-height: 42px;
+  padding: 10px 11px;
+  border-radius: 11px;
+  background: #0d1828;
+}
+
+#hsr-tab-tryptase .btn {
+  min-height: 42px;
+  margin-top: 2px;
+  border-color: rgba(76, 196, 224, 0.46);
+  background: #19354e;
+  color: #f2f7fb;
+}
+
+/* NIHR: case construction left, recommendation right */
+#hsr-tab-nihr {
+  grid-template-areas:
+    "intro output"
+    "severity output"
+    "class output"
+    "known output"
+    "danger output"
+    ". referral";
+}
+
+#hsr-tab-nihr > .card:nth-child(1) { grid-area: intro; }
+#hsr-tab-nihr > .card:nth-child(2) { grid-area: referral; }
+#hsr-tab-nihr > .card:nth-child(3) { grid-area: severity; }
+#hsr-tab-nihr > .card:nth-child(4) { grid-area: class; }
+#hsr-tab-nihr > .card:nth-child(5) { grid-area: known; }
+#hsr-tab-nihr > .card:nth-child(6) { grid-area: danger; }
+#hsr-tab-nihr > .card:nth-child(7) { grid-area: output; }
+
+#hsr-tab-nihr > .card:nth-child(3) .seg {
+  display: flex;
+  grid-template-columns: none;
+}
+
+#hsr-tab-nihr > .card:nth-child(3) .seg__btn {
+  min-width: 0;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+#hsr-tab-nihr > .card:nth-child(4) .seg,
+#hsr-tab-nihr > .card:nth-child(5) .seg {
+  display: flex;
+  flex-wrap: wrap;
+  grid-template-columns: none;
+}
+
+#hsr-tab-nihr > .card:nth-child(4) .seg__btn,
+#hsr-tab-nihr > .card:nth-child(5) .seg__btn {
+  min-width: 0;
+  flex: 1 1 120px;
+  text-align: center;
+}
+
+#hsr-tab-nihr > .card:nth-child(3) > .hint {
+  margin-top: 8px;
+  color: #75899c;
+  font-size: 10.8px;
+  line-height: 1.42;
+}
+
+#hsr-tab-nihr .checklist {
+  gap: 6px;
+}
+
+#hsr-tab-nihr .checklist label {
+  gap: 8px;
+  padding: 8px 9px;
+  border-color: rgba(148, 176, 214, 0.12);
+  border-radius: 10px;
+  background: #0d1828;
+  color: #b7c6d3;
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+#hsr-tab-nihr .checklist input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+/* Keep NIHR's existing neutral business logic but give it the same result pane. */
+#hsr-tab-nihr::before {
+  content: "Select the required case details";
+  grid-area: output;
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border: 1px solid rgba(148, 176, 214, 0.14);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(76, 196, 224, 0.025), transparent 46%),
+    rgba(10, 19, 32, 0.64);
+  color: #8396a8;
+  text-align: center;
+  font-size: 14px;
+}
+
+html[lang="de"] #hsr-tab-nihr::before {
+  content: "Erforderliche Falldetails auswählen";
+}
+
+#hsr-tab-nihr:has(> .card--output:not([hidden]))::before {
+  display: none;
+}
+
+#hsr-tab-nihr > .card:nth-child(2) {
+  margin-top: 14px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--border);
+  color: #7f91a2;
+}
+
+#hsr-tab-nihr > .card:nth-child(2) .card__title {
+  color: #8da0b2;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+
+#hsr-tab-nihr > .card:nth-child(2) .output {
+  color: #7f91a2;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+#hsr-tab-nihr > .card:nth-child(2) .output ul {
+  margin: 0;
+  padding-left: 17px;
+}
+
+/* Mobile: same information hierarchy, stacked instead of side-by-side */
+@media (max-width: 768px) {
+  #hsr-tab-acute,
+  #hsr-tab-switch,
+  #hsr-tab-tryptase,
+  #hsr-tab-nihr {
+    grid-template-columns: 1fr;
+    padding: 15px 14px 13px;
+    border-radius: 16px;
+  }
+
+  #hsr-tab-acute {
+    grid-template-areas:
+      "intro"
+      "immediate"
+      "severity"
+      "pattern"
+      "output";
+  }
+
+  #hsr-tab-switch {
+    grid-template-areas:
+      "intro"
+      "type"
+      "agent"
+      "output"
+      "safety";
+  }
+
+  #hsr-tab-tryptase {
+    grid-template-areas:
+      "info"
+      "values"
+      "output";
+  }
+
+  #hsr-tab-nihr {
+    grid-template-areas:
+      "intro"
+      "severity"
+      "class"
+      "known"
+      "danger"
+      "output"
+      "referral";
+  }
+
+  #hsr-tab-acute > .card--output,
+  #hsr-tab-switch > .card--output,
+  #hsr-tab-tryptase > .card--output,
+  #hsr-tab-nihr > .card--output,
+  #hsr-tab-nihr::before {
+    min-height: 0;
+    margin-top: 10px;
+    padding: 15px;
+    border-radius: 13px;
+  }
+
+  #hsr-tab-nihr::before {
+    min-height: 150px;
+  }
+
+  #hsr-tab-acute > .card:not(.card--output),
+  #hsr-tab-switch > .card:not(.card--output),
+  #hsr-tab-tryptase > .card:not(.card--output),
+  #hsr-tab-nihr > .card:not(.card--output) {
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+
+  #hsr-tab-acute > .card:nth-child(3) .seg,
+  #hsr-tab-nihr > .card:nth-child(3) .seg {
+    display: flex;
+  }
+
+  #hsr-tab-switch #icmCard .seg,
+  #hsr-tab-switch #gbcaCard .seg {
+    grid-template-columns: 1fr;
+  }
+
+  #hsr-tab-acute .seg__btn,
+  #hsr-tab-switch .seg__btn,
+  #hsr-tab-nihr .seg__btn {
+    min-height: 39px;
+    padding: 8px 7px;
+    font-size: 12px;
+  }
+
+  #hsr-tab-acute .card--output .output,
+  #hsr-tab-switch .card--output .output,
+  #hsr-tab-tryptase .card--output .output,
+  #hsr-tab-nihr .card--output .output {
+    font-size: 12.5px;
+  }
+}
