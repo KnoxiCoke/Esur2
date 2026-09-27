@@ -1596,6 +1596,46 @@ body.emergency #hsr-tab-guidance > .card:nth-child(3) .seg__btn.active {
   border-color: rgba(212, 106, 114, 0.58);
 }
 
+.flow-severity-hint {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.flow-severity-hint__scope {
+  margin: 0 7px 5px;
+  font-size: 11px;
+}
+
+.flow-severity-hint__row {
+  display: grid;
+  grid-template-columns: minmax(68px, auto) minmax(0, 1fr);
+  gap: 7px;
+  padding: 6px 7px;
+  border-left: 2px solid transparent;
+  overflow-wrap: anywhere;
+}
+
+.flow-severity-hint__row + .flow-severity-hint__row {
+  border-top: 1px solid var(--border);
+}
+
+.flow-severity-hint__row.is-selected {
+  border-left-color: var(--accent);
+  background: var(--accent-faint);
+}
+
+body.emergency .flow-severity-hint__row.is-selected {
+  border-left-color: var(--danger);
+  background: var(--danger-faint);
+}
+
+.flow-severity-hint__label {
+  color: var(--text);
+  font-weight: 800;
+}
+
 /* Neutral output pane without touching script.js or adding medical logic. */
 #hsr-tab-guidance::before {
   content: "Select situation and severity";

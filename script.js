@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
       flow_subtitle: "Educational support for prior contrast media hypersensitivity reactions.",
       flow_step1: "Step 1 — Clinical situation",
       flow_step2: "Step 2 — Prior reaction severity",
+      flow_severity_scope: "Previous immediate hypersensitivity reaction in adults (ACR classification).",
+      flow_severity_mild_help: "Scattered urticaria/pruritus; limited cutaneous oedema; itchy/scratchy throat; nasal congestion; sneezing/conjunctivitis/rhinorrhoea.",
+      flow_severity_moderate_help: "Diffuse urticaria/pruritus; diffuse erythema with stable vital signs; facial oedema without dyspnoea; throat tightness/hoarseness without dyspnoea; mild wheezing/bronchospasm.",
+      flow_severity_severe_help: "Diffuse erythema with hypotension; diffuse/facial oedema with dyspnoea; laryngeal oedema with stridor; severe wheezing/bronchospasm with hypoxia; generalized anaphylactic reaction/shock; cardiopulmonary arrest.",
 
       flow_routing_note:
         "Educational support for prior immediate hypersensitivity reactions. For non-immediate reactions, use the NIHR module.",
@@ -503,6 +507,10 @@ arrest: [
       flow_subtitle: "Didaktische Orientierung bei früheren Hypersensitivitätsreaktionen auf Kontrastmittel.",
       flow_step1: "Schritt 1 — Klinische Situation",
       flow_step2: "Schritt 2 — Schweregrad der früheren Reaktion",
+      flow_severity_scope: "Frühere unmittelbare Hypersensitivitätsreaktion bei Erwachsenen (ACR-Klassifikation).",
+      flow_severity_mild_help: "Vereinzelte Urtikaria/Pruritus; begrenztes kutanes Ödem; Jucken/Kratzen im Hals; nasale Kongestion; Niesen/Konjunktivitis/Rhinorrhö.",
+      flow_severity_moderate_help: "Diffuse Urtikaria/Pruritus; diffuses Erythem bei stabilen Vitalzeichen; Gesichtsödem ohne Dyspnoe; Engegefühl im Hals oder Heiserkeit, jeweils ohne Dyspnoe; mildes Giemen/milder Bronchospasmus.",
+      flow_severity_severe_help: "Diffuses Erythem mit Hypotonie; diffuses Ödem oder Gesichtsödem, jeweils mit Dyspnoe; Larynxödem mit Stridor; schweres Giemen oder schwerer Bronchospasmus, jeweils mit Hypoxie; generalisierte anaphylaktische Reaktion/Schock; kardiopulmonaler Stillstand.",
 
       flow_routing_note:
         "Didaktische Orientierung bei früheren unmittelbaren Hypersensitivitätsreaktionen. Bei nicht unmittelbaren Reaktionen das NIHR-Modul verwenden.",
@@ -3242,10 +3250,18 @@ ${renderAcuteList(content.arrest)}
     hint.replaceChildren(rows);
   }
 
+  function renderFlowSeverityHint() {
+    const selected = document.querySelector('#hsr-tab-guidance .seg__btn[data-seg="reaction"].active')?.dataset.value;
+    document.querySelectorAll(".flow-severity-hint__row").forEach((row) => {
+      row.classList.toggle("is-selected", row.dataset.level === selected);
+    });
+  }
+
   function renderAll() {
   setBodyMode();
 
   applyStaticTranslations();
+  renderFlowSeverityHint();
   renderNihrSeverityHint();
   renderFlow();
   renderAcuteManagement();
