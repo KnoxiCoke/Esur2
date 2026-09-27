@@ -474,7 +474,8 @@ arrest: [
       changes_compare_mode_badge: "Compare",
       changes_action_mode_badge: "Action mode",
       changes_sources_label: "Sources",
-      changes_no_search_results: "No topics match this search."
+      changes_no_search_results: "No topics match this search.",
+      changes_compare_details_label: "Additional comparison details"
     },
 
     de: {
@@ -927,7 +928,8 @@ arrest: [
       changes_compare_mode_badge: "Vergleich",
       changes_action_mode_badge: "Action mode",
       changes_sources_label: "Quellen",
-      changes_no_search_results: "Keine Themen passen zu dieser Suche."
+      changes_no_search_results: "Keine Themen passen zu dieser Suche.",
+      changes_compare_details_label: "Weitere Vergleichsdetails"
     }
   };
 
@@ -3077,7 +3079,17 @@ ${renderAcuteList(content.arrest)}
     const firstTwo = primary.slice(0, 2);
     const remaining = primary.slice(2);
     const nested = (block.nested || []).length
-      ? `<div class="change-nested">${block.nested.map(renderNestedItem).join("")}</div>`
+      ? `
+        <details class="change-compare-details">
+          <summary class="change-compare-details__summary">
+            <span>${escapeHtml(t("changes_compare_details_label"))}</span>
+            ${iconSvg("chevron", "change-compare-details__chevron")}
+          </summary>
+          <div class="change-compare-details__body">
+            ${block.nested.map(renderNestedItem).join("")}
+          </div>
+        </details>
+      `
       : "";
 
     return `
