@@ -48,6 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.appendChild(tooltip);
 
   let active = null;
+  let activeKey = null;
+  let activeLang = null;
   let pinned = false;
   let scheduled = false;
 
@@ -92,11 +94,14 @@ document.addEventListener("DOMContentLoaded", () => {
       parts.push(document.createTextNode(value.slice(cursor, match.index)));
       const term = document.createElement("span");
       term.className = "abbr-term";
-      term.setAttribute("role", "button");
-      term.tabIndex = 0;
       term.dataset.abbr = match[0];
-      term.setAttribute("aria-label", `${match[0]}: ${expansions[language()][match[0]]}`);
-      term.setAttribute("aria-expanded", "false");
+      // Existing controls retain their own click and keyboard behavior.
+      if (!node.parentElement.closest("button")) {
+        term.setAttribute("role", "button");
+        term.tabIndex = 0;
+        term.setAttribute("aria-label", `${match[0]}: ${expansions[language()][match[0]]}`);
+        term.setAttribute("aria-expanded", "false");
+      }
       term.textContent = match[0];
       parts.push(term);
       cursor = pattern.lastIndex;
@@ -108,38 +113,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function close() {
     if (active) {
-      active.setAttribute("aria-expanded", "false");
+      if (active.matches("button")) active.removeAttribute("aria-expanded");
+      else active.setAttribute("aria-expanded", "false");
       active.removeAttribute("aria-describedby");
     }
     active = null;
+    activeKey = null;
+    activeLang = null;
     pinned = false;
     tooltip.hidden = true;
   }
 
   function place() {
     if (!active || !visible(active)) return close();
-    const box = active.getBoundingClientRect();
+    const anchor = active.matches("button")
+      ? active.querySelector(`.abbr-term[data-abbr="${activeKey}"]`) || active
+      : active;
+    const box = anchor.getBoundingClientRect();
     const width = tooltip.offsetWidth;
     const height = tooltip.offsetHeight;
     tooltip.style.left = `${Math.max(10, Math.min(window.innerWidth - width - 10, box.left + box.width / 2 - width / 2))}px`;
     tooltip.style.top = `${box.top >= height + 12 ? box.top - height - 7 : Math.min(window.innerHeight - height - 10, box.bottom + 7)}px`;
   }
 
-  function open(term, lock = false) {
-    if (active !== term) close();
-    active = term;
+  function open(anchor, key, lock = false) {
+    if (active !== anchor || activeKey !== key) close();
+    active = anchor;
+    activeKey = key;
+    activeLang = language();
     pinned = lock || pinned;
-    tooltip.textContent = expansions[language()][term.dataset.abbr];
+    tooltip.textContent = expansions[language()][key];
     tooltip.hidden = false;
-    term.setAttribute("aria-expanded", "true");
-    term.setAttribute("aria-describedby", tooltip.id);
+    anchor.setAttribute("aria-expanded", "true");
+    anchor.setAttribute("aria-describedby", tooltip.id);
     place();
   }
 
   function annotateVisible() {
     scheduled = false;
-    if (active && (!visible(active) ||
-        active.getAttribute("aria-label") !== `${active.dataset.abbr}: ${expansions[language()][active.dataset.abbr]}`)) close();
+    if (active && (!visible(active) || activeLang !== language())) close();
     for (const root of roots) {
       if (!visible(root)) continue;
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -165,21 +177,32 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", event => {
     const term = event.target.closest?.(".abbr-term");
     if (term) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (active === term && pinned) close();
-      else open(term, true);
+      const button = term.closest("button");
+      const anchor = button || term;
+      if (!button) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (active === anchor && activeKey === term.dataset.abbr && pinned) close();
+      else open(anchor, term.dataset.abbr, true);
+    } else if (event.detail === 0 && event.target.matches?.("button") &&
+               event.target.querySelector(".abbr-term")) {
+      const embedded = event.target.querySelector(".abbr-term");
+      open(event.target, embedded.dataset.abbr, true);
     } else if (!tooltip.contains(event.target)) close();
   }, true);
   document.addEventListener("mouseover", event => {
     const term = event.target.closest?.(".abbr-term");
-    if (term && !pinned) open(term);
+    if (term && !pinned) open(term.closest("button") || term, term.dataset.abbr);
   });
   document.addEventListener("mouseout", event => {
     if (active && !pinned && event.target === active && !active.contains(event.relatedTarget)) close();
   });
   document.addEventListener("focusin", event => {
-    if (event.target.matches?.(".abbr-term")) open(event.target);
+    const term = event.target.matches?.(".abbr-term")
+      ? event.target : event.target.matches?.("button")
+        ? event.target.querySelector(".abbr-term") : null;
+    if (term) open(term.closest("button") || term, term.dataset.abbr);
   });
   document.addEventListener("focusout", event => {
     if (event.target === active && !pinned) close();
@@ -189,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       event.stopPropagation();
       if (active === event.target && pinned) close();
-      else open(event.target, true);
+      else open(event.target, event.target.dataset.abbr, true);
     } else if (event.key === "Escape" && active) {
       event.preventDefault();
       close();
