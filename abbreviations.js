@@ -73,8 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!visible(parent)) return false;
     // The German Acute wording already explains resuscitation in context.
     if (key === "CPR" && language() === "de") return false;
-    // The NIHR module title already expands its own abbreviation.
-    if (key === "NIHR" && parent.closest('[data-i18n="nihr_title"]')) return false;
+    // The NIHR module title already expands its abbreviation for that module.
+    if (key === "NIHR" && parent.closest("#hsr-tab-nihr")) return false;
     const local = parent.closest("li, p, h1, h2, h3, .card__title, .seg__btn") || parent;
     if (local.textContent.toLocaleLowerCase().includes(expansions[language()][key].toLocaleLowerCase())) return false;
     return true;
