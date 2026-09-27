@@ -411,10 +411,7 @@ body.emergency .card--output .output li::marker {
   word-break: break-word;
 }
 
-#switchOutput .hint,
-#thyroidOutput .hint,
-#doseOutput .hint,
-#washoutOutput .hint {
+#switchOutput .hint {
   padding: 12px;
   border: 1px dashed var(--border-strong);
   border-radius: 14px;
@@ -424,10 +421,7 @@ body.emergency .card--output .output li::marker {
 #nihrOutput > div:first-child,
 #flowOutput > div:first-child,
 #switchOutput > div:first-child,
-#tryptaseOutput > div:first-child,
-#thyroidOutput > div:first-child,
-#doseOutput > div:first-child,
-#washoutOutput > div:first-child {
+#tryptaseOutput > div:first-child {
   font-size: 15px;
 }
 
