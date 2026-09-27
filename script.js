@@ -19,10 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
     lang: "en",
 
     // Practice Changes tab
-    changesFilter: "all",   // all | high | medium | low
     changesMode: "compare", // compare | action
     changesSearch: "",
-    openChanges: new Set()
+    selectedChangeId: null
   };
 
   const i18n = {
@@ -473,7 +472,9 @@ arrest: [
       changes_no_results:
         "No topics match the current filter. Try another search term or switch back to “All”.",
       changes_compare_mode_badge: "Compare",
-      changes_action_mode_badge: "Action mode"
+      changes_action_mode_badge: "Action mode",
+      changes_sources_label: "Sources",
+      changes_no_search_results: "No topics match this search."
     },
 
     de: {
@@ -924,7 +925,9 @@ arrest: [
       changes_no_results:
         "Keine Themen passen zum aktuellen Filter. Versuche einen anderen Suchbegriff oder stelle auf „Alle“ zurück.",
       changes_compare_mode_badge: "Vergleich",
-      changes_action_mode_badge: "Action mode"
+      changes_action_mode_badge: "Action mode",
+      changes_sources_label: "Quellen",
+      changes_no_search_results: "Keine Themen passen zu dieser Suche."
     }
   };
 
@@ -2987,17 +2990,16 @@ ${renderAcuteList(content.arrest)}
   function getVisibleChanges() {
     const search = state.changesSearch.trim().toLowerCase();
     return getChanges().filter((change) => {
-      const levelMatch = state.changesFilter === "all" || change.level === state.changesFilter;
-      if (!levelMatch) return false;
       if (!search) return true;
       return flattenChangeText(change).includes(search);
     });
   }
 
-  function renderChangeSection(section) {
+  function renderChangeSection(section, extraClass = "") {
     const classes = ["change-section"];
     if (section.variant === "action") classes.push("change-section--action");
     if (section.variant === "impact") classes.push("change-section--impact");
+    if (extraClass) classes.push(extraClass);
 
     const paragraphs = (section.paragraphs || [])
       .map((p) => `<p>${escapeHtml(p)}</p>`)
@@ -3008,154 +3010,184 @@ ${renderAcuteList(content.arrest)}
       : "";
 
     return `
-      <div class="${classes.join(" ")}">
+      <section class="${classes.join(" ")}">
         <div class="change-section__label">${escapeHtml(section.label)}</div>
         <div class="change-section__content">
           ${paragraphs}
           ${bullets}
         </div>
-      </div>
+      </section>
     `;
   }
 
   function renderNestedItem(item) {
     return `
-      <div class="change-nested__item">
-        <div class="change-nested__head">
-          <div class="change-nested__title">${escapeHtml(item.title)}</div>
-        </div>
+      <details class="change-nested__item">
+        <summary class="change-nested__head">
+          <span class="change-nested__title">${escapeHtml(item.title)}</span>
+          ${iconSvg("chevron", "change-nested__chevron")}
+        </summary>
         <div class="change-nested__body">
-          ${(item.sections || []).map(renderChangeSection).join("")}
+          ${(item.sections || []).map((section) => renderChangeSection(section)).join("")}
         </div>
-      </div>
+      </details>
     `;
   }
 
   function renderRefs(refs) {
+    if (!(refs || []).length) return "";
     return `
-      <div class="change-card__refs">
-        ${(refs || []).map((ref) => `<span class="change-ref">${escapeHtml(ref)}</span>`).join("")}
-      </div>
+      <details class="change-sources">
+        <summary class="change-sources__summary">
+          <span>${escapeHtml(t("changes_sources_label"))}</span>
+          ${iconSvg("chevron", "change-sources__chevron")}
+        </summary>
+        <div class="change-card__refs">
+          ${refs.map((ref) => `<span class="change-ref">${escapeHtml(ref)}</span>`).join("")}
+        </div>
+      </details>
     `;
   }
 
-  function renderChangeBody(change) {
-    const block = state.changesMode === "action" ? change.action : change.compare;
-    const sections = (block.sections || []).map(renderChangeSection).join("");
+  function renderChangeTopic(change) {
+    const isSelected = change.id === state.selectedChangeId;
+    return `
+      <button
+        class="change-topic ${isSelected ? "active" : ""}"
+        type="button"
+        data-change-topic="${escapeHtml(change.id)}"
+        aria-current="${isSelected ? "true" : "false"}"
+      >
+        <span class="change-topic__icon">${iconSvg(change.icon, "change-topic__svg")}</span>
+        <span class="change-topic__title">${escapeHtml(change.title)}</span>
+        <span
+          class="change-topic__level change-topic__level--${escapeHtml(change.level)}"
+          title="${escapeHtml(levelLabel(change.level))}"
+          aria-label="${escapeHtml(levelLabel(change.level))}"
+        ></span>
+      </button>
+    `;
+  }
+
+  function renderCompareBody(change) {
+    const block = change.compare || {};
+    const sections = block.sections || [];
+    const primary = sections.filter((section) => section.variant !== "impact");
+    const impact = sections.filter((section) => section.variant === "impact");
+    const firstTwo = primary.slice(0, 2);
+    const remaining = primary.slice(2);
     const nested = (block.nested || []).length
       ? `<div class="change-nested">${block.nested.map(renderNestedItem).join("")}</div>`
       : "";
 
     return `
-      <div class="change-card__body" ${state.openChanges.has(change.id) ? "" : "hidden"}>
-        ${sections}
-        ${nested}
-        ${renderRefs(block.refs || [])}
+      <div class="change-compare-grid">
+        ${firstTwo.map((section) => renderChangeSection(section, "change-section--compare")).join("")}
       </div>
+      ${remaining.map((section) => renderChangeSection(section)).join("")}
+      ${impact.map((section) => renderChangeSection(section, "change-section--impact-full")).join("")}
+      ${nested}
+      ${renderRefs(block.refs || [])}
     `;
   }
 
-  function renderChangeSummary(change) {
+  function renderActionBody(change) {
+    const block = change.action || {};
+    const sections = (block.sections || []).map((section) => renderChangeSection(section)).join("");
+    const nested = (block.nested || []).length
+      ? `<div class="change-nested">${block.nested.map(renderNestedItem).join("")}</div>`
+      : "";
+
     return `
-      <article class="change-summary" data-change-summary="${escapeHtml(change.id)}">
-        <div class="change-summary__top">
-          <div class="change-summary__titlewrap">
-            <div class="change-summary__titleline">
-              ${iconSvg(change.icon, "change-summary__icon")}
-              <div class="change-summary__title">${escapeHtml(change.title)}</div>
+      ${sections}
+      ${nested}
+      ${renderRefs(block.refs || [])}
+    `;
+  }
+
+  function renderChangeDetail(change) {
+    const body = state.changesMode === "action"
+      ? renderActionBody(change)
+      : renderCompareBody(change);
+
+    return `
+      <article class="change-detail-card" data-change-card="${escapeHtml(change.id)}">
+        <header class="change-detail__header">
+          <div class="change-detail__titleline">
+            ${iconSvg(change.icon, "change-detail__icon")}
+            <div>
+              <h2 class="change-detail__title">${escapeHtml(change.title)}</h2>
+              <p class="change-detail__summary">${escapeHtml(change.summary)}</p>
             </div>
-            <span class="change-pill change-pill--${escapeHtml(change.level)}">${escapeHtml(levelLabel(change.level))}</span>
           </div>
+        </header>
+
+        <div class="change-detail__mode" role="group" aria-label="${escapeHtml(t("changes_mode_label"))}">
+          <button
+            class="change-detail__mode-btn ${state.changesMode === "compare" ? "active" : ""}"
+            type="button"
+            data-change-mode="compare"
+          >${escapeHtml(t("changes_mode_compare"))}</button>
+          <button
+            class="change-detail__mode-btn ${state.changesMode === "action" ? "active" : ""}"
+            type="button"
+            data-change-mode="action"
+          >${escapeHtml(t("changes_mode_action"))}</button>
         </div>
-        <div class="change-summary__text">${escapeHtml(change.summary)}</div>
-        <button class="change-summary__jump" type="button" data-change-open="${escapeHtml(change.id)}">${escapeHtml(t("changes_open"))}</button>
-      </article>
-    `;
-  }
 
-  function renderChangeCard(change) {
-    const isOpen = state.openChanges.has(change.id);
-    return `
-      <article class="change-card ${isOpen ? "is-open" : ""}" id="change-card-${escapeHtml(change.id)}" data-change-card="${escapeHtml(change.id)}">
-        <button class="change-card__header" type="button" data-change-toggle="${escapeHtml(change.id)}" aria-expanded="${isOpen ? "true" : "false"}">
-          <div class="change-card__titlewrap">
-            <div class="change-card__titleline">
-              ${iconSvg(change.icon, "change-card__icon")}
-              <div class="change-card__title">${escapeHtml(change.title)}</div>
-            </div>
-            <div class="change-card__meta">
-              <span class="change-pill change-pill--${escapeHtml(change.level)}">${escapeHtml(levelLabel(change.level))}</span>
-              <span class="change-pill change-pill--mode">${escapeHtml(modeLabel(state.changesMode))}</span>
-            </div>
-          </div>
-          ${iconSvg("chevron", "change-card__chevron")}
-        </button>
-        ${renderChangeBody(change)}
+        <div class="change-detail__body">
+          ${body}
+        </div>
       </article>
     `;
   }
 
   function updateChangeControlButtons() {
-    document.querySelectorAll("[data-change-filter]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.changeFilter === state.changesFilter);
-    });
-
-    document.querySelectorAll("[data-change-mode]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.changeMode === state.changesMode);
-    });
-
     if (changesSearchInput && changesSearchInput.value !== state.changesSearch) {
       changesSearchInput.value = state.changesSearch;
     }
   }
 
   function attachChangeEvents() {
-    document.querySelectorAll("[data-change-toggle]").forEach((btn) => {
+    document.querySelectorAll("[data-change-topic]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const id = btn.dataset.changeToggle;
-        if (state.openChanges.has(id)) {
-          state.openChanges.delete(id);
-        } else {
-          state.openChanges.add(id);
-        }
+        state.selectedChangeId = btn.dataset.changeTopic;
         renderChanges();
       });
     });
 
-    document.querySelectorAll("[data-change-open]").forEach((btn) => {
+    document.querySelectorAll("[data-change-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const id = btn.dataset.changeOpen;
-        state.openChanges.add(id);
+        state.changesMode = btn.dataset.changeMode;
         renderChanges();
-
-        requestAnimationFrame(() => {
-          const target = document.getElementById(`change-card-${id}`);
-          if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        });
       });
     });
   }
 
   function renderChanges() {
-  if (!changesSummaryGrid || !changesList) return;
+    if (!changesSummaryGrid || !changesList) return;
 
-  updateChangeControlButtons();
-  changesSummaryGrid.innerHTML = "";
+    updateChangeControlButtons();
 
-  const visible = getVisibleChanges();
+    const visible = getVisibleChanges();
 
-  if (!visible.length) {
-    const empty = `<div class="change-empty">${escapeHtml(t("changes_no_results"))}</div>`;
-    changesList.innerHTML = empty;
-    return;
+    if (!visible.length) {
+      changesSummaryGrid.innerHTML = "";
+      changesList.innerHTML = `<div class="change-empty">${escapeHtml(t("changes_no_search_results"))}</div>`;
+      return;
+    }
+
+    if (!state.selectedChangeId || !visible.some((change) => change.id === state.selectedChangeId)) {
+      state.selectedChangeId = visible[0].id;
+    }
+
+    const selected = visible.find((change) => change.id === state.selectedChangeId) || visible[0];
+
+    changesSummaryGrid.innerHTML = visible.map(renderChangeTopic).join("");
+    changesList.innerHTML = renderChangeDetail(selected);
+
+    attachChangeEvents();
   }
-
-  changesList.innerHTML = visible.map(renderChangeCard).join("");
-
-  attachChangeEvents();
-}
 
   function renderAll() {
   setBodyMode();
@@ -3205,10 +3237,9 @@ ${renderAcuteList(content.arrest)}
 
 
 
-    state.changesFilter = "all";
     state.changesMode = "compare";
     state.changesSearch = "";
-    state.openChanges = new Set();
+    state.selectedChangeId = null;
 
     document.body.classList.remove("emergency");
 
@@ -3239,14 +3270,6 @@ ${renderAcuteList(content.arrest)}
 
     document.querySelectorAll(".bottomnav__btn").forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.mainNav === "hsr");
-    });
-
-    document.querySelectorAll("[data-change-filter]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.changeFilter === "all");
-    });
-
-    document.querySelectorAll("[data-change-mode]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.changeMode === "compare");
     });
 
     const idsToClear = [
@@ -3343,21 +3366,7 @@ if (stickyDisclaimer) {
     });
   });
 
-  // Practice Changes controls
-  document.querySelectorAll("[data-change-filter]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.changesFilter = btn.dataset.changeFilter;
-      renderChanges();
-    });
-  });
-
-  document.querySelectorAll("[data-change-mode]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.changesMode = btn.dataset.changeMode;
-      renderChanges();
-    });
-  });
-
+  // Practice Changes search; topic and local mode controls are attached after each render.
   if (changesSearchInput) {
     changesSearchInput.addEventListener("input", (event) => {
       state.changesSearch = event.target.value || "";
