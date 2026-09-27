@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ESUR UI prototype — Previous reaction</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --bg-2: #101a2c;
+      --panel: #121c2e;
+      --line: rgba(148, 176, 214, 0.16);
+      --text: #e8eef8;
+      --muted: #93a4bd;
+      --accent: #4cc4e0;
+      --accent-2: #7ad7ea;
+      --warn: #f0b4b8;
+      --ok: #8fd3b0;
+      --max: 1160px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 "Segoe UI", system-ui, sans-serif; }
+    a { color: inherit; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px 48px; }
+    header.app {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(11,18,32,.92); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .app-inner { max-width: var(--max); margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 18px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 650; letter-spacing: .01em; }
+    .mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(180deg, #4cc4e0, #2a7d99); }
+    nav.top { display: flex; gap: 6px; }
+    nav.top button {
+      background: none; border: 0; color: var(--muted); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;
+    }
+    nav.top button.on { color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+    .right { margin-left: auto; display: flex; gap: 8px; }
+    .chip, .reset {
+      border: 1px solid var(--line); background: #152238; color: var(--text);
+      border-radius: 999px; padding: 6px 10px; cursor: pointer; font-size: 13px;
+    }
+    .chip.on { background: #1d3a52; border-color: #3d7a96; }
+    .banner {
+      background: #2a161c; color: #f3d4d6; font-size: 13px;
+      padding: 8px 20px; border-bottom: 1px solid #3a2228;
+    }
+    .banner b { color: #ffd6d8; }
+    h1 { font-size: 32px; margin: 22px 0 6px; letter-spacing: -.02em; }
+    .lede { color: var(--muted); margin: 0 0 18px; }
+    .tabs {
+      display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line);
+      border-radius: 14px; background: #0e1726; margin-bottom: 18px; overflow-x: auto;
+    }
+    .tabs button {
+      border: 0; background: transparent; color: var(--muted); padding: 9px 14px;
+      border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 600;
+    }
+    .tabs button.on { background: #1a2c44; color: var(--text); }
+    .grid { display: grid; grid-template-columns: 300px 1fr; gap: 16px; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+    .col { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .hint { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+    .step { font-size: 11px; letter-spacing: .08em; color: #8aa0bc; font-weight: 700; margin: 14px 0 8px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pick {
+      flex: 1; min-width: 90px; border: 1px solid var(--line); background: #0f1a2b;
+      color: var(--text); border-radius: 12px; padding: 10px 8px; cursor: pointer; font-weight: 650;
+    }
+    .pick.on { background: #1b3a55; border-color: #4aa3c2; box-shadow: inset 0 0 0 1px #4aa3c2; }
+    .result { border-color: rgba(76,196,224,.28); }
+    .kicker { font-size: 11px; letter-spacing: .1em; color: var(--accent-2); font-weight: 700; margin: 0 0 6px; }
+    .case { font-size: 18px; margin: 0 0 14px; }
+    .empty {
+      min-height: 280px; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 24px;
+    }
+    .empty strong { display: block; color: var(--text); font-size: 18px; margin-bottom: 6px; }
+    ol.acts { margin: 0; padding: 0; list-style: none; }
+    ol.acts li {
+      position: relative; padding: 11px 0 11px 16px; border-top: 1px solid var(--line);
+    }
+    ol.acts li:first-child { border-top: 0; }
+    ol.acts li::before {
+      content: ""; position: absolute; left: 0; top: 18px; width: 6px; height: 6px;
+      border-radius: 50%; background: var(--accent);
+    }
+    .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    @media (max-width: 860px) { .notes { grid-template-columns: 1fr; } }
+    .note { color: var(--muted); font-size: 13px; }
+    .note b { display: block; color: #c5d4e8; margin-bottom: 4px; }
+    .changes { margin-top: 22px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px;
+    }
+    .tag { font-size: 11px; color: #9fb4ce; letter-spacing: .06em; }
+    .proto { margin: 10px 20px 0; color: #7f93ad; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <p class="proto">Design prototype only · medical strings copied from current tool · not Esur22 / not approved</p>
+  <header class="app">
+    <div class="app-inner">
+      <div class="brand"><span class="mark"></span> Radiology Contrast & Safety App</div>
+      <nav class="top">
+        <button class="on" type="button">HSR</button>
+        <button type="button">Practice Changes</button>
+      </nav>
+      <div class="right">
+        <button class="chip on" type="button">EN</button>
+        <button class="chip" type="button">DE</button>
+        <button class="reset" type="button" id="reset">Reset</button>
+      </div>
+    </div>
+  </header>
+  <div class="banner"><b>Educational tool. Follow local protocols.</b> Information only. Clinical decisions should follow local protocols, source documents and clinical judgement. No patient data are stored.</div>
+  <div class="wrap">
+    <div class="tag">HSR</div>
+    <h1>Previous reaction</h1>
+    <p class="lede">Previous-reaction planning, acute management, empiric switch support, tryptase interpretation and NIHR decision support.</p>
+    <div class="tabs">
+      <button class="on" type="button">Previous reaction</button>
+      <button type="button">Acute management</button>
+      <button type="button">Switch</button>
+      <button type="button">Tryptase</button>
+      <button type="button">NIHR</button>
+    </div>
+    <div class="grid">
+      <section class="col">
+        <p class="hint">Educational support for prior immediate hypersensitivity reactions. For non-immediate reactions, use the NIHR module.</p>
+        <div class="step">STEP 1 — CLINICAL SITUATION</div>
+        <div class="row">
+          <button class="pick" id="el" type="button">Elective</button>
+          <button class="pick" id="em" type="button">Emergency</button>
+        </div>
+        <div class="step">STEP 2 — PRIOR REACTION SEVERITY</div>
+        <div class="row">
+          <button class="pick" id="mi" type="button">Mild</button>
+          <button class="pick" id="mo" type="button">Moderate</button>
+          <button class="pick" id="se" type="button">Severe</button>
+        </div>
+      </section>
+      <section class="col result" id="out"></section>
+    </div>
+    <section class="changes">
+      <div class="card">
+        <div class="tag">PRACTICE CHANGES · excerpt</div>
+        <h2 style="margin:8px 0 6px;font-size:20px;">Hypersensitivity</h2>
+        <p class="hint" style="margin:0;">Layout sample only. Wording stays on the controlled Esur22 objects and is not edited here.</p>
+      </div>
+    </section>
+  </div>
+  <script>
+    const sit = { el: false, em: false };
+    const sev = { mi: false, mo: false, se: false };
+    const out = document.getElementById("out");
+    function one(map, key, group) {
+      Object.keys(map).forEach(k => map[k] = false);
+      map[key] = true;
+      group.forEach(id => document.getElementById(id).classList.toggle("on", map[id]));
+      render();
+    }
+    ["el","em"].forEach(id => document.getElementById(id).onclick = () => one(sit, id, ["el","em"]));
+    ["mi","mo","se"].forEach(id => document.getElementById(id).onclick = () => one(sev, id, ["mi","mo","se"]));
+    document.getElementById("reset").onclick = () => {
+      Object.keys(sit).forEach(k => sit[k] = false);
+      Object.keys(sev).forEach(k => sev[k] = false);
+      ["el","em","mi","mo","se"].forEach(id => document.getElementById(id).classList.remove("on"));
+      render();
+    };
+    function render() {
+      const s = sit.el ? "Elective" : sit.em ? "Emergency" : null;
+      const v = sev.mi ? "mild" : sev.mo ? "moderate" : sev.se ? "severe" : null;
+      if (!s || !v) {
+        out.innerHTML = `<div class="empty"><div><strong>Select situation and severity</strong>The pathway appears only after both steps are chosen.</div></div>`;
+        return;
+      }
+      out.innerHTML = `
+        <p class="kicker">PATHWAY</p>
+        <h2 class="case">${s} imaging — prior ${v} immediate hypersensitivity reaction</h2>
+        <ol class="acts">
+          <li>Refer the patient to a drug allergy specialist (if not done before).</li>
+          <li>Optimize the allergy registration in the electronic health record.</li>
+          <li>Postpone imaging to wait for the results of the allergy analysis.</li>
+          <li>Apply the advice of the drug allergy specialist for a safe iodine-based contrast medium or gadolinium-based contrast agent.</li>
+          <li>When the contrast medium is administered, observe the patient for at least 30 min with the IV line in place.</li>
+          <li>Be prepared and vigilant for a recurring immediate hypersensitivity reaction.</li>
+          <li>If an immediate hypersensitivity reaction recurs, referral to a drug allergy specialist is mandatory.</li>
+          <li>Consider an alternative imaging modality, or consider performing an unenhanced exam if the diagnostic yield is sufficient for the correct management of the patient.</li>
+          <li>Never deny a patient a clinically well-indicated enhanced examination if alternative imaging strategies are not available.</li>
+        </ol>
+        <div class="notes">
+          <div class="note"><b>Referral & documentation</b>When referring the patient to a drug allergy specialist, always specify the used contrast medium. Detailed documentation of the culprit contrast agent and the severity of the reaction, including a grading scheme, is mandatory.</div>
+          <div class="note"><b>Safety net</b>Acute hypersensitivity reactions should be managed according to local protocols and ESUR acute management guidance.</div>
+        </div>`;
+    }
+    render();
+  </script>
+</body>
+</html>
