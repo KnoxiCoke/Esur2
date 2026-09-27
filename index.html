@@ -35,6 +35,7 @@
   <!-- HSR MAIN VIEW -->
   <section class="view" id="view-hsr">
     <h1 class="h1" data-i18n="hsr_title">HSR</h1>
+    <div class="abbr-slot abbr-slot--lead" id="hsrCoreAbbreviations"></div>
     <p class="p-muted" data-i18n="hsr_subtitle">
       Previous-reaction planning, acute management, empiric switch support, tryptase interpretation and NIHR decision support.
     </p>
@@ -76,6 +77,7 @@
         <div class="card__title" data-i18n="recommendation">Recommendation</div>
         <div class="output" id="flowOutput"></div>
       </div>
+      <div class="abbr-slot" id="previousAbbreviations"></div>
 
       <div class="card card--subtle">
         <div class="card__title" data-i18n="hsr_referral_title">Referral & documentation</div>
@@ -131,6 +133,7 @@
         <div class="card__title" data-i18n="acute_output_title">ESUR acute management</div>
         <div class="output" id="acuteOutput"></div>
       </div>
+      <div class="abbr-slot" id="acuteAbbreviations"></div>
     </section>
 
     <!-- HSR: SWITCH -->
@@ -138,6 +141,7 @@
       <div class="card card--subtle">
         <div class="output hint" id="switchNonvalidated"></div>
       </div>
+      <div class="abbr-slot" id="switchAbbreviations"></div>
 
       <div class="card">
         <div class="card__title" data-i18n="contrast_type">Contrast type</div>
@@ -245,6 +249,7 @@
           For a previous non-immediate hypersensitivity reaction to an iodine-based contrast medium or a gadolinium-based contrast agent when re-administration is being considered.
         </div>
       </div>
+      <div class="abbr-slot" id="nihrAbbreviations"></div>
 
       <div class="card card--subtle">
         <div class="card__title" data-i18n="hsr_referral_title">Referral & documentation</div>

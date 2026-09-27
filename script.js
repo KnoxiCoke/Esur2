@@ -933,6 +933,95 @@ arrest: [
     }
   };
 
+  const abbreviationUi = {
+    en: {
+      label: "Abbreviations",
+      organizations: [
+        ["ESUR", "European Society of Urogenital Radiology"],
+        ["CMSC", "Contrast Media Safety Committee"]
+      ],
+      hsrCore: [
+        ["IHR", "immediate hypersensitivity reaction"],
+        ["NIHR", "non-immediate hypersensitivity reaction"]
+      ],
+      switch: [
+        ["ICM", "iodine-based contrast medium"],
+        ["GBCA", "gadolinium-based contrast agent"]
+      ],
+      previous: [
+        ["EAACI", "European Association of Allergy & Clinical Immunology"]
+      ],
+      acute: [
+        ["CPR", "cardiopulmonary resuscitation"]
+      ],
+      nihr: [
+        ["ICM", "iodine-based contrast medium"],
+        ["GBCA", "gadolinium-based contrast agent"],
+        ["SCAR", "severe cutaneous adverse reaction"]
+      ],
+      changes: {
+        hypersensitivity: [
+          ["ACR", "American College of Radiology"],
+          ["SCAR", "severe cutaneous adverse reaction"]
+        ],
+        waiting_times: [
+          ["eGFR", "estimated glomerular filtration rate"]
+        ],
+        dialysis_refinement: [
+          ["NSF", "nephrogenic systemic fibrosis"]
+        ],
+        new_clinical_scenarios: [
+          ["HSG", "hysterosalpingography"],
+          ["PAD", "peripheral arterial disease"],
+          ["EVAR", "endovascular aneurysm repair"]
+        ]
+      }
+    },
+    de: {
+      label: "Abkürzungen",
+      organizations: [
+        ["ESUR", "European Society of Urogenital Radiology"],
+        ["CMSC", "Contrast Media Safety Committee"]
+      ],
+      hsrCore: [
+        ["IHR", "unmittelbare Hypersensitivitätsreaktion"],
+        ["NIHR", "nicht unmittelbare Hypersensitivitätsreaktion"]
+      ],
+      switch: [
+        ["ICM", "iodhaltiges Kontrastmittel"],
+        ["GBCA", "gadoliniumbasiertes Kontrastmittel"]
+      ],
+      previous: [
+        ["EAACI", "European Association of Allergy & Clinical Immunology"]
+      ],
+      acute: [
+        ["CPR", "kardiopulmonale Reanimation"]
+      ],
+      nihr: [
+        ["ICM", "iodhaltiges Kontrastmittel"],
+        ["GBCA", "gadoliniumbasiertes Kontrastmittel"],
+        ["SCAR", "schwere kutane unerwünschte Reaktion"]
+      ],
+      changes: {
+        hypersensitivity: [
+          ["ACR", "American College of Radiology"],
+          ["SCAR", "schwere kutane unerwünschte Reaktion"]
+        ],
+        waiting_times: [
+          ["eGFR", "errechnete glomeruläre Filtrationsrate"]
+        ],
+        dialysis_refinement: [
+          ["NSF", "nephrogene systemische Fibrose"]
+        ],
+        new_clinical_scenarios: [
+          ["HSG", "Hysterosalpingographie"],
+          ["PAD", "peripheral arterial disease"],
+          ["EVAR", "endovascular aneurysm repair"]
+        ]
+      }
+    }
+  };
+
   const changesLibrary = {
     en: [
       {
@@ -2418,6 +2507,43 @@ arrest: [
       .replace(/'/g, "&#039;");
   }
 
+  function abbreviationConfig() {
+    return abbreviationUi[state.lang] || abbreviationUi.en;
+  }
+
+  function renderAbbreviationDisclosure(items, extraClass = "") {
+    if (!items || !items.length) return "";
+    const config = abbreviationConfig();
+    const cls = extraClass ? ` abbr-disclosure--${escapeHtml(extraClass)}` : "";
+
+    return `
+      <details class="abbr-disclosure${cls}">
+        <summary class="abbr-disclosure__summary">${escapeHtml(config.label)}</summary>
+        <dl class="abbr-disclosure__list">
+          ${items.map(([abbr, expansion]) => `
+            <div class="abbr-disclosure__row">
+              <dt>${escapeHtml(abbr)}</dt>
+              <dd>${escapeHtml(expansion)}</dd>
+            </div>
+          `).join("")}
+        </dl>
+      </details>
+    `;
+  }
+
+  function setAbbreviationDisclosure(id, items) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = renderAbbreviationDisclosure(items);
+  }
+
+  function renderChangeAbbreviations(change) {
+    const items = abbreviationConfig().changes?.[change.id] || [];
+    return items.length
+      ? `<div class="abbr-slot abbr-slot--change">${renderAbbreviationDisclosure(items, "change")}</div>`
+      : "";
+  }
+
   function fmt(value, digits = 2) {
     return Number(value).toFixed(digits);
   }
@@ -2533,6 +2659,16 @@ arrest: [
 
     const stickyDisclaimer = document.getElementById("stickyDisclaimer");
     if (stickyDisclaimer) {
+      let organizations = stickyDisclaimer.querySelector('[data-ui-abbr="organizations"]');
+      if (!organizations) {
+        organizations = document.createElement("span");
+        organizations.setAttribute("data-ui-abbr", "organizations");
+        stickyDisclaimer.appendChild(organizations);
+      }
+      organizations.textContent = abbreviationConfig().organizations
+        .map(([abbr, expansion]) => `${expansion} (${abbr})`)
+        .join(" · ");
+
       let extra = stickyDisclaimer.querySelector('[data-i18n="disclaimer_line3"]');
       if (!extra) {
         extra = document.createElement("span");
@@ -2541,6 +2677,13 @@ arrest: [
       }
       extra.textContent = t("disclaimer_line3");
     }
+
+    const abbr = abbreviationConfig();
+    setAbbreviationDisclosure("hsrCoreAbbreviations", abbr.hsrCore);
+    setAbbreviationDisclosure("previousAbbreviations", abbr.previous);
+    setAbbreviationDisclosure("acuteAbbreviations", abbr.acute);
+    setAbbreviationDisclosure("switchAbbreviations", abbr.switch);
+    setAbbreviationDisclosure("nihrAbbreviations", abbr.nihr);
 
     const setText = (id, value) => {
       const el = document.getElementById(id);
@@ -3133,6 +3276,8 @@ ${renderAcuteList(content.arrest)}
             </div>
           </div>
         </header>
+
+        ${renderChangeAbbreviations(change)}
 
         <div class="change-detail__mode" role="group" aria-label="${escapeHtml(t("changes_mode_label"))}">
           <button
