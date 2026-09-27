@@ -2717,3 +2717,40 @@ html[lang="de"] #hsr-tab-nihr::before {
     font-size: 12.5px;
   }
 }
+
+
+/* UI PHASE 2B — SPECIFICITY GUARD
+   Ensure the unified workspace overrides the earlier generic non-guidance card rule. */
+#view-hsr #hsr-tab-acute > .card,
+#view-hsr #hsr-tab-switch > .card,
+#view-hsr #hsr-tab-tryptase > .card,
+#view-hsr #hsr-tab-nihr > .card {
+  margin: 0;
+  box-shadow: none;
+}
+
+#view-hsr #hsr-tab-acute > .card:not(.card--output),
+#view-hsr #hsr-tab-switch > .card:not(.card--output),
+#view-hsr #hsr-tab-tryptase > .card:not(.card--output),
+#view-hsr #hsr-tab-nihr > .card:not(.card--output) {
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+}
+
+#view-hsr #hsr-tab-acute > .card--output,
+#view-hsr #hsr-tab-switch > .card--output,
+#view-hsr #hsr-tab-tryptase > .card--output,
+#view-hsr #hsr-tab-nihr > .card--output {
+  border: 1px solid rgba(76, 196, 224, 0.25);
+  border-left: 3px solid rgba(76, 196, 224, 0.82);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(76, 196, 224, 0.055), rgba(76, 196, 224, 0.012) 46%),
+    rgba(10, 19, 32, 0.72);
+}
+
+#view-hsr #hsr-tab-switch > .card:nth-child(6),
+#view-hsr #hsr-tab-nihr > .card:nth-child(2) {
+  border-top: 1px solid var(--border);
+}
