@@ -940,10 +940,6 @@ arrest: [
         ["ESUR", "European Society of Urogenital Radiology"],
         ["CMSC", "Contrast Media Safety Committee"]
       ],
-      hsrCore: [
-        ["IHR", "immediate hypersensitivity reaction"],
-        ["NIHR", "non-immediate hypersensitivity reaction"]
-      ],
       switch: [
         ["ICM", "iodine-based contrast medium"],
         ["GBCA", "gadolinium-based contrast agent"]
@@ -953,6 +949,9 @@ arrest: [
       ],
       acute: [
         ["CPR", "cardiopulmonary resuscitation"]
+      ],
+      tryptase: [
+        ["IHR", "immediate hypersensitivity reaction"]
       ],
       nihr: [
         ["ICM", "iodine-based contrast medium"],
@@ -983,10 +982,6 @@ arrest: [
         ["ESUR", "European Society of Urogenital Radiology"],
         ["CMSC", "Contrast Media Safety Committee"]
       ],
-      hsrCore: [
-        ["IHR", "unmittelbare Hypersensitivitätsreaktion"],
-        ["NIHR", "nicht unmittelbare Hypersensitivitätsreaktion"]
-      ],
       switch: [
         ["ICM", "iodhaltiges Kontrastmittel"],
         ["GBCA", "gadoliniumbasiertes Kontrastmittel"]
@@ -994,8 +989,9 @@ arrest: [
       previous: [
         ["EAACI", "European Association of Allergy & Clinical Immunology"]
       ],
-      acute: [
-        ["CPR", "kardiopulmonale Reanimation"]
+      acute: [],
+      tryptase: [
+        ["IHR", "unmittelbare Hypersensitivitätsreaktion"]
       ],
       nihr: [
         ["ICM", "iodhaltiges Kontrastmittel"],
@@ -2531,17 +2527,93 @@ arrest: [
     `;
   }
 
-  function setAbbreviationDisclosure(id, items) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = renderAbbreviationDisclosure(items);
+  function isAsciiAlphaNumeric(char) {
+    return Boolean(char && /[A-Za-z0-9]/.test(char));
   }
 
-  function renderChangeAbbreviations(change) {
-    const items = abbreviationConfig().changes?.[change.id] || [];
-    return items.length
-      ? `<div class="abbr-slot abbr-slot--change">${renderAbbreviationDisclosure(items, "change")}</div>`
-      : "";
+  function containsAbbreviation(text, abbreviation) {
+    let index = text.indexOf(abbreviation);
+
+    while (index !== -1) {
+      const before = index > 0 ? text[index - 1] : "";
+      const afterIndex = index + abbreviation.length;
+      const after = afterIndex < text.length ? text[afterIndex] : "";
+
+      if (!isAsciiAlphaNumeric(before) && !isAsciiAlphaNumeric(after)) return true;
+      index = text.indexOf(abbreviation, index + abbreviation.length);
+    }
+
+    return false;
+  }
+
+  function renderedTextWithoutClosedDetails(target) {
+    if (!target || target.closest("[hidden]")) return "";
+
+    const clone = target.cloneNode(true);
+    clone.querySelectorAll(".abbr-slot").forEach((el) => el.remove());
+    clone.querySelectorAll("[hidden]").forEach((el) => el.remove());
+    clone.querySelectorAll("details:not([open])").forEach((details) => {
+      Array.from(details.children).forEach((child) => {
+        if (child.tagName !== "SUMMARY") child.remove();
+      });
+    });
+
+    return (clone.textContent || "").replace(/\s+/g, " ").trim();
+  }
+
+  function setContextualAbbreviationDisclosure(slotId, target, candidates, extraClass = "") {
+    const slot = document.getElementById(slotId);
+    if (!slot) return;
+
+    slot.innerHTML = "";
+    if (!target || target.closest("[hidden]") || !candidates || !candidates.length) return;
+
+    const visibleText = renderedTextWithoutClosedDetails(target);
+    const items = candidates.filter(([abbr]) => containsAbbreviation(visibleText, abbr));
+    slot.innerHTML = renderAbbreviationDisclosure(items, extraClass);
+  }
+
+  function updateContextualAbbreviations() {
+    const config = abbreviationConfig();
+
+    setContextualAbbreviationDisclosure(
+      "previousAbbreviations",
+      document.getElementById("hsr-tab-guidance"),
+      config.previous
+    );
+
+    setContextualAbbreviationDisclosure(
+      "acuteAbbreviations",
+      document.getElementById("hsr-tab-acute"),
+      state.lang === "en" ? config.acute : []
+    );
+
+    setContextualAbbreviationDisclosure(
+      "switchAbbreviations",
+      document.getElementById("hsr-tab-switch"),
+      config.switch
+    );
+
+    setContextualAbbreviationDisclosure(
+      "tryptaseAbbreviations",
+      document.getElementById("hsr-tab-tryptase"),
+      config.tryptase
+    );
+
+    setContextualAbbreviationDisclosure(
+      "nihrAbbreviations",
+      document.getElementById("hsr-tab-nihr"),
+      config.nihr
+    );
+
+    const changeCard = document.querySelector(".change-detail-card");
+    const changeCandidates = config.changes?.[state.selectedChangeId] || [];
+    setContextualAbbreviationDisclosure(
+      "changeAbbreviations",
+      changeCard,
+      changeCandidates,
+      "change"
+    );
   }
 
   function fmt(value, digits = 2) {
@@ -2678,13 +2750,6 @@ arrest: [
       extra.textContent = t("disclaimer_line3");
     }
 
-    const abbr = abbreviationConfig();
-    setAbbreviationDisclosure("hsrCoreAbbreviations", abbr.hsrCore);
-    setAbbreviationDisclosure("previousAbbreviations", abbr.previous);
-    setAbbreviationDisclosure("acuteAbbreviations", abbr.acute);
-    setAbbreviationDisclosure("switchAbbreviations", abbr.switch);
-    setAbbreviationDisclosure("nihrAbbreviations", abbr.nihr);
-
     const setText = (id, value) => {
       const el = document.getElementById(id);
       if (el) el.textContent = value;
@@ -2749,8 +2814,15 @@ arrest: [
 }
   
   document.addEventListener("click", function () {
-  window.requestAnimationFrame(setBodyMode);
+  window.requestAnimationFrame(() => {
+    setBodyMode();
+    updateContextualAbbreviations();
+  });
 });
+
+  document.addEventListener("toggle", function () {
+    window.requestAnimationFrame(updateContextualAbbreviations);
+  }, true);
   function showMainView(name) {
     Object.keys(views).forEach((key) => {
       if (views[key]) views[key].hidden = key !== name;
@@ -3277,7 +3349,7 @@ ${renderAcuteList(content.arrest)}
           </div>
         </header>
 
-        ${renderChangeAbbreviations(change)}
+        <div class="abbr-slot abbr-slot--change" id="changeAbbreviations"></div>
 
         <div class="change-detail__mode" role="group" aria-label="${escapeHtml(t("changes_mode_label"))}">
           <button
@@ -3344,6 +3416,7 @@ ${renderAcuteList(content.arrest)}
     changesList.innerHTML = renderChangeDetail(selected);
 
     attachChangeEvents();
+    updateContextualAbbreviations();
   }
 
   function renderAll() {
@@ -3356,6 +3429,7 @@ ${renderAcuteList(content.arrest)}
   renderTryptase();
   renderNihr();
   renderChanges();
+  updateContextualAbbreviations();
 }
 
   function refreshComputedModulesAfterLanguageChange() {
@@ -3369,6 +3443,7 @@ ${renderAcuteList(content.arrest)}
 
     renderNihr();
     renderChanges();
+    updateContextualAbbreviations();
   }
 
   function clearButtons(seg) {
@@ -3533,7 +3608,12 @@ if (stickyDisclaimer) {
 
   // Tryptase calculator
   const calcBtn = document.getElementById("calcTryptase");
-  if (calcBtn) calcBtn.addEventListener("click", calcTryptase);
+  if (calcBtn) {
+    calcBtn.addEventListener("click", () => {
+      calcTryptase();
+      updateContextualAbbreviations();
+    });
+  }
 
 
 
