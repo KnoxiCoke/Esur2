@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     nihrCmtype: null,
     nihrSeverity: null,
     nihrCulpritKnown: null,
-    acuteSeverity: "mild",   // mild | moderate | severe
-    acutePattern: "mild_general",
+    acuteSeverity: null,   // mild | moderate | severe
+    acutePattern: null,
     icm: null,
     gbca: null,
 
@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
       flow_subtitle: "Educational support for prior contrast media hypersensitivity reactions.",
       flow_step1: "Step 1 — Clinical situation",
       flow_step2: "Step 2 — Prior reaction severity",
+      select_situation_and_severity: "Select situation and severity",
+      select_situation: "Select situation",
+      select_severity: "Select severity",
+      select_dominant_pattern: "Select dominant reaction pattern",
       flow_severity_scope: "Previous immediate hypersensitivity reaction in adults (ACR classification).",
       flow_severity_mild_help: "Scattered urticaria/pruritus; limited cutaneous oedema; itchy/scratchy throat; nasal congestion; sneezing/conjunctivitis/rhinorrhoea.",
       flow_severity_moderate_help: "Diffuse urticaria/pruritus; diffuse erythema with stable vital signs; facial oedema without dyspnoea; throat tightness/hoarseness without dyspnoea; mild wheezing/bronchospasm.",
@@ -511,6 +515,10 @@ arrest: [
       flow_subtitle: "Didaktische Orientierung bei früheren Hypersensitivitätsreaktionen auf Kontrastmittel.",
       flow_step1: "Schritt 1 — Klinische Situation",
       flow_step2: "Schritt 2 — Schweregrad der früheren Reaktion",
+      select_situation_and_severity: "Situation und Schweregrad wählen",
+      select_situation: "Situation wählen",
+      select_severity: "Schweregrad wählen",
+      select_dominant_pattern: "Dominantes Reaktionsmuster wählen",
       flow_severity_scope: "Frühere unmittelbare Hypersensitivitätsreaktion bei Erwachsenen (ACR-Klassifikation).",
       flow_severity_mild_help: "Vereinzelte Urtikaria/Pruritus; begrenztes kutanes Ödem; Jucken/Kratzen im Hals; nasale Kongestion; Niesen/Konjunktivitis/Rhinorrhö.",
       flow_severity_moderate_help: "Diffuse Urtikaria/Pruritus; diffuses Erythem bei stabilen Vitalzeichen; Gesichtsödem ohne Dyspnoe; Engegefühl im Hals oder Heiserkeit, jeweils ohne Dyspnoe; mildes Giemen/milder Bronchospasmus.",
@@ -2407,8 +2415,11 @@ arrest: [
 
 
   const flowOutput = document.getElementById("flowOutput");
+  const flowPrompt = document.getElementById("flowPrompt");
   const flowSafety = document.getElementById("flowSafety");
   const acuteImmediateOutput = document.getElementById("acuteImmediateOutput");
+  const acutePatternCard = document.getElementById("acutePatternCard");
+  const acutePrompt = document.getElementById("acutePrompt");
   const acuteOutput = document.getElementById("acuteOutput");
   const switchOutput = document.getElementById("switchOutput");
   const tryptaseOutput = document.getElementById("tryptaseOutput");
@@ -2656,9 +2667,9 @@ arrest: [
 
 
   function defaultAcutePattern(severity) {
-    if (severity === "moderate") return "moderate_urticaria";
     if (severity === "severe") return "severe_anaphylaxis";
-    return "mild_general";
+    if (severity === "mild") return "mild_general";
+    return null;
   }
 
   function setSegment(seg, value) {
@@ -2687,6 +2698,12 @@ arrest: [
     const hasCaseSelection = Boolean(state.situation && state.reaction);
 
     if (outputCard) outputCard.hidden = !hasCaseSelection;
+    if (flowPrompt) {
+      flowPrompt.hidden = hasCaseSelection;
+      flowPrompt.textContent = t(!state.situation
+        ? (state.reaction ? "select_situation" : "select_situation_and_severity")
+        : "select_severity");
+    }
     if (!hasCaseSelection) {
       if (flowOutput) flowOutput.innerHTML = "";
       if (flowSafety) flowSafety.textContent = t("flow_safety");
@@ -2714,9 +2731,7 @@ arrest: [
 
   function renderAcuteManagement() {
     const contentByPattern = t("acute_content");
-    if (!contentByPattern[state.acutePattern]) {
-      state.acutePattern = defaultAcutePattern(state.acuteSeverity);
-    }
+    if (acutePatternCard) acutePatternCard.hidden = state.acuteSeverity !== "moderate";
 
     document.querySelectorAll('.seg__btn[data-seg="acuteSeverity"]').forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.value === state.acuteSeverity);
@@ -2742,6 +2757,18 @@ arrest: [
     if (!acuteOutput) return;
 
     const content = contentByPattern[state.acutePattern];
+    const outputCard = acuteOutput.closest(".card");
+    if (outputCard) outputCard.classList.toggle("is-pending", !content);
+    acuteOutput.hidden = !content;
+    if (acutePrompt) {
+      acutePrompt.hidden = Boolean(content);
+      acutePrompt.textContent = t(state.acuteSeverity === "moderate"
+        ? "select_dominant_pattern" : "select_severity");
+    }
+    if (!content) {
+      acuteOutput.innerHTML = "";
+      return;
+    }
     const warning = content.warning
       ? `<div><strong>${escapeHtml(t("acute_warning_label"))}:</strong> ${escapeHtml(content.warning)}</div>`
       : "";
@@ -3359,8 +3386,8 @@ ${renderAcuteList(content.arrest)}
     state.nihrCmtype = null;
     state.nihrSeverity = null;
     state.nihrCulpritKnown = null;
-    state.acuteSeverity = "mild";
-    state.acutePattern = "mild_general";
+    state.acuteSeverity = null;
+    state.acutePattern = null;
     state.icm = null;
     state.gbca = null;
 
@@ -3379,8 +3406,8 @@ ${renderAcuteList(content.arrest)}
       nihrCmtype: null,
       nihrSeverity: null,
       nihrCulpritKnown: null,
-      acuteSeverity: "mild",
-      acutePattern: "mild_general",
+      acuteSeverity: null,
+      acutePattern: null,
     };
 
     Object.keys(defaults).forEach((seg) => {

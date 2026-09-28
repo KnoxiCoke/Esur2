@@ -106,6 +106,7 @@
         <div class="card__title" data-i18n="safety_net">Safety note</div>
         <div class="output" id="flowSafety"></div>
       </div>
+      <div class="flow-placeholder" id="flowPrompt" role="status" aria-live="polite"></div>
     </section>
 
     <!-- HSR: ACUTE MANAGEMENT -->
@@ -125,10 +126,24 @@
       <div class="card">
         <div class="card__title" data-i18n="acute_severity_title">Severity selector</div>
         <div class="seg seg--stack">
-          <button class="seg__btn active" data-seg="acuteSeverity" data-value="mild" type="button" data-i18n="acute_severity_mild">Mild reactions</button>
+          <button class="seg__btn" data-seg="acuteSeverity" data-value="mild" type="button" data-i18n="acute_severity_mild">Mild reactions</button>
           <button class="seg__btn" data-seg="acuteSeverity" data-value="moderate" type="button" data-i18n="acute_severity_moderate">Moderate reactions</button>
           <button class="seg__btn" data-seg="acuteSeverity" data-value="severe" type="button" data-i18n="acute_severity_severe">Severe reactions</button>
         </div>
+      </div>
+
+      <div class="card" id="acutePatternCard" hidden>
+        <div class="card__title" data-i18n="acute_pattern_title">Dominant reaction pattern</div>
+        <div class="seg seg--stack" id="acutePatternOptions">
+          <button class="seg__btn" data-seg="acutePattern" data-value="mild_general" data-acute-severity="mild" type="button" data-i18n="acute_pattern_mild_general" hidden>Mild reactions</button>
+          <button class="seg__btn" data-seg="acutePattern" data-value="moderate_urticaria" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_urticaria" hidden>Diffuse urticaria / diffuse erythema</button>
+          <button class="seg__btn" data-seg="acutePattern" data-value="moderate_angioedema" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_angioedema" hidden>Facial edema without stridor</button>
+          <button class="seg__btn" data-seg="acutePattern" data-value="moderate_bronchospasm" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_bronchospasm" hidden>Mild bronchospasm</button>
+          <button class="seg__btn" data-seg="acutePattern" data-value="severe_anaphylaxis" data-acute-severity="severe" type="button" data-i18n="acute_pattern_severe_anaphylaxis" hidden>Anaphylactic reaction or stridor</button>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="flow-severity-hint acute-severity-hint" id="acuteSeverityHint">
           <div class="flow-severity-hint__scope" data-i18n="acute_severity_scope"></div>
           <div class="flow-severity-hint__row" data-level="mild">
@@ -146,19 +161,9 @@
         </div>
       </div>
 
-      <div class="card" id="acutePatternCard">
-        <div class="card__title" data-i18n="acute_pattern_title">Dominant reaction pattern</div>
-        <div class="seg seg--stack" id="acutePatternOptions">
-          <button class="seg__btn active" data-seg="acutePattern" data-value="mild_general" data-acute-severity="mild" type="button" data-i18n="acute_pattern_mild_general">Mild reactions</button>
-          <button class="seg__btn" data-seg="acutePattern" data-value="moderate_urticaria" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_urticaria" hidden>Diffuse urticaria / diffuse erythema</button>
-          <button class="seg__btn" data-seg="acutePattern" data-value="moderate_angioedema" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_angioedema" hidden>Facial edema without stridor</button>
-          <button class="seg__btn" data-seg="acutePattern" data-value="moderate_bronchospasm" data-acute-severity="moderate" type="button" data-i18n="acute_pattern_moderate_bronchospasm" hidden>Mild bronchospasm</button>
-          <button class="seg__btn" data-seg="acutePattern" data-value="severe_anaphylaxis" data-acute-severity="severe" type="button" data-i18n="acute_pattern_severe_anaphylaxis" hidden>Anaphylactic reaction or stridor</button>
-        </div>
-      </div>
-
       <div class="card card--output">
         <div class="card__title" data-i18n="acute_output_title">ESUR acute management</div>
+        <div class="acute-prompt" id="acutePrompt" role="status" aria-live="polite"></div>
         <div class="output" id="acuteOutput"></div>
       </div>
     </section>

@@ -1645,9 +1645,8 @@ body.emergency .flow-severity-hint__row.is-selected {
   margin-top: 2px;
 }
 
-/* Neutral output pane without touching script.js or adding medical logic. */
-#hsr-tab-guidance::before {
-  content: "Select situation and severity";
+/* State-aware guidance while one or both F02 choices are missing. */
+#hsr-tab-guidance > .flow-placeholder {
   grid-area: result;
   min-height: 360px;
   display: flex;
@@ -1662,14 +1661,6 @@ body.emergency .flow-severity-hint__row.is-selected {
   color: #8396a8;
   text-align: center;
   font-size: 14px;
-}
-
-html[lang="de"] #hsr-tab-guidance::before {
-  content: "Situation und Schweregrad wählen";
-}
-
-#hsr-tab-guidance:has(> .card--output:not([hidden]))::before {
-  display: none;
 }
 
 #hsr-tab-guidance > .card--output {
@@ -2053,7 +2044,7 @@ input {
     border-radius: 16px;
   }
 
-  #hsr-tab-guidance::before {
+  #hsr-tab-guidance > .flow-placeholder {
     min-height: 170px;
     margin-top: 10px;
     padding: 22px 18px;
@@ -2371,14 +2362,31 @@ input {
     "intro output"
     "immediate output"
     "severity output"
-    "pattern output";
+    "pattern output"
+    "reference output";
 }
 
 #hsr-tab-acute > .card:nth-child(1) { grid-area: intro; }
 #hsr-tab-acute > .card:nth-child(2) { grid-area: immediate; }
 #hsr-tab-acute > .card:nth-child(3) { grid-area: severity; }
 #hsr-tab-acute > .card:nth-child(4) { grid-area: pattern; }
-#hsr-tab-acute > .card:nth-child(5) { grid-area: output; }
+#hsr-tab-acute > .card:nth-child(5) { grid-area: reference; }
+#hsr-tab-acute > .card:nth-child(6) { grid-area: output; }
+
+#hsr-tab-acute > .card--output {
+  align-self: start;
+  min-height: 0;
+}
+
+#hsr-tab-acute > .card--output.is-pending > .card__title {
+  display: none;
+}
+
+#acutePrompt {
+  color: #8396a8;
+  text-align: center;
+  font-size: 14px;
+}
 
 #hsr-tab-acute > .card:nth-child(1) .card__title {
   color: #c8d5df;
@@ -2723,6 +2731,7 @@ html[lang="de"] #hsr-tab-nihr::before {
       "immediate"
       "severity"
       "pattern"
+      "reference"
       "output";
   }
 
