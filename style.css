@@ -2571,6 +2571,11 @@ input {
 #hsr-tab-nihr > .card:nth-child(6) { grid-area: danger; }
 #hsr-tab-nihr > .card:nth-child(7) { grid-area: output; }
 
+#hsr-tab-nihr > .card--output {
+  min-height: 0;
+  align-self: start;
+}
+
 #hsr-tab-nihr > .card:nth-child(3) .seg {
   display: flex;
   grid-template-columns: none;
@@ -2653,11 +2658,12 @@ input {
 #hsr-tab-nihr::before {
   content: "Select the required case details";
   grid-area: output;
-  min-height: 360px;
+  min-height: 0;
+  align-self: start;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 30px;
+  padding: 20px;
   border: 1px solid rgba(148, 176, 214, 0.14);
   border-radius: 16px;
   background:
