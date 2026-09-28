@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
       severe: "Severe",
 
       recommendation: "Recommendation",
-      safety_net: "Safety net",
+      safety_net: "Safety note",
       flow_safety:
         "Acute hypersensitivity reactions should be managed according to local protocols and ESUR acute management guidance.",
 
@@ -531,7 +531,7 @@ arrest: [
       severe: "Schwer",
 
       recommendation: "Empfehlung",
-      safety_net: "Safety net",
+      safety_net: "Sicherheitshinweis",
       flow_safety:
         "Akute Hypersensitivitätsreaktionen sollten gemäss lokalen Protokollen und der ESUR-Guidance zum Akutmanagement behandelt werden.",
 
