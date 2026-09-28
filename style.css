@@ -1609,9 +1609,6 @@ body.emergency #hsr-tab-guidance > .card:nth-child(3) .seg__btn.active {
 }
 
 .flow-severity-hint__row {
-  display: grid;
-  grid-template-columns: minmax(68px, auto) minmax(0, 1fr);
-  gap: 7px;
   padding: 6px 7px;
   border-left: 2px solid transparent;
   overflow-wrap: anywhere;
@@ -1632,12 +1629,20 @@ body.emergency .flow-severity-hint__row.is-selected {
 }
 
 .flow-severity-hint__label {
+  display: block;
+  margin-bottom: 4px;
   color: var(--text);
   font-weight: 800;
 }
 
-#acuteSeverityHint .flow-severity-hint__row {
-  grid-template-columns: minmax(86px, 100px) minmax(0, 1fr);
+.flow-severity-hint__items {
+  margin: 0;
+  padding-left: 17px;
+  list-style: disc;
+}
+
+.flow-severity-hint__items li + li {
+  margin-top: 2px;
 }
 
 /* Neutral output pane without touching script.js or adding medical logic. */
@@ -2429,9 +2434,8 @@ input {
 #hsr-tab-switch {
   grid-template-areas:
     "intro output"
-    "type output"
-    "agent output"
-    ". safety";
+    "type ."
+    "agent .";
 }
 
 #hsr-tab-switch > .card:nth-child(1) { grid-area: intro; }
@@ -2439,7 +2443,11 @@ input {
 #hsr-tab-switch > .card:nth-child(3),
 #hsr-tab-switch > .card:nth-child(4) { grid-area: agent; }
 #hsr-tab-switch > .card:nth-child(5) { grid-area: output; }
-#hsr-tab-switch > .card:nth-child(6) { grid-area: safety; }
+
+#hsr-tab-switch > .card--output {
+  min-height: 0;
+  align-self: start;
+}
 
 #hsr-tab-switch > .card:nth-child(2) .seg {
   display: flex;
@@ -2471,20 +2479,20 @@ input {
   font-weight: 650;
 }
 
-#hsr-tab-switch > .card:nth-child(6) {
-  margin-top: 14px;
+#hsr-tab-switch .switch-safety {
+  margin-top: 18px;
   padding: 14px 0 0;
   border-top: 1px solid var(--border);
   color: #7f91a2;
 }
 
-#hsr-tab-switch > .card:nth-child(6) .card__title {
+#hsr-tab-switch .switch-safety .card__title {
   color: #8da0b2;
   font-size: 10.5px;
   letter-spacing: 0.08em;
 }
 
-#hsr-tab-switch > .card:nth-child(6) .output {
+#hsr-tab-switch .switch-safety .output {
   color: #7f91a2;
   font-size: 11.5px;
   line-height: 1.5;
@@ -2586,6 +2594,10 @@ input {
   min-width: 0;
   flex: 1 1 120px;
   text-align: center;
+}
+
+#hsr-tab-nihr .seg__btn[data-seg="nihrCmtype"][data-value="unknown"] {
+  overflow-wrap: anywhere;
 }
 
 #hsr-tab-nihr > .card:nth-child(3) > .hint {
@@ -2713,8 +2725,7 @@ html[lang="de"] #hsr-tab-nihr::before {
       "intro"
       "type"
       "agent"
-      "output"
-      "safety";
+      "output";
   }
 
   #hsr-tab-tryptase {
@@ -2816,7 +2827,7 @@ html[lang="de"] #hsr-tab-nihr::before {
     rgba(10, 19, 32, 0.72);
 }
 
-#view-hsr #hsr-tab-switch > .card:nth-child(6),
+#view-hsr #hsr-tab-switch .switch-safety,
 #view-hsr #hsr-tab-nihr > .card:nth-child(2) {
   border-top: 1px solid var(--border);
 }

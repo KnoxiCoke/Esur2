@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
       HSG: "hysterosalpingography",
       EAACI: "European Association of Allergy & Clinical Immunology",
       ACR: "American College of Radiology",
+      "CA-AKI": "contrast-associated acute kidney injury",
       CPR: "cardiopulmonary resuscitation",
       PAD: "peripheral arterial disease",
       EVAR: "endovascular aneurysm repair"
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       HSG: "Hysterosalpingographie",
       EAACI: "European Association of Allergy & Clinical Immunology",
       ACR: "American College of Radiology",
+      "CA-AKI": "kontrastmittelassoziierte akute Nierenschädigung",
       CPR: "kardiopulmonale Reanimation",
       PAD: "peripheral arterial disease",
       EVAR: "endovascular aneurysm repair"

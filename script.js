@@ -3265,6 +3265,23 @@ ${renderAcuteList(content.arrest)}
     });
   }
 
+  // Segment the existing translated Medical strings only at their semicolon separators.
+  function renderSeverityHintItems() {
+    document.querySelectorAll('#flowSeverityHint [data-i18n$="_help"], #acuteSeverityHint [data-i18n$="_help"]').forEach((target) => {
+      const source = t(target.dataset.i18n);
+      const items = source.split("; ");
+      if (items.length < 2 || items.join("; ") !== source) return;
+      const list = document.createElement("ul");
+      list.className = "flow-severity-hint__items";
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+      target.replaceChildren(list);
+    });
+  }
+
   function renderAcuteSeverityHint() {
     document.querySelectorAll("#acuteSeverityHint .flow-severity-hint__row").forEach((row) => {
       row.classList.toggle("is-selected", row.dataset.level === state.acuteSeverity);
@@ -3275,6 +3292,7 @@ ${renderAcuteList(content.arrest)}
   setBodyMode();
 
   applyStaticTranslations();
+  renderSeverityHintItems();
   renderFlowSeverityHint();
   renderAcuteSeverityHint();
   renderNihrSeverityHint();

@@ -74,15 +74,15 @@
           <div class="flow-severity-hint__scope" data-i18n="flow_severity_scope"></div>
           <div class="flow-severity-hint__row" data-level="mild">
             <span class="flow-severity-hint__label" data-i18n="mild"></span>
-            <span data-i18n="flow_severity_mild_help"></span>
+            <div data-i18n="flow_severity_mild_help"></div>
           </div>
           <div class="flow-severity-hint__row" data-level="moderate">
             <span class="flow-severity-hint__label" data-i18n="moderate"></span>
-            <span data-i18n="flow_severity_moderate_help"></span>
+            <div data-i18n="flow_severity_moderate_help"></div>
           </div>
           <div class="flow-severity-hint__row" data-level="severe">
             <span class="flow-severity-hint__label" data-i18n="severe"></span>
-            <span data-i18n="flow_severity_severe_help"></span>
+            <div data-i18n="flow_severity_severe_help"></div>
           </div>
         </div>
       </div>
@@ -133,15 +133,15 @@
           <div class="flow-severity-hint__scope" data-i18n="acute_severity_scope"></div>
           <div class="flow-severity-hint__row" data-level="mild">
             <span class="flow-severity-hint__label" data-i18n="acute_severity_mild"></span>
-            <span data-i18n="acute_severity_mild_help"></span>
+            <div data-i18n="acute_severity_mild_help"></div>
           </div>
           <div class="flow-severity-hint__row" data-level="moderate">
             <span class="flow-severity-hint__label" data-i18n="acute_severity_moderate"></span>
-            <span data-i18n="acute_severity_moderate_help"></span>
+            <div data-i18n="acute_severity_moderate_help"></div>
           </div>
           <div class="flow-severity-hint__row" data-level="severe">
             <span class="flow-severity-hint__label" data-i18n="acute_severity_severe"></span>
-            <span data-i18n="acute_severity_severe_help"></span>
+            <div data-i18n="acute_severity_severe_help"></div>
           </div>
         </div>
       </div>
@@ -232,12 +232,11 @@
       <div class="card card--output">
         <div class="card__title" data-i18n="possible_alternatives">Possible alternatives</div>
         <div class="output" id="switchOutput"></div>
-      </div>
-
-      <div class="card card--subtle">
-        <div class="card__title" data-i18n="safety_note">Safety note</div>
-        <div class="output" id="switchSafety" data-i18n="switch_safety_note">
-          This switch overview is optional and based on a non-validated classification and practical experience. The CMSC cannot make evidence-based recommendations on a robust scientific basis for change to an alternative contrast agent based on practical experience. Cross-reactivity cannot be predicted on the basis of the chemical structure. The best option is to choose an alternative based on the results of an allergy evaluation.
+        <div class="switch-safety">
+          <div class="card__title" data-i18n="safety_note">Safety note</div>
+          <div class="output" id="switchSafety" data-i18n="switch_safety_note">
+            This switch overview is optional and based on a non-validated classification and practical experience. The CMSC cannot make evidence-based recommendations on a robust scientific basis for change to an alternative contrast agent based on practical experience. Cross-reactivity cannot be predicted on the basis of the chemical structure. The best option is to choose an alternative based on the results of an allergy evaluation.
+          </div>
         </div>
       </div>
     </section>
