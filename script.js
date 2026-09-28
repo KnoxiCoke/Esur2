@@ -2595,8 +2595,14 @@ arrest: [
 
     const baseline = document.getElementById("baseline");
     const acute = document.getElementById("acute");
-    if (baseline) baseline.placeholder = `${t("tryptase_baseline")} (ng/mL)`;
-    if (acute) acute.placeholder = `${t("tryptase_acute")} (ng/mL)`;
+    if (baseline) {
+      baseline.placeholder = `${t("tryptase_baseline")} (ng/mL)`;
+      baseline.setAttribute("aria-label", `${t("tryptase_baseline")} in ng/mL`);
+    }
+    if (acute) {
+      acute.placeholder = `${t("tryptase_acute")} (ng/mL)`;
+      acute.setAttribute("aria-label", `${t("tryptase_acute")} in ng/mL`);
+    }
 
     if (changesSearchInput && changesSearchInput.value !== state.changesSearch) {
       changesSearchInput.value = state.changesSearch;
@@ -2828,12 +2834,18 @@ ${renderAcuteList(content.arrest)}
 
   function renderTryptase() {
     if (!tryptaseOutput) return;
-    if (!tryptaseOutput.dataset.ready) {
-      tryptaseOutput.innerHTML = `
-        <div class="hint">${escapeHtml(t("tryptase_default"))}</div>
-        <div class="hint" style="margin-top:10px">${escapeHtml(t("tryptase_formula"))}</div>
-      `;
+    if (tryptaseOutput.dataset.state === "result") {
+      calcTryptase();
+      return;
     }
+    if (tryptaseOutput.dataset.state === "invalid") {
+      tryptaseOutput.innerHTML = `<div class="hint">${escapeHtml(t("tryptase_invalid"))}</div>`;
+      return;
+    }
+    tryptaseOutput.innerHTML = `
+      <div class="hint">${escapeHtml(t("tryptase_default"))}</div>
+      <div class="hint" style="margin-top:10px">${escapeHtml(t("tryptase_formula"))}</div>
+    `;
   }
 
   function calcTryptase() {
@@ -2843,7 +2855,8 @@ ${renderAcuteList(content.arrest)}
     const acuteRaw = document.getElementById("acute")?.value?.trim() ?? "";
 
     if (baselineRaw === "" || acuteRaw === "") {
-      tryptaseOutput.innerHTML = `<div class="hint">${escapeHtml(t("tryptase_invalid"))}</div>`;
+      tryptaseOutput.dataset.state = "invalid";
+      renderTryptase();
       return;
     }
 
@@ -2851,7 +2864,8 @@ ${renderAcuteList(content.arrest)}
     const acute = Number(acuteRaw);
 
     if (!Number.isFinite(baseline) || !Number.isFinite(acute) || baseline < 0 || acute < 0) {
-      tryptaseOutput.innerHTML = `<div class="hint">${escapeHtml(t("tryptase_invalid"))}</div>`;
+      tryptaseOutput.dataset.state = "invalid";
+      renderTryptase();
       return;
     }
 
@@ -2867,7 +2881,7 @@ ${renderAcuteList(content.arrest)}
       <div class="hint" style="margin-top:10px">${escapeHtml(t("tryptase_note"))}</div>
     `;
 
-    tryptaseOutput.dataset.ready = "1";
+    tryptaseOutput.dataset.state = "result";
   }
 
   function renderNihr() {
@@ -3176,13 +3190,15 @@ ${renderAcuteList(content.arrest)}
     }
   }
 
-  function attachChangeEvents() {
-    document.querySelectorAll("[data-change-topic]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        state.selectedChangeId = btn.dataset.changeTopic;
-        renderChanges();
+  function attachChangeEvents(attachTopics = true) {
+    if (attachTopics) {
+      changesSummaryGrid.querySelectorAll("[data-change-topic]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.selectedChangeId = btn.dataset.changeTopic;
+          renderChanges({ preserveTopics: true });
+        });
       });
-    });
+    }
 
     document.querySelectorAll("[data-change-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -3192,7 +3208,7 @@ ${renderAcuteList(content.arrest)}
     });
   }
 
-  function renderChanges() {
+  function renderChanges({ preserveTopics = false } = {}) {
     if (!changesSummaryGrid || !changesList) return;
 
     updateChangeControlButtons();
@@ -3211,10 +3227,20 @@ ${renderAcuteList(content.arrest)}
 
     const selected = visible.find((change) => change.id === state.selectedChangeId) || visible[0];
 
-    changesSummaryGrid.innerHTML = visible.map(renderChangeTopic).join("");
+    const keepTopics = preserveTopics && changesSummaryGrid.children.length === visible.length &&
+      visible.every((change, index) => changesSummaryGrid.children[index].dataset.changeTopic === change.id);
+    if (keepTopics) {
+      changesSummaryGrid.querySelectorAll("[data-change-topic]").forEach((btn) => {
+        const isSelected = btn.dataset.changeTopic === state.selectedChangeId;
+        btn.classList.toggle("active", isSelected);
+        btn.setAttribute("aria-current", isSelected ? "true" : "false");
+      });
+    } else {
+      changesSummaryGrid.innerHTML = visible.map(renderChangeTopic).join("");
+    }
     changesList.innerHTML = renderChangeDetail(selected);
 
-    attachChangeEvents();
+    attachChangeEvents(!keepTopics);
   }
 
   // Split only the existing translated hint for display; keep every source character.
@@ -3389,7 +3415,7 @@ ${renderAcuteList(content.arrest)}
     document.querySelectorAll(".nihr-check").forEach((el) => (el.checked = false));
 
     if (tryptaseOutput) {
-      delete tryptaseOutput.dataset.ready;
+      delete tryptaseOutput.dataset.state;
       tryptaseOutput.innerHTML = "";
     }
 
@@ -3401,19 +3427,33 @@ ${renderAcuteList(content.arrest)}
 const stickyDisclaimer = document.getElementById("stickyDisclaimer");
 
 if (stickyDisclaimer) {
-  stickyDisclaimer.setAttribute("role", "button");
-  stickyDisclaimer.setAttribute("tabindex", "0");
-  stickyDisclaimer.setAttribute("aria-expanded", "false");
+  const mobileDisclaimer = window.matchMedia("(max-width: 768px)");
+
+  const syncDisclaimerInteraction = () => {
+    if (mobileDisclaimer.matches) {
+      stickyDisclaimer.setAttribute("role", "button");
+      stickyDisclaimer.setAttribute("tabindex", "0");
+      stickyDisclaimer.setAttribute("aria-expanded", stickyDisclaimer.classList.contains("is-open") ? "true" : "false");
+    } else {
+      stickyDisclaimer.classList.remove("is-open");
+      stickyDisclaimer.removeAttribute("role");
+      stickyDisclaimer.removeAttribute("tabindex");
+      stickyDisclaimer.removeAttribute("aria-expanded");
+    }
+  };
 
   const toggleDisclaimer = () => {
+    if (!mobileDisclaimer.matches) return;
     const isOpen = stickyDisclaimer.classList.toggle("is-open");
     stickyDisclaimer.setAttribute("aria-expanded", isOpen ? "true" : "false");
   };
 
+  mobileDisclaimer.addEventListener("change", syncDisclaimerInteraction);
+  syncDisclaimerInteraction();
   stickyDisclaimer.addEventListener("click", toggleDisclaimer);
 
   stickyDisclaimer.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
+    if (mobileDisclaimer.matches && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
       toggleDisclaimer();
     }
