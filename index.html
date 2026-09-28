@@ -170,19 +170,15 @@
 
     <!-- HSR: SWITCH -->
     <section class="subview" id="hsr-tab-switch" hidden>
-      <div class="card card--subtle">
-        <div class="output hint" id="switchNonvalidated"></div>
-      </div>
-
-      <div class="card">
+      <div class="card switch-type">
         <div class="card__title" data-i18n="contrast_type">Contrast type</div>
         <div class="seg">
-          <button class="seg__btn active" data-seg="cmtype" data-value="icm" type="button" data-i18n="icm_ct">ICM (CT)</button>
+          <button class="seg__btn" data-seg="cmtype" data-value="icm" type="button" data-i18n="icm_ct">ICM (CT)</button>
           <button class="seg__btn" data-seg="cmtype" data-value="gbca" type="button" data-i18n="gbca_mri">GBCA (MRI)</button>
         </div>
       </div>
 
-      <div class="card" id="icmCard">
+      <div class="card" id="icmCard" hidden>
         <div class="card__title" data-i18n="icm_title">ICM (iodine-based)</div>
         <div class="hint" id="icmHint"></div>
 
@@ -208,6 +204,7 @@
             <div class="small" data-i18n="icm_unknown_hint">Use when the involved ICM is not known.</div>
           </button>
         </div>
+        <div class="hint switch-brand-note" data-i18n="switch_brand_governance"></div>
       </div>
 
       <div class="card" id="gbcaCard" hidden>
@@ -232,6 +229,7 @@
             <div class="small" data-i18n="gbca_unknown_hint">Use when the involved GBCA is not known.</div>
           </button>
         </div>
+        <div class="hint switch-brand-note" data-i18n="switch_brand_governance"></div>
       </div>
 
       <div class="card card--output">

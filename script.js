@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // HSR
     situation: null,
     reaction: null,          // mild | moderate | severe
-    cmtype: "icm",
+    cmtype: null,
     nihrCmtype: null,
     nihrSeverity: null,
     nihrCulpritKnown: null,
@@ -406,8 +406,9 @@ arrest: [
         ]
       },
 
-      switch_placeholder_icm: "Select the involved ICM group above.",
-      switch_placeholder_gbca: "Select the involved GBCA group above.",
+      switch_placeholder_type: "Select contrast type",
+      switch_placeholder_icm: "Select ICM group",
+      switch_placeholder_gbca: "Select GBCA group",
 
       icm_rules: {
         A: {
@@ -872,8 +873,9 @@ arrest: [
         ]
       },
 
-      switch_placeholder_icm: "Bitte oben die beteiligte ICM-Gruppe auswählen.",
-      switch_placeholder_gbca: "Bitte oben die beteiligte GBCA-Gruppe auswählen.",
+      switch_placeholder_type: "Kontrastmitteltyp wählen",
+      switch_placeholder_icm: "ICM-Gruppe wählen",
+      switch_placeholder_gbca: "GBCA-Gruppe wählen",
 
       icm_rules: {
         A: {
@@ -2673,6 +2675,12 @@ arrest: [
   }
 
   function setSegment(seg, value) {
+    if (seg === "cmtype" && state.cmtype !== value) {
+      state.icm = null;
+      state.gbca = null;
+      clearButtons("icm");
+      clearButtons("gbca");
+    }
     state[seg] = value;
 
     if (seg === "acuteSeverity") {
@@ -2807,23 +2815,28 @@ ${renderAcuteList(content.arrest)}
 
   function fillSwitchPrinciples() {
     const items = [
-      t("switch_status_optional"),
-      t("switch_cmsc"),
-      t("switch_cr_structure"),
-      t("switch_cr_frequency"),
-      t("switch_best_option")
+      "switch_status_optional",
+      "switch_cmsc",
+      "switch_cr_structure",
+      "switch_cr_frequency",
+      "switch_best_option"
     ];
-    const html =
-      `<ul>${items.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>` +
-      `<div class="hint">${escapeHtml(t("switch_brand_governance"))}</div>`;
-    const top = document.getElementById("switchNonvalidated");
     const safety = document.getElementById("switchSafety");
-    if (top) top.innerHTML = html;
-    if (safety) safety.innerHTML = html;
+    if (safety) safety.innerHTML = `<ul>${items.map((key) => {
+      const line = escapeHtml(t(key));
+      return `<li>${key === "switch_best_option" ? `<strong>${line}</strong>` : line}</li>`;
+    }).join("")}</ul>`;
   }
 
   function renderSwitch() {
     if (!switchOutput) return;
+
+    if (!state.cmtype) {
+      if (icmCard) icmCard.hidden = true;
+      if (gbcaCard) gbcaCard.hidden = true;
+      switchOutput.innerHTML = `<div class="hint">${escapeHtml(t("switch_placeholder_type"))}</div>`;
+      return;
+    }
 
     if (state.cmtype === "icm") {
       if (icmCard) icmCard.hidden = false;
@@ -3382,7 +3395,7 @@ ${renderAcuteList(content.arrest)}
 
     state.situation = null;
     state.reaction = null;
-    state.cmtype = "icm";
+    state.cmtype = null;
     state.nihrCmtype = null;
     state.nihrSeverity = null;
     state.nihrCulpritKnown = null;
@@ -3402,7 +3415,7 @@ ${renderAcuteList(content.arrest)}
     const defaults = {
       situation: null,
       reaction: null,
-      cmtype: "icm",
+      cmtype: null,
       nihrCmtype: null,
       nihrSeverity: null,
       nihrCulpritKnown: null,

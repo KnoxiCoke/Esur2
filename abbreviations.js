@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
       EAACI: "European Association of Allergy & Clinical Immunology",
       ACR: "American College of Radiology",
       "CA-AKI": "contrast-associated acute kidney injury",
+      "PC-AKI": "post-contrast acute kidney injury",
       CPR: "cardiopulmonary resuscitation",
       PAD: "peripheral arterial disease",
       EVAR: "endovascular aneurysm repair"
@@ -33,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       EAACI: "European Association of Allergy & Clinical Immunology",
       ACR: "American College of Radiology",
       "CA-AKI": "kontrastmittelassoziierte akute Nierenschädigung",
+      "PC-AKI": "Kontrastmittel-assoziierte akute Nierenschädigung",
       CPR: "kardiopulmonale Reanimation",
       PAD: "peripheral arterial disease",
       EVAR: "endovascular aneurysm repair"

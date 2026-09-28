@@ -2440,29 +2440,28 @@ input {
 
 /* Switch: selection left, alternative output right, safety subordinate */
 #hsr-tab-switch {
+  grid-template-rows: auto 1fr;
   grid-template-areas:
-    "intro output"
-    "type ."
-    "agent .";
+    "type output"
+    "agent output";
 }
 
-#hsr-tab-switch > .card:nth-child(1) { grid-area: intro; }
-#hsr-tab-switch > .card:nth-child(2) { grid-area: type; }
-#hsr-tab-switch > .card:nth-child(3),
-#hsr-tab-switch > .card:nth-child(4) { grid-area: agent; }
-#hsr-tab-switch > .card:nth-child(5) { grid-area: output; }
+#hsr-tab-switch > .switch-type { grid-area: type; }
+#hsr-tab-switch > #icmCard,
+#hsr-tab-switch > #gbcaCard { grid-area: agent; }
+#hsr-tab-switch > .card--output { grid-area: output; }
 
 #hsr-tab-switch > .card--output {
   min-height: 0;
   align-self: start;
 }
 
-#hsr-tab-switch > .card:nth-child(2) .seg {
+#hsr-tab-switch > .switch-type .seg {
   display: flex;
   grid-template-columns: none;
 }
 
-#hsr-tab-switch > .card:nth-child(2) .seg__btn {
+#hsr-tab-switch > .switch-type .seg__btn {
   min-width: 0;
   flex: 1 1 0;
   text-align: center;
@@ -2492,6 +2491,10 @@ input {
   padding: 14px 0 0;
   border-top: 1px solid var(--border);
   color: #7f91a2;
+}
+
+#hsr-tab-switch .switch-brand-note {
+  margin-top: 14px;
 }
 
 #hsr-tab-switch .switch-safety .card__title {
@@ -2736,8 +2739,8 @@ html[lang="de"] #hsr-tab-nihr::before {
   }
 
   #hsr-tab-switch {
+    grid-template-rows: auto;
     grid-template-areas:
-      "intro"
       "type"
       "agent"
       "output";
